@@ -193,6 +193,142 @@ pre {
   margin-top: 2rem;
 }
 
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---- the songlist (#11) ---- */
+
+main.wide {
+  max-width: 64rem;
+}
+
+.song-summary {
+  color: var(--muted);
+}
+
+.song-search {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+}
+
+.song-query-label,
+.choices legend {
+  font-weight: 700;
+}
+
+.song-search input[type="search"] {
+  width: 100%;
+  min-height: 2.75rem;
+  margin-top: -0.5rem;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid var(--text);
+  border-radius: 0;
+  font: inherit;
+}
+
+.choices {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choices legend {
+  margin-bottom: 0.5rem;
+  padding: 0;
+}
+
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.75rem;
+  border: 2px solid var(--text);
+  cursor: pointer;
+}
+
+.choice:has(input:checked) {
+  background: var(--text);
+  color: var(--bg);
+}
+
+.choice:has(input:focus-visible) {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.song-count {
+  margin: 0 0 0.5rem;
+  color: var(--muted);
+}
+
+.songs {
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--line);
+  list-style: none;
+}
+
+.songs li {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid var(--line);
+  overflow-wrap: break-word;
+}
+
+.song-artist {
+  font-weight: 700;
+}
+
+.song-album {
+  display: block;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.songs-head {
+  display: none;
+}
+
+@media (min-width: 48rem) {
+  .songs li,
+  .songs-head {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr 1fr;
+    gap: 1rem;
+  }
+
+  .songs-head {
+    padding: 0.5rem 0;
+    border-bottom: 2px solid var(--text);
+    font-weight: 700;
+  }
+
+  .songs {
+    border-top: 0;
+  }
+
+  .song-sep {
+    display: none;
+  }
+
+  .song-album {
+    font-size: inherit;
+  }
+}
+
 /* ---- footer ---- */
 
 .site-footer {

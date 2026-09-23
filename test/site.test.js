@@ -39,7 +39,7 @@ describe('sitePath', () => {
 });
 
 describe('views', () => {
-  const index = buildIndex(FIXTURE);
+  const index = buildIndex(FIXTURE, { git: false });
 
   it('writes dates out in English', () => {
     assert.equal(formatDate('2025-12-27'), 'December 27, 2025');
@@ -78,9 +78,10 @@ describe('views', () => {
 
 describe('buildIndex', () => {
   it('lists every page and post with its front matter', () => {
-    assert.deepEqual(buildIndex(FIXTURE), {
+    assert.deepEqual(buildIndex(FIXTURE, { git: false }), {
       pages: [{ name: 'about', title: 'About', date: '2013-09-15', updated: '2021-11-13' }],
       posts: [{ name: '2026-01-02-first-post', title: 'First post: an example', date: '2026-01-02', updated: null }],
+      songlist: { updated: null },
     });
   });
 });
