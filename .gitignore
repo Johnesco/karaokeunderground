@@ -6,10 +6,15 @@
 # Claude Code local state (settings.local.json, launch.json, worktrees) — never commit
 .claude/
 
+# Local copy of the live site (#6). It's the owner's content, and this repo is public — never commit it
+/snapshot/
+/snapshot.partial/
+
 # Windows artifact: a stray `> nul` in Git Bash writes a literal file named nul
 nul
 
 # Dependencies and build output
+__pycache__/
 node_modules/
 dist/
 build/

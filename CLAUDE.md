@@ -53,9 +53,11 @@ karaokeunderground/
 │   └── legacy-site/
 │       ├── audit.md               # What the old site has and does (spike #1)
 │       └── urls.csv               # Every known legacy URL; becomes the redirect map
-└── scripts/
-    ├── setup-labels.sh            # Vendored: creates the label taxonomy
-    └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
+├── scripts/
+│   ├── setup-labels.sh            # Vendored: creates the label taxonomy
+│   ├── snapshot-content.py        # Ours: pulls a local copy of the live site into snapshot/ (#6)
+│   └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
+└── snapshot/                      # Gitignored, local only: the owner's content. Never commit it
 ```
 
 > Update this section as the project grows. Claude uses it to navigate the codebase.
@@ -158,6 +160,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Pulled a local copy of the live site (#6): `scripts/snapshot-content.py` writes a gitignored `snapshot/` with clean content and a reference copy
 - **2026-09-23**: Recorded that this is a revamp for the owner, offered as a replacement for the current site (#5)
 - **2026-09-23**: Audited the legacy site (#1): [`docs/legacy-site/`](docs/legacy-site/audit.md)
 - **2026-09-23**: Kickoff. Adopted sdlc-baseline (`core`) and created the repo, labels and board #7. Opened discovery spikes #1 (site audit) and #2 (stack → ADR-001)
