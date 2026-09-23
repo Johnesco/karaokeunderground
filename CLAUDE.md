@@ -25,14 +25,14 @@ The owner has to be able to take it over: the stack runs in accounts they contro
 
 **Stack: decided in [ADR-001](docs/adr/001-static-netlify-core-files.md)** (spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)). It's a static site on Netlify's free plan, with the same pattern as the Austin Karaoke Directory:
 
-- **Core files:** everything that changes lives in one `content/` folder: `songlist.csv`, `shows.csv`, page text and posts as Markdown, and images. Updating the site means replacing or editing a file there on GitHub
+- **Core files:** everything that changes lives in one `content/` folder: `songlist.csv`, page text and posts as Markdown, and images, in the formats [ADR-002](docs/adr/002-core-file-formats.md) sets. The shows join them once we decide how events get updated. Updating the site means replacing or editing a file there on GitHub
 - **The browser reads them.** The site's JavaScript fetches the core files and renders the songlist with its search, the shows and the pages
 - **Checked before every deploy.** A dependency-free Node script validates the core files and writes derived files such as `_redirects`. A failed check stops the deploy, so the live site keeps its last good version
 - **Netlify also provides the contact form and the 301s.** Netlify Forms handles the form, and `_redirects` sends old query-string URLs to their new pages
 - **Code and content live apart until the owner agrees.** Code is in this public repo, the core files in the private content repo, and the Netlify build combines them
 - **An owner login comes later.** A git-based editor, such as TinaCMS or Decap, edits the same files
 - **Watch the credits.** The free plan gives 300 credits a month: 15 per production deploy, 20 per GB of traffic. When they run out, every site on the account is paused. Batch content updates, and develop on deploy previews, which are free
-- **Local for now.** The site is built and previewed on John's machine, reading the core files from `work/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
+- **Local for now.** The site is built and previewed on John's machine, reading the core files from `work/content/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
 
 ### The current site
 
@@ -53,6 +53,7 @@ karaokeunderground/
 ├── CLAUDE.md                      # THIS FILE
 ├── README.md                      # Public documentation
 ├── CHANGELOG.md                   # Keep a Changelog; entries accrue as issues close
+├── package.json                   # npm test, the gate, and the version. No dependencies
 ├── .gitattributes                 # LF everywhere: vendored scripts break on CRLF
 ├── .github/                       # Vendored from sdlc-baseline. Never hand-edit;
 │   ├── ISSUE_TEMPLATE/            #   refresh with scripts/sync-github-templates.sh
@@ -60,7 +61,8 @@ karaokeunderground/
 ├── docs/
 │   ├── adr/
 │   │   ├── README.md              # ADR index
-│   │   └── 001-static-netlify-core-files.md   # The stack: static on Netlify, core files read in the browser
+│   │   ├── 001-static-netlify-core-files.md   # The stack: static on Netlify, core files read in the browser
+│   │   └── 002-core-file-formats.md           # The formats of the core files (#10)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -68,34 +70,51 @@ karaokeunderground/
 │   └── research/
 │       └── stack-and-hosting.md   # The sourced findings behind ADR-001 (spike #2)
 ├── scripts/
+│   ├── check-content.js           # Ours: the content check, which npm test runs (#10)
+│   ├── lib/                       # Its parts. csv.js, front-matter.js and songlist.js use no Node APIs, so the site can share them
+│   ├── convert-working-copy.py    # Ours, one-off: turned the working copy into the core files (#10)
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
 │   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
 │   └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
+├── test/                          # Unit tests for node --test. fixtures/content/ is a made-up example of the core files
 ├── snapshot/                      # Gitignored: the 2026-09-23 snapshot, frozen read-only. Later ones go in snapshots/
-└── work/                          # Gitignored: the content working copy. Its own repo, pushed to a private one
+└── work/                          # Gitignored: the content working copy, its own repo pushed to a private one. The core files are in work/content/
 ```
 
 > Update this section as the project grows. Claude uses it to navigate the codebase.
 
 ## Key Technical Patterns
 
-From [ADR-001](docs/adr/001-static-netlify-core-files.md); the first build tickets will add detail:
+From [ADR-001](docs/adr/001-static-netlify-core-files.md) and [ADR-002](docs/adr/002-core-file-formats.md):
 
 - **The core files are the only source.** Nothing that changes is typed into HTML or JavaScript. It comes from `content/`
 - **Nothing reaches production unchecked.** The deploy-time Node check is the safety net for uploads made in GitHub's web editor, which bypass the local gate
-- **Plain Node for tooling,** with no dependencies where possible, like the directory's build scripts
+- **Plain Node for tooling,** with no dependencies where possible, like the directory's build scripts. ES modules throughout (`"type": "module"`)
+- **The check and the site share their parsers.** `scripts/lib/csv.js`, `front-matter.js` and `songlist.js` use no Node APIs, so the browser runs the same code the check tested. #11 can move them to where the site loads them
+- **Errors and warnings.** The check fails on an error: something that would break the site, lose content or publish something it shouldn't. A warning is worth a look but doesn't stop anything
+- **No HTML in the content.** The check rejects HTML in pages and posts, and the renderer still escapes it, because uploads can bypass the local gate
 
 ## Data Formats
 
-**Planned, per ADR-001:** `content/songlist.csv` and `content/shows.csv`, page text and posts as Markdown, and images, all in `content/`. The exact columns and front-matter fields get settled in the ticket that converts the working copy. Until then, `work/` uses the snapshot's formats:
+**Decided in [ADR-002](docs/adr/002-core-file-formats.md).** The core files are in `work/content/`, in the private content repo, until the owner agrees. [`scripts/lib/check-content.js`](scripts/lib/check-content.js) enforces every rule here, and `test/fixtures/content/` is a small made-up example of each file.
 
-- `songlist.csv`: `Artist,Title,Album`. Solo artists are filed "Last, First", and covers are written as "Title (by Original Artist)"
-- `themed-songlists.csv`: `post_id,post_title,rank,artist,title,album,note`, one row per song across the 8 themed lists
-- `shows.json`: `homepage` and `calendar` lists of `{date, weekday, venue, details, link, text}`. The site gives no years, so each `date` is inferred
+- **All text is UTF-8.** The byte-order mark that Excel's "CSV UTF-8" adds is fine
+- **`songlist.csv`:** the first row names the five columns, `Artist,Title,Album,Themes,Tags`, in any order
+  - Artist and Title are required, and Album can be blank. Solo artists are filed "Last, First", and covers are "Title (by Original Artist)"
+  - Themes and Tags can be blank, or hold several values separated by semicolons: `sad; scary`. Themes are the themed lists (`sad` and `scary` so far). Tags are categories for browsing, all empty so far
+  - Every song is on the main list. The theme `unlisted` takes a song off every list, themed ones included, until the word is removed
+  - No other columns, because everything in the file is public once deployed. At least 1,000 songs, so a cut-off or filtered export can't replace the list
+- **`pages/<slug>.md`, `posts/<YYYY-MM-DD>-<slug>.md`:** plain Markdown (CommonMark, plus `~~strikethrough~~`) with no HTML. A line break inside a paragraph is a backslash at the end of the line
+  - Front matter between two `---` lines: `title` (required), `date` (required for posts, and the same as the file name's), `updated`, and `old_url`, the legacy address without the domain, in the same form as `urls.csv` (`/?p=835`). A value with `: ` or ` #` in it goes in double quotes, and the converted files quote every title
+  - Links to other pages and posts point at their `.md` files, and images use paths from the file: `![Alt text](../images/2014/04/poster.jpg)`. Links are checked exactly, upper and lower case included, because the web host is case-sensitive
+- **`images/`:** WordPress's year/month folders, plus `site/` for the logo and icons. jpg, jpeg, png, gif or webp
+- **The shows wait.** `work/shows.json` stays as the snapshot wrote it (`homepage` and `calendar` lists of `{date, weekday, venue, details, link, text}`, with each year inferred) until we decide how events get updated
 
 ## Testing
 
-**Local gate:** `npm test` ([ADR-001](docs/adr/001-static-netlify-core-files.md)). It must pass before any release tag, and it's deterministic: no network, and it builds and checks from local files only. The scaffold ticket defines what it runs.
+**Local gate:** `npm test` ([ADR-001](docs/adr/001-static-netlify-core-files.md)). It runs the unit tests in `test/` with `node --test`, then `scripts/check-content.js` on `work/content/`. It must pass before any release tag, and it's deterministic: local files only, with no network and no clock, so a show in the past is never an error. It needs the private content in `work/`, and says so when it's missing.
+
+- `npm run check` runs the content check alone, and `node scripts/check-content.js <folder>` checks any other content folder
 
 ## Releases
 
@@ -179,6 +198,7 @@ None yet. Create the first once discovery (#1, #2) shows the shape of the build.
 ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr/README.md)). Format, stub and threshold rule: [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md).
 
 - [ADR-001](docs/adr/001-static-netlify-core-files.md): a static site on Netlify that reads its core files in the browser. *Accepted* 2026-09-23 (spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)); revisit after the owner interview, [#3](https://github.com/Johnesco/karaokeunderground/issues/3)
+- [ADR-002](docs/adr/002-core-file-formats.md): the formats of the core files, including the Themes and Tags columns and plain Markdown. *Accepted* 2026-09-23 ([#10](https://github.com/Johnesco/karaokeunderground/issues/10)); the shows wait for the decision on events
 
 ### The diary
 
@@ -192,6 +212,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Converted the working copy into the core files (#10). [ADR-002](docs/adr/002-core-file-formats.md) sets their formats, and `npm test` checks them
 - **2026-09-23**: Chose the stack (#2): [ADR-001](docs/adr/001-static-netlify-core-files.md), a static site on Netlify that reads its core files in the browser
 - **2026-09-23**: Started the revamp diary for the portfolio (#8): [`docs/diary.md`](docs/diary.md)
 - **2026-09-23**: Froze the snapshot and started the content working copy in `work/`, a private repo (#7)

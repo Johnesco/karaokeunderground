@@ -26,7 +26,8 @@ Every entry is tagged:
 | 2026-09-23 | [Our own copy of the site](#2026-09-23--taking-our-own-copy) ([#6]) |
 | 2026-09-23 | [The copy frozen, and a working copy started](#2026-09-23--frozen-copy-working-copy) ([#7]) |
 | 2026-09-23 | [The stack chosen: ADR-001](#2026-09-23--choosing-the-stack) ([#2]) |
-| Next | The site scaffolded, with the first core files in place |
+| 2026-09-23 | [The content converted into core files, with a check to guard them](#2026-09-23--the-core-files) ([#10]) |
+| Next | The site scaffolded, starting with the songlist page ([#11]) |
 | Later | A preview ready to show |
 | Later | Presented to the owner |
 
@@ -179,6 +180,38 @@ Five build tickets came out of it:
 - redirects for every old URL ([#14])
 
 Netlify stays the plan, but for now everything is built and previewed on John's machine.
+
+### 2026-09-23 · The core files
+
+**Milestone · Decision · Finding** · [#10] · [ADR-002](adr/002-core-file-formats.md) · [the converter](../scripts/convert-working-copy.py) · [the check](../scripts/lib/check-content.js)
+
+ADR-001 said that everything that changes would live in a few core files. This step decided what exactly those files look like, converted the working copy into them, and started the gate that checks them.
+
+**The decisions.** Claude proposed the formats, and John decided four questions:
+
+- **Themed lists become columns.** The audit had suggested a theme tag on each song, so that December's SAD SONGS ONLY list stops being copied by hand. John took the idea further. The songlist gets two new columns: Themes, for the themed lists a song is on, and Tags, for categories to browse by. Each can hold several values. One special theme, `unlisted`, takes a song off every list without deleting it. Claude added two refinements: semicolons between values, so a cell never needs CSV quotes, and a check that refuses an export without the new columns, so hidden songs can't silently come back.
+- **Plain Markdown, with no HTML.** Pages and posts can't carry raw HTML, so the site can escape everything, and a third-party player appears only if the site adds it on purpose. The 9 YouTube players and one Instagram embed became links.
+- **Images keep WordPress's year/month folders,** so one redirect rule will cover old links to them.
+- **The shows wait.** How events get updated isn't decided yet. So the shows stay as the snapshot found them, and the homepage and calendar ticket ([#12]) waits with them.
+
+**The conversion.** A small script, standard library only, converted everything in one pass: 1,853 songs, 6 pages, 46 posts and 57 images. It stops at anything it has no rule for. It removes the old files only after checking that every song, image and link came across, and that each page and post reads word for word as before.
+
+A second, stricter check went further. It rendered all 52 Markdown files with a real Markdown parser and compared them with the original HTML, character by character. That covered every bold, italic and struck-through character, all 2,641 line breaks, every link and all 33 images. They matched.
+
+That second check earned its keep. The script's first version dropped the backslash that marks a line break, and a word-by-word comparison can't see that. The check also caught a parser quirk: escaped characters vanish from image descriptions. So the script now leaves an underscore inside a word, as in `IMG_3103`, unescaped. It can't start italics there anyway.
+
+The conversion changed the format and nothing else. The fixes to the content went into a separate commit, so each kind of change can be reviewed on its own.
+
+**Findings along the way:**
+
+- **The songlist loses accented letters.** On the live site, Björk appears as "Bjrk", Hüsker Dü as "Hsker D" and Susanne Sundfør as "Sundfr". The owner's own posts spell them right, so the letters go missing somewhere between the owner's spreadsheet and the page. We restored the names in our copy. The export still needs fixing where it happens, though, and a check can't catch this: a missing letter isn't garbled, just gone.
+- **The themed lists match the master list almost perfectly.** 530 of the 542 songs on the 2025 sad list matched on their own. The other 12 were the lost accents, one typo on the master list, and four names written differently. All 542 are now tagged `sad`.
+- **The song count on the songlist page was typed by hand, and it was already wrong:** it said 1,854 for 1,853 songs. The site will count them instead.
+
+**The gate.** `npm test` now runs 54 unit tests, then a check of the content, with no dependencies and no network.
+
+- **It fails** on anything that would break the site, lose something, or publish something it shouldn't: a missing or extra column, a duplicate song, garbled characters, HTML in a post, a broken image link, or a cut-off songlist.
+- **It warns** about things worth a look. Right now that's 8 images with no description for screen readers, and the empty Photos page.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
