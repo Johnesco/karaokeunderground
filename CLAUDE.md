@@ -2,25 +2,29 @@
 
 > This file serves as persistent context for Claude Code sessions. It is automatically read at the start of every conversation. Keep this document **thin and project-specific** — link to canonical sdlc-baseline docs rather than restating them. See [sdlc-baseline consumption model](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/consumption.md).
 
-<!-- ============================================================
-     PROJECT-SPECIFIC SECTIONS
-     Fill these in for your project. They provide context Claude
-     needs to understand your codebase.
-     ============================================================ -->
-
 ## Project Identity
 
 **Name:** Karaoke Underground (site revamp)
-**Purpose:** Rebuild karaokeunderground.com, the site for Karaoke Underground (punk and indie video karaoke in Austin, TX), replacing its end-of-life WordPress install
-**Target Users:** Punk and indie fans checking where the next show is and what they can sing, mostly on phones and often at the show. Also whoever runs KU and keeps shows and songlists current
-**Live Site:** https://karaokeunderground.com (still the legacy WordPress site until cutover; `www.` 301s to the apex)
+**Purpose:** Revamp karaokeunderground.com, the site for Karaoke Underground (punk and indie video karaoke in Austin, TX), and offer it to the owner as a replacement for the end-of-life WordPress install
+**Owner:** the people who run Karaoke Underground. They hold the live site, the domain and the hosting, and they decide whether the revamp replaces the current site. John builds the revamp for them
+**Target Users:** Punk and indie fans checking where the next show is and what they can sing, mostly on phones and often at the show. Also the owner, who keeps shows and songlists current
+**Live Site:** https://karaokeunderground.com, the owner's current WordPress site (`www.` 301s to the apex). It stays as it is unless the owner adopts the revamp
 **Repo:** https://github.com/Johnesco/karaokeunderground (public)
+
+## Approach
+
+1. **Copy.** Pull our own copy of the current site's public content (pages, posts, the songlist, shows, media) into this project. [`docs/legacy-site/`](docs/legacy-site/audit.md) maps what there is
+2. **Improve.** Rebuild it on the stack ADR-001 picks, fixing what the audit found
+3. **Present.** Publish it at a preview address of our own, never karaokeunderground.com, and show it to the owner as a replacement
+4. **Owner's call.** It replaces the current site only if the owner accepts. The owner, or someone they authorize, makes the switch: domain, DNS, email and hosting. [`urls.csv`](docs/legacy-site/urls.csv) becomes the redirect map, so old links keep working
+
+The owner has to be able to take it over, so ADR-001 must pick a stack they can run: in accounts they control, at a cost they accept, and easy for them to edit.
 
 ## Architecture
 
 **Stack: not chosen yet.** Spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2) decides it and records the decision as ADR-001. No site code lands until ADR-001 is Accepted.
 
-### The site being replaced
+### The current site
 
 Audited 2026-09-23 in spike [#1](https://github.com/Johnesco/karaokeunderground/issues/1). Findings are in [`docs/legacy-site/audit.md`](docs/legacy-site/audit.md), and every known URL is in [`urls.csv`](docs/legacy-site/urls.csv).
 
@@ -83,7 +87,7 @@ None yet. The songlist and the show calendar are the likely first. Document each
 ## Working in this project
 
 **SDLC profile:** core
-<!-- Assumes the rebuild is static: files served by a host, with no server we operate.
+<!-- Assumes the revamp is static: files served by a host, with no server anyone has to operate.
      If ADR-001 picks a CMS server, a backend or a database, switch to core+ops: change this
      line and restore the ops link block from CLAUDE-TEMPLATE.md.
      See https://github.com/Johnesco/sdlc-baseline/blob/main/docs/profiles.md -->
@@ -151,20 +155,18 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 
 - ADR-001: stack and hosting. *Pending* on spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)
 
-<!-- ============================================================
-     PROJECT HISTORY & SECURITY
-     ============================================================ -->
-
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Recorded that this is a revamp for the owner, offered as a replacement for the current site (#5)
 - **2026-09-23**: Audited the legacy site (#1): [`docs/legacy-site/`](docs/legacy-site/audit.md)
 - **2026-09-23**: Kickoff. Adopted sdlc-baseline (`core`) and created the repo, labels and board #7. Opened discovery spikes #1 (site audit) and #2 (stack → ADR-001)
 
 ## Security Considerations
 
 - **This repo is public.** Never commit secrets. Hosting, DNS, form-service and CMS credentials live in the platform's environment config; `.env*` is gitignored
-- **The legacy install is end-of-life** (PHP 5.6, WordPress 5.8). Export its content, but don't port its code or plugins
+- **The live site is the owner's.** Read its public pages only: no logins, no form submissions, no changes. Keep the owner's accounts and personal details out of this repo
+- **The legacy install is end-of-life** (PHP 5.6, WordPress 5.8). Copy its content, but don't port its code or plugins
 - **Contact form:** validate input at the boundary, add spam protection, and keep the destination address out of page source
 - **Third-party embeds** (Instagram, Facebook, Spotify) run other people's scripts on our pages. Add each one on purpose, never by default
 
