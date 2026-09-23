@@ -8,6 +8,7 @@ The rebuild of [karaokeunderground.com](https://karaokeunderground.com), the sit
 
 - **Work:** [open issues](https://github.com/Johnesco/karaokeunderground/issues). Every change starts as one
 - **Decisions:** [`docs/adr/`](docs/adr/README.md). The first, ADR-001, picks the stack
+- **The old site:** [`docs/legacy-site/`](docs/legacy-site/audit.md). What it has and does, and every URL the rebuild must redirect
 - **Changes:** [`CHANGELOG.md`](CHANGELOG.md)
 
 ## Process

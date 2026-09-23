@@ -22,12 +22,14 @@
 
 ### The site being replaced
 
-From a first look on 2026-09-23. The full inventory is spike [#1](https://github.com/Johnesco/karaokeunderground/issues/1).
+Audited 2026-09-23 in spike [#1](https://github.com/Johnesco/karaokeunderground/issues/1). Findings are in [`docs/legacy-site/audit.md`](docs/legacy-site/audit.md), and every known URL is in [`urls.csv`](docs/legacy-site/urls.csv).
 
-- **Platform:** WordPress 5.8.17 on Apache with PHP 5.6.40, both years past end-of-life. Custom theme `KU`
-- **Plugins:** Contact Form 7, MetaSlider, Simply Instagram, Instagram Feed
+- **Platform:** WordPress 5.8.17 on Apache with PHP 5.6.40, both years past end-of-life, on LinkSky shared hosting. Custom theme `KU`
+- **Plugins:** Contact Form 7, MetaSlider, Simply Instagram, Instagram Feed (broken), plus admin-only ones the page source can't show
 - **Menu:** Songlist · Calendar · Photos · Contact · Media · About
-- **Changes often:** the upcoming-shows list, and themed songlists posted as blog posts (e.g. *SAD SONGS ONLY 2025*, 542 songs). Easy editing is a requirement, not a nice-to-have
+- **Changes often:** the upcoming shows and the 1,853-song master songlist, both every month or so. Themed songlists go up as blog posts about once a year (e.g. *SAD SONGS ONLY 2025*, 542 songs). Easy editing is a requirement, not a nice-to-have
+- **URLs are query strings** (`/?page_id=16`, `/?p=835`), so the new host must redirect on query parameters. The pre-WordPress static site (2004–2013) is still live alongside it
+- **Email runs on the web server** (MX points at the apex), so move it before changing DNS. The domain expires 2027-01-15
 - **Off-site:** Facebook events, Spotify playlists, Instagram `@karaokeunderground`, X/Twitter `@KUAustin`
 
 ## File Structure Overview
@@ -42,8 +44,11 @@ karaokeunderground/
 │   ├── ISSUE_TEMPLATE/            #   refresh with scripts/sync-github-templates.sh
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── docs/
-│   └── adr/
-│       └── README.md              # ADR index
+│   ├── adr/
+│   │   └── README.md              # ADR index
+│   └── legacy-site/
+│       ├── audit.md               # What the old site has and does (spike #1)
+│       └── urls.csv               # Every known legacy URL; becomes the redirect map
 └── scripts/
     ├── setup-labels.sh            # Vendored: creates the label taxonomy
     └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
@@ -153,6 +158,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Audited the legacy site (#1): [`docs/legacy-site/`](docs/legacy-site/audit.md)
 - **2026-09-23**: Kickoff. Adopted sdlc-baseline (`core`) and created the repo, labels and board #7. Opened discovery spikes #1 (site audit) and #2 (stack → ADR-001)
 
 ## Security Considerations
