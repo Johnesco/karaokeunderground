@@ -2,9 +2,8 @@
 
 Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md).
 
-No ADRs yet. The first one, ADR-001 (stack and hosting), will come out of spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2).
-
 ## Index
 
 | # | Title | Status |
 |---|---|---|
+| [001](001-static-netlify-core-files.md) | A static site on Netlify that reads its core files in the browser | Accepted |

@@ -25,7 +25,8 @@ Every entry is tagged:
 | 2026-09-23 | [The old site audited](#2026-09-23--auditing-the-old-site) ([#1]) |
 | 2026-09-23 | [Our own copy of the site](#2026-09-23--taking-our-own-copy) ([#6]) |
 | 2026-09-23 | [The copy frozen, and a working copy started](#2026-09-23--frozen-copy-working-copy) ([#7]) |
-| Next | The stack chosen: ADR-001 ([#2]) |
+| 2026-09-23 | [The stack chosen: ADR-001](#2026-09-23--choosing-the-stack) ([#2]) |
+| Next | The site scaffolded, with the first core files in place |
 | Later | A preview ready to show |
 | Later | Presented to the owner |
 
@@ -144,6 +145,41 @@ This revamp is also a portfolio piece, and the process is half of it, so we star
 
 The plan is to keep this version detailed as we go, and condense it into a shorter one for a final portfolio page once the revamp is done ([#9]).
 
+### 2026-09-23 · Choosing the stack
+
+**Milestone · Decision** · [#2] · [ADR-001](adr/001-static-netlify-core-files.md) · [the research](research/stack-and-hosting.md)
+
+The ticket's deciding question was who updates the shows and the songlist, how often, and from what device. It couldn't be answered yet, because the owner hears about the revamp only when it's ready to show. So the decision rests on stated assumptions: monthly updates, a songlist kept in a spreadsheet, maybe a show posted from a phone, and no developer on their side. The ADR writes them down, to be revisited after the owner interview ([#3]).
+
+Two research agents checked this year's facts on hosting plans, redirects, forms, private previews, email forwarding, content editors and site generators. The [research doc](research/stack-and-hosting.md) has every source. What shaped the decision:
+
+- **Netlify's free plan now runs on credits:** 300 a month, 15 for each published update, 20 per GB of traffic. When they run out, every site on the account is paused. We confirmed that on Netlify's own pages.
+- **Cloudflare's redirects file can't match query strings**, which the old URLs are full of. Its zone-level rules can, once the domain's DNS points there.
+- **GitHub Pages and Vercel were out.** GitHub Pages bars business sites and can't send real 301s or take a form. Vercel's free plan is for non-commercial use only.
+- **A new requirement surfaced:** the preview has to stay private, because it shows the owner's content before they've agreed to anything.
+
+Partway through, the editing plan changed. John asked whether a site kept on GitHub could later let the owner log in and edit. It can: several free editors sit on top of the files in a repo. So the plan became a handful of core files in one folder (the songlist and shows as CSVs, the pages as Markdown), updated by replacing a file on GitHub. A login gets added when the owner wants one.
+
+Then came the decision itself. Claude recommended Cloudflare Pages, reading the core files when the site is built, and the Eleventy generator. John chose Netlify, reading the files in the visitor's browser, and a plain Node build script. That's the same pattern as his [Austin Karaoke Directory](https://github.com/Johnesco/karaokedirectory), which he already knows how to run. The ADR records the runners-up and the tradeoffs he took on:
+
+- the credit cap
+- pages that need JavaScript to appear
+- no free private preview
+
+One piece kept most of the safety of building from the files: a plain Node check runs before every deploy, so a bad upload stops the deploy instead of breaking the live site.
+
+The takeaway for the process: a recommendation is an input, not the decision. The person who owns the decision makes it, and the ADR keeps both, so the reasoning survives.
+
+Five build tickets came out of it:
+
+- convert the working copy into the core files ([#10])
+- the songlist page with search ([#11])
+- upcoming shows ([#12])
+- the pages and post archive ([#13])
+- redirects for every old URL ([#14])
+
+Netlify stays the plan, but for now everything is built and previewed on John's machine.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -153,3 +189,8 @@ The plan is to keep this version detailed as we go, and condense it into a short
 [#7]: https://github.com/Johnesco/karaokeunderground/issues/7
 [#8]: https://github.com/Johnesco/karaokeunderground/issues/8
 [#9]: https://github.com/Johnesco/karaokeunderground/issues/9
+[#10]: https://github.com/Johnesco/karaokeunderground/issues/10
+[#11]: https://github.com/Johnesco/karaokeunderground/issues/11
+[#12]: https://github.com/Johnesco/karaokeunderground/issues/12
+[#13]: https://github.com/Johnesco/karaokeunderground/issues/13
+[#14]: https://github.com/Johnesco/karaokeunderground/issues/14

@@ -15,15 +15,24 @@
 ## Approach
 
 1. **Copy.** Pull our own copy of the current site's public content (pages, posts, the songlist, shows, media). The copy from 2026-09-23 is frozen in `snapshot/` as the record of the site before the revamp. [`docs/legacy-site/`](docs/legacy-site/audit.md) maps what there is
-2. **Improve.** Edit the content in `work/`, a private repo. Rebuild the site from it on the stack ADR-001 picks, fixing what the audit found
-3. **Present.** Publish it at a preview address of our own, never karaokeunderground.com, and show it to the owner as a replacement
+2. **Improve.** Edit the content in `work/`, a private repo. Rebuild the site from it on the stack [ADR-001](docs/adr/001-static-netlify-core-files.md) chose, fixing what the audit found
+3. **Present.** Show it to the owner privately as a replacement: from John's machine, or in person. Netlify's free plan can't password-protect a preview, and it's never shown at karaokeunderground.com
 4. **Owner's call.** It replaces the current site only if the owner accepts. The owner, or someone they authorize, makes the switch: domain, DNS, email and hosting. [`urls.csv`](docs/legacy-site/urls.csv) becomes the redirect map, so old links keep working
 
-The owner has to be able to take it over, so ADR-001 must pick a stack they can run: in accounts they control, at a cost they accept, and easy for them to edit.
+The owner has to be able to take it over: the stack runs in accounts they control, at a cost they accept, and it's easy for them to update.
 
 ## Architecture
 
-**Stack: not chosen yet.** Spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2) decides it and records the decision as ADR-001. No site code lands until ADR-001 is Accepted.
+**Stack: decided in [ADR-001](docs/adr/001-static-netlify-core-files.md)** (spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)). It's a static site on Netlify's free plan, with the same pattern as the Austin Karaoke Directory:
+
+- **Core files:** everything that changes lives in one `content/` folder: `songlist.csv`, `shows.csv`, page text and posts as Markdown, and images. Updating the site means replacing or editing a file there on GitHub
+- **The browser reads them.** The site's JavaScript fetches the core files and renders the songlist with its search, the shows and the pages
+- **Checked before every deploy.** A dependency-free Node script validates the core files and writes derived files such as `_redirects`. A failed check stops the deploy, so the live site keeps its last good version
+- **Netlify also provides the contact form and the 301s.** Netlify Forms handles the form, and `_redirects` sends old query-string URLs to their new pages
+- **Code and content live apart until the owner agrees.** Code is in this public repo, the core files in the private content repo, and the Netlify build combines them
+- **An owner login comes later.** A git-based editor, such as TinaCMS or Decap, edits the same files
+- **Watch the credits.** The free plan gives 300 credits a month: 15 per production deploy, 20 per GB of traffic. When they run out, every site on the account is paused. Batch content updates, and develop on deploy previews, which are free
+- **Local for now.** The site is built and previewed on John's machine, reading the core files from `work/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
 
 ### The current site
 
@@ -50,11 +59,14 @@ karaokeunderground/
 │   └── PULL_REQUEST_TEMPLATE.md
 ├── docs/
 │   ├── adr/
-│   │   └── README.md              # ADR index
+│   │   ├── README.md              # ADR index
+│   │   └── 001-static-netlify-core-files.md   # The stack: static on Netlify, core files read in the browser
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
-│   └── legacy-site/
-│       ├── audit.md               # What the old site has and does (spike #1)
-│       └── urls.csv               # Every known legacy URL; becomes the redirect map
+│   ├── legacy-site/
+│   │   ├── audit.md               # What the old site has and does (spike #1)
+│   │   └── urls.csv               # Every known legacy URL; becomes the redirect map
+│   └── research/
+│       └── stack-and-hosting.md   # The sourced findings behind ADR-001 (spike #2)
 ├── scripts/
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
 │   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
@@ -67,11 +79,15 @@ karaokeunderground/
 
 ## Key Technical Patterns
 
-None yet. They follow from ADR-001 and the first build tickets.
+From [ADR-001](docs/adr/001-static-netlify-core-files.md); the first build tickets will add detail:
+
+- **The core files are the only source.** Nothing that changes is typed into HTML or JavaScript. It comes from `content/`
+- **Nothing reaches production unchecked.** The deploy-time Node check is the safety net for uploads made in GitHub's web editor, which bypass the local gate
+- **Plain Node for tooling,** with no dependencies where possible, like the directory's build scripts
 
 ## Data Formats
 
-None decided yet: ADR-001 settles where the songlist and the show calendar are kept. Until then the working copy in `work/` uses the snapshot's formats:
+**Planned, per ADR-001:** `content/songlist.csv` and `content/shows.csv`, page text and posts as Markdown, and images, all in `content/`. The exact columns and front-matter fields get settled in the ticket that converts the working copy. Until then, `work/` uses the snapshot's formats:
 
 - `songlist.csv`: `Artist,Title,Album`. Solo artists are filed "Last, First", and covers are written as "Title (by Original Artist)"
 - `themed-songlists.csv`: `post_id,post_title,rank,artist,title,album,note`, one row per song across the 8 themed lists
@@ -79,12 +95,12 @@ None decided yet: ADR-001 settles where the songlist and the show calendar are k
 
 ## Testing
 
-**Local gate:** not named yet. ADR-001 names it along with the stack. It will be one command, and it must pass before any release tag.
+**Local gate:** `npm test` ([ADR-001](docs/adr/001-static-netlify-core-files.md)). It must pass before any release tag, and it's deterministic: no network, and it builds and checks from local files only. The scaffold ticket defines what it runs.
 
 ## Releases
 
-**Version source of truth:** not chosen yet. ADR-001 decides between `package.json` `version` (for an npm-based stack) and a root `VERSION` file
-**Build numbers:** decided with ADR-001
+**Version source of truth:** `package.json` `version` ([ADR-001](docs/adr/001-static-netlify-core-files.md))
+**Build numbers:** none. It's a website, so each deploy is identified by its commit
 **Release command:** none yet
 
 <!-- ============================================================
@@ -96,8 +112,8 @@ None decided yet: ADR-001 settles where the songlist and the show calendar are k
 ## Working in this project
 
 **SDLC profile:** core
-<!-- Assumes the revamp is static: files served by a host, with no server anyone has to operate.
-     If ADR-001 picks a CMS server, a backend or a database, switch to core+ops: change this
+<!-- ADR-001 keeps the revamp static: files served by Netlify, with no server anyone has to operate.
+     If a CMS server, a backend or a database is ever added, switch to core+ops: change this
      line and restore the ops link block from CLAUDE-TEMPLATE.md.
      See https://github.com/Johnesco/sdlc-baseline/blob/main/docs/profiles.md -->
 
@@ -129,7 +145,7 @@ When sdlc-baseline updates, glance at its [CHANGELOG](https://github.com/Johnesc
 
 ### Project-specific deviations
 
-- **The gate and the version source of truth wait on ADR-001 ([#2](https://github.com/Johnesco/karaokeunderground/issues/2)).** The kickoff checklist names both on day one, but both depend on the stack, which isn't chosen yet. Delete this entry once ADR-001 is Accepted.
+None. The gate and the version source of truth waited on ADR-001, which named both on 2026-09-23.
 
 ### Project IDs
 
@@ -162,7 +178,7 @@ None yet. Create the first once discovery (#1, #2) shows the shape of the build.
 
 ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr/README.md)). Format, stub and threshold rule: [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-baseline/blob/main/docs/adrs.md).
 
-- ADR-001: stack and hosting. *Pending* on spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)
+- [ADR-001](docs/adr/001-static-netlify-core-files.md): a static site on Netlify that reads its core files in the browser. *Accepted* 2026-09-23 (spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)); revisit after the owner interview, [#3](https://github.com/Johnesco/karaokeunderground/issues/3)
 
 ### The diary
 
@@ -176,6 +192,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Chose the stack (#2): [ADR-001](docs/adr/001-static-netlify-core-files.md), a static site on Netlify that reads its core files in the browser
 - **2026-09-23**: Started the revamp diary for the portfolio (#8): [`docs/diary.md`](docs/diary.md)
 - **2026-09-23**: Froze the snapshot and started the content working copy in `work/`, a private repo (#7)
 - **2026-09-23**: Pulled a local copy of the live site (#6): `scripts/snapshot-content.py` writes a gitignored `snapshot/` with clean content and a reference copy
