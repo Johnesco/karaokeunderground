@@ -6,6 +6,7 @@
 
 **Name:** Karaoke Underground (site revamp)
 **Purpose:** Revamp karaokeunderground.com, the site for Karaoke Underground (punk and indie video karaoke in Austin, TX), and offer it to the owner as a replacement for the end-of-life WordPress install
+**Also:** a portfolio piece for John, showing the process as well as the result. See [The diary](#the-diary)
 **Owner:** the people who run Karaoke Underground. They hold the live site, the domain and the hosting, and they decide whether the revamp replaces the current site. John builds the revamp for them
 **Target Users:** Punk and indie fans checking where the next show is and what they can sing, mostly on phones and often at the show. Also the owner, who keeps shows and songlists current
 **Live Site:** https://karaokeunderground.com, the owner's current WordPress site (`www.` 301s to the apex). It stays as it is unless the owner adopts the revamp
@@ -50,6 +51,7 @@ karaokeunderground/
 ├── docs/
 │   ├── adr/
 │   │   └── README.md              # ADR index
+│   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   └── legacy-site/
 │       ├── audit.md               # What the old site has and does (spike #1)
 │       └── urls.csv               # Every known legacy URL; becomes the redirect map
@@ -162,9 +164,18 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 
 - ADR-001: stack and hosting. *Pending* on spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)
 
+### The diary
+
+This revamp is also a portfolio piece, and the process is half of it. [`docs/diary.md`](docs/diary.md) tells the story as it happens: milestones reached, findings, decisions and why, and challenges and mistakes.
+
+- **When:** add or extend an entry in Step 6, before a ticket moves to Verify. Also add one when something worth telling happens between tickets
+- **How:** dated entries, oldest first, each tagged Milestone, Finding, Decision, Challenge or Process and linked to its tickets, commits and docs. Write for someone outside the project, and put new milestones in the table at the top
+- **It's public:** the rules under Security Considerations apply. No owner content, personal details or admin details
+
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Started the revamp diary for the portfolio (#8): [`docs/diary.md`](docs/diary.md)
 - **2026-09-23**: Froze the snapshot and started the content working copy in `work/`, a private repo (#7)
 - **2026-09-23**: Pulled a local copy of the live site (#6): `scripts/snapshot-content.py` writes a gitignored `snapshot/` with clean content and a reference copy
 - **2026-09-23**: Recorded that this is a revamp for the owner, offered as a replacement for the current site (#5)

@@ -6,6 +6,7 @@ A revamp of [karaokeunderground.com](https://karaokeunderground.com), the site f
 
 ## Where things are
 
+- **The diary:** [`docs/diary.md`](docs/diary.md). How the revamp is being made: what we found, what we chose and why
 - **Work:** [open issues](https://github.com/Johnesco/karaokeunderground/issues). Every change starts as one
 - **Decisions:** [`docs/adr/`](docs/adr/README.md). The first, ADR-001, picks the stack
 - **The old site:** [`docs/legacy-site/`](docs/legacy-site/audit.md). What it has and does, and every URL the revamp must redirect
