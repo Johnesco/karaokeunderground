@@ -734,7 +734,8 @@ def readme(r: dict, homepage: list[dict], calendar: list[dict]) -> str:
               " copy (archives, attachments, feeds) go to the live site. YouTube players load from the web.", "",
               "The contact form is switched off in the copy, so it can't send the owner a real message.", "",
               "If the fonts or anything else look wrong when opened straight from disk, serve the folder instead:"
-              " run `python -m http.server 8000 --directory snapshot/reference` and open http://localhost:8000/.", "",
+              " run `python -m http.server 8000 --bind 127.0.0.1 --directory snapshot/reference` and open"
+              " http://localhost:8000/. `--bind 127.0.0.1` keeps it on this machine, off the local network.", "",
               f"{r['reference']['local_links_checked']} local links checked, {r['reference']['broken_local_links']} broken.", ""]
     gaps = r["reference"]["missing_on_live_site"]
     if gaps:
