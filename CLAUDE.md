@@ -170,6 +170,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 
 - **When:** add or extend an entry in Step 6, before a ticket moves to Verify. Also add one when something worth telling happens between tickets
 - **How:** dated entries, oldest first, each tagged Milestone, Finding, Decision, Challenge or Process and linked to its tickets, commits and docs. Write for someone outside the project, and put new milestones in the table at the top
+- **Detail:** keep entries detailed. A shorter version for the portfolio gets written when the revamp is done, so don't condense this one along the way
 - **It's public:** the rules under Security Considerations apply. No owner content, personal details or admin details
 
 ## Project History
