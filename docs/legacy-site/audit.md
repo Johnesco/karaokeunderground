@@ -36,7 +36,7 @@ Every known URL is in [`urls.csv`](urls.csv) (212 rows). It becomes the redirect
 | Calendar | `/?page_id=8` | 2026-08-01 | stale | Lists 8/1, 9/5 and 10/3; two of them are past. Doesn't match the homepage list |
 | About | `/?page_id=6` | 2021-11-13 | current | The hosts, KU since 2004, band links. Its intro differs from the homepage's |
 | Contact | `/?page_id=10` | 2014-11-20 | current | Contact Form 7 ([§4](#4-the-contact-form)) |
-| Media | `/?page_id=12` | 2021-11-13 | stale | 15 press entries from 2010–2016: 3 links are dead, 3 land on a section front page, and 1 has no link. 4 YouTube embeds. Three quotes show `�` in place of curly quotes |
+| Media | `/?page_id=12` | 2021-11-13 | stale | 15 press entries from 2010–2016: 3 links are dead, 3 land on a section front page, and 1 has no link. 4 YouTube embeds |
 | Photos | `/?page_id=14` | 2018-01-29 | broken | Instagram Feed has no connected account. The error is hidden by CSS, so visitors see an empty page |
 
 ### Posts, media and archives
@@ -51,7 +51,7 @@ Every known URL is in [`urls.csv`](urls.csv) (212 rows). It becomes the redirect
   | `/?p=499` 2018 Top Tens | 2019 | Most-sung lists, written Title – Artist |
   | `/?p=501` Sing The Unsung | 2019 | 89 songs nobody had sung |
   | `/?p=576` 6th Annual SAD SONGS ONLY | 2019 | About 250 songs |
-  | `/?p=646` SAD SONGS ONLY 2022 | 2022 | 262 songs, in a table rather than lines |
+  | `/?p=646` SAD SONGS ONLY 2022 | 2022 | 261 songs, in a table rather than lines (one long title wraps onto a second row) |
   | `/?p=679` Scary-oke on 10.27 | 2022 | About 165 songs |
   | `/?p=692` SAD SONGS ONLY – DEC 26 2024 | 2024 | 515 songs. Created 2022-12-28 and rewritten for 2024, so this URL's content changed |
   | `/?p=835` SAD SONGS ONLY 2025 | 2025 | 542 songs |
