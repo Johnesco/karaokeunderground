@@ -75,7 +75,7 @@ karaokeunderground/
 │       └── stack-and-hosting.md   # The sourced findings behind ADR-001 (spike #2)
 ├── site/                          # What the browser loads: the page shell, its styles and scripts (#13, #11)
 │   ├── index.html                 # The one page shell for every path (ADR-003)
-│   ├── css/site.css               # Plain, phone-first styles. The design comes later, with the owner
+│   ├── css/site.css               # Plain, phone-first styles, white on black. The design comes later, with the owner
 │   └── js/                        # ES modules. app.js runs the page; router.js, views.js, markdown.js (ADR-004) and
 │                                  #   songlist-page.js render it; csv.js, front-matter.js and songlist.js are shared with the check
 ├── scripts/
@@ -106,6 +106,7 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-004](docs/adr/
 - **Errors and warnings.** The check fails on an error: something that would break the site, lose content or publish something it shouldn't. A warning is worth a look but doesn't stop anything
 - **No HTML in the content.** The check rejects HTML in pages and posts, and the renderer still escapes it, because uploads can bypass the local gate
 - **Phone-first.** Base styles are for a phone, and wider screens only add room. Nothing may scroll sideways at 320px, and touch targets are at least 44px
+- **White text on black, everywhere we can,** at the owner's request, as the old site was. No inverted panels: a picked control shows a white border, bold text and its own state. Text colours stay at WCAG AA or better on black, and so do the borders of controls. The colours are the variables at the top of `site.css`
 
 ## Data Formats
 

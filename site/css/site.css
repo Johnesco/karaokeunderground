@@ -1,18 +1,23 @@
 /*
  * The site's styles. Plain for now (#13): the design comes later, with the owner.
  *
+ * White text on black everywhere we can, at the owner's request, as the old
+ * site was. Every colour passes WCAG AA on black: text at 4.5:1 or more, and
+ * the borders of controls at 3:1 or more.
+ *
  * Phone-first: the base styles are for a phone, and a wider screen only adds
  * room. Nothing may push the page sideways, long addresses included.
  */
 
 :root {
-  --text: #111;
-  --muted: #555;
-  --line: #ddd;
-  --bg: #fff;
-  --header-bg: #000;
-  --header-text: #fff;
-  --focus: #0a58ca;
+  color-scheme: dark; /* native controls, like radio buttons and scrollbars, render dark too */
+  --bg: #000;
+  --text: #fff; /* 21:1 */
+  --muted: #aaa; /* 9:1, for dates and counts */
+  --control: #888; /* 5.9:1, the border of a control that isn't picked */
+  --line: #444; /* dividers, which carry no meaning */
+  --code-bg: #1a1a1a;
+  --focus: #fff;
   --measure: 42rem;
 }
 
@@ -48,7 +53,7 @@ a {
 
 :focus-visible {
   outline: 3px solid var(--focus);
-  outline-offset: 2px;
+  outline-offset: 3px; /* a black gap keeps the ring apart from white borders */
 }
 
 .skip-link {
@@ -57,6 +62,7 @@ a {
   left: 0.5rem;
   z-index: 10;
   padding: 0.5rem 1rem;
+  border: 2px solid var(--text);
   background: var(--bg);
   color: var(--text);
 }
@@ -73,12 +79,7 @@ a {
   align-items: center;
   gap: 0.5rem 1.25rem;
   padding: 0.75rem 1rem;
-  background: var(--header-bg);
-  color: var(--header-text);
-}
-
-.site-header :focus-visible {
-  outline-color: var(--header-text);
+  border-bottom: 1px solid var(--line);
 }
 
 .site-logo {
@@ -167,7 +168,7 @@ blockquote {
 pre {
   overflow-x: auto;
   padding: 0.75rem;
-  background: #f4f4f4;
+  background: var(--code-bg);
 }
 
 .meta,
@@ -233,7 +234,14 @@ main.wide {
   padding: 0.5rem 0.75rem;
   border: 2px solid var(--text);
   border-radius: 0;
+  background: var(--bg);
+  color: var(--text);
   font: inherit;
+}
+
+.song-search input[type="search"]::placeholder {
+  color: var(--muted);
+  opacity: 1;
 }
 
 .choices {
@@ -256,18 +264,24 @@ main.wide {
   gap: 0.4rem;
   min-height: 2.75rem;
   padding: 0.4rem 0.75rem;
-  border: 2px solid var(--text);
+  border: 2px solid var(--control);
   cursor: pointer;
 }
 
+.choice input {
+  accent-color: var(--text);
+}
+
+/* Picked: a white border, bold text and the filled radio button, still white on black.
+   The border isn't the only sign, so it doesn't rely on colour alone. */
 .choice:has(input:checked) {
-  background: var(--text);
-  color: var(--bg);
+  border-color: var(--text);
+  font-weight: 700;
 }
 
 .choice:has(input:focus-visible) {
   outline: 3px solid var(--focus);
-  outline-offset: 2px;
+  outline-offset: 3px;
 }
 
 .song-count {

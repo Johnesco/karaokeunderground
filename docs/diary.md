@@ -275,6 +275,16 @@ On a phone the page renders in about half a second.
 
 The empty Photos page now links to Instagram.
 
+### 2026-09-23 · White on black
+
+**Decision** · [#13]
+
+The owner asked for white text on black, wherever possible. That's how the old site looked, so their photos and flyers were made to sit on black.
+
+- **Everywhere:** the whole site switched, including the search box and the browser's own controls.
+- **No inverted panels:** a picked songlist button shows a white border, bold text and its filled radio button, instead of turning white.
+- **Accessible:** every text colour was measured on every page. White text on black is 21:1 and the gray for dates and counts is 9:1, where WCAG asks for at least 4.5:1.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
