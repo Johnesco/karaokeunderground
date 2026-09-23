@@ -142,7 +142,7 @@ Edits happen in a separate working copy of the content, in a repository of its o
 
 This revamp is also a portfolio piece, and the process is half of it, so we started this diary. It gets an entry whenever something is found, chosen, reached or fixed, linked to the tickets and commits behind it. Keeping it up is part of finishing a ticket.
 
-The plan is to keep this version detailed as we go, and condense it into a shorter one once the revamp is done.
+The plan is to keep this version detailed as we go, and condense it into a shorter one for a final portfolio page once the revamp is done ([#9]).
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
@@ -152,3 +152,4 @@ The plan is to keep this version detailed as we go, and condense it into a short
 [#6]: https://github.com/Johnesco/karaokeunderground/issues/6
 [#7]: https://github.com/Johnesco/karaokeunderground/issues/7
 [#8]: https://github.com/Johnesco/karaokeunderground/issues/8
+[#9]: https://github.com/Johnesco/karaokeunderground/issues/9
