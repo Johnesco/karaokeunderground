@@ -9,6 +9,7 @@
   },
   "scripts": {
     "test": "node --test \"test/**/*.test.js\" && node scripts/check-content.js",
-    "check": "node scripts/check-content.js"
+    "check": "node scripts/check-content.js",
+    "dev": "node scripts/dev-server.js"
   }
 }
