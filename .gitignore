@@ -1,0 +1,29 @@
+# Environment / secrets — this repo is public
+.env
+.env.local
+.env.*.local
+
+# Claude Code local state (settings.local.json, launch.json, worktrees) — never commit
+.claude/
+
+# Windows artifact: a stray `> nul` in Git Bash writes a literal file named nul
+nul
+
+# Dependencies and build output
+node_modules/
+dist/
+build/
+.cache/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editors and OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.sw?
+.DS_Store
+Thumbs.db
+desktop.ini

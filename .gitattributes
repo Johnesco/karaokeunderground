@@ -1,0 +1,15 @@
+# LF in the working tree, even with core.autocrlf=true (the Git for Windows default).
+# Two things break on CRLF: shell scripts under Git Bash, and the byte comparison
+# scripts/sync-github-templates.sh runs against sdlc-baseline's LF originals.
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.woff binary
+*.woff2 binary
+*.mp3 binary
+*.mp4 binary

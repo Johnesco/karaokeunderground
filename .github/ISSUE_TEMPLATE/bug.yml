@@ -1,0 +1,51 @@
+name: Bug Report
+description: Something isn't working correctly
+labels: ["bug"]
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What's wrong?
+      description: Describe the bug clearly. What did you observe?
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Exact steps to trigger the bug.
+      value: |
+        1. Go to...
+        2. Click on...
+        3. Observe...
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What should happen instead?
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How impactful is this bug?
+      # Keep these four strings in sync with docs/severity-matrix.md ("Severity Levels" table).
+      options:
+        - Low — Cosmetic or minor inconvenience
+        - Medium — Feature works but with significant issues
+        - High — Major feature is broken, no workaround
+        - Critical — System is down, data loss, or security vulnerability
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Browser, OS, device, or any relevant environment details.
+      placeholder: "Chrome 120 on macOS 14, iPhone 15 Safari, etc."
+  - type: textarea
+    id: done
+    attributes:
+      label: Definition of Done
+      value: |
+        - [ ] Bug fixed and verified
+        - [ ] Root cause understood
+        - [ ] Project spec updated (if behavior changed)
+        - [ ] No regressions introduced
