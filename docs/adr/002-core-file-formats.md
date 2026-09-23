@@ -30,7 +30,7 @@ The full formats are in [CLAUDE.md → Data Formats](../../CLAUDE.md#data-format
 
 - The owner interview ([#3](https://github.com/Johnesco/karaokeunderground/issues/3)) shows the owner won't keep the extra columns.
 - Tags are still empty when the site launches. Drop the column.
-- We decide how events get updated. The shows get a format, in an amendment or a new ADR.
+- We decide how events get updated. The shows get their format in a new ADR ([#12](https://github.com/Johnesco/karaokeunderground/issues/12)).
 
 ## Options considered
 
