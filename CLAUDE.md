@@ -13,8 +13,8 @@
 
 ## Approach
 
-1. **Copy.** Pull our own copy of the current site's public content (pages, posts, the songlist, shows, media) into this project. [`docs/legacy-site/`](docs/legacy-site/audit.md) maps what there is
-2. **Improve.** Rebuild it on the stack ADR-001 picks, fixing what the audit found
+1. **Copy.** Pull our own copy of the current site's public content (pages, posts, the songlist, shows, media). The copy from 2026-09-23 is frozen in `snapshot/` as the record of the site before the revamp. [`docs/legacy-site/`](docs/legacy-site/audit.md) maps what there is
+2. **Improve.** Edit the content in `work/`, a private repo. Rebuild the site from it on the stack ADR-001 picks, fixing what the audit found
 3. **Present.** Publish it at a preview address of our own, never karaokeunderground.com, and show it to the owner as a replacement
 4. **Owner's call.** It replaces the current site only if the owner accepts. The owner, or someone they authorize, makes the switch: domain, DNS, email and hosting. [`urls.csv`](docs/legacy-site/urls.csv) becomes the redirect map, so old links keep working
 
@@ -55,9 +55,10 @@ karaokeunderground/
 │       └── urls.csv               # Every known legacy URL; becomes the redirect map
 ├── scripts/
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
-│   ├── snapshot-content.py        # Ours: pulls a local copy of the live site into snapshot/ (#6)
+│   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
 │   └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
-└── snapshot/                      # Gitignored, local only: the owner's content. Never commit it
+├── snapshot/                      # Gitignored: the 2026-09-23 snapshot, frozen read-only. Later ones go in snapshots/
+└── work/                          # Gitignored: the content working copy. Its own repo, pushed to a private one
 ```
 
 > Update this section as the project grows. Claude uses it to navigate the codebase.
@@ -68,7 +69,11 @@ None yet. They follow from ADR-001 and the first build tickets.
 
 ## Data Formats
 
-None yet. The songlist and the show calendar are the likely first. Document each one here once its source of truth is decided.
+None decided yet: ADR-001 settles where the songlist and the show calendar are kept. Until then the working copy in `work/` uses the snapshot's formats:
+
+- `songlist.csv`: `Artist,Title,Album`. Solo artists are filed "Last, First", and covers are written as "Title (by Original Artist)"
+- `themed-songlists.csv`: `post_id,post_title,rank,artist,title,album,note`, one row per song across the 8 themed lists
+- `shows.json`: `homepage` and `calendar` lists of `{date, weekday, venue, details, link, text}`. The site gives no years, so each `date` is inferred
 
 ## Testing
 
@@ -160,6 +165,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Froze the snapshot and started the content working copy in `work/`, a private repo (#7)
 - **2026-09-23**: Pulled a local copy of the live site (#6): `scripts/snapshot-content.py` writes a gitignored `snapshot/` with clean content and a reference copy
 - **2026-09-23**: Recorded that this is a revamp for the owner, offered as a replacement for the current site (#5)
 - **2026-09-23**: Audited the legacy site (#1): [`docs/legacy-site/`](docs/legacy-site/audit.md)
@@ -169,6 +175,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 
 - **This repo is public.** Never commit secrets. Hosting, DNS, form-service and CMS credentials live in the platform's environment config; `.env*` is gitignored
 - **The live site is the owner's.** Read its public pages only: no logins, no form submissions, no changes. Keep the owner's accounts and personal details out of this repo
+- **The owner's content stays private.** It lives only in `snapshot/` on John's machine and in `work/`, whose remote is the private `Johnesco/karaokeunderground-content` repo. Never commit it here, paste it into issues, or quote it in commit messages
 - **The legacy install is end-of-life** (PHP 5.6, WordPress 5.8). Copy its content, but don't port its code or plugins
 - **Contact form:** validate input at the boundary, add spam protection, and keep the destination address out of page source
 - **Third-party embeds** (Instagram, Facebook, Spotify) run other people's scripts on our pages. Add each one on purpose, never by default

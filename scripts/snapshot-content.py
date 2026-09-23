@@ -19,15 +19,17 @@ starting with the upcoming shows.
 
 The snapshot is the owner's content, and this repo is public, so it never gets
 committed. The script reads public pages and WordPress's public API only, one
-request at a time. It builds into snapshot.partial/ and swaps that in only when
-the whole run succeeds, so a failed run leaves the last good snapshot alone.
+request at a time. A snapshot is a record of the site on the day it was taken,
+so the script never replaces one (#7): it builds into <folder>.partial/ and
+renames that into place only when the whole run succeeds.
 
-    python scripts/snapshot-content.py             # writes snapshot/
-    python scripts/snapshot-content.py --out DIR   # writes DIR instead
+    python scripts/snapshot-content.py                              # writes snapshot/, if it isn't there yet
+    python scripts/snapshot-content.py --out snapshots/2026-10-01   # takes another
 
 Standard library only, so there's nothing to install. Exit 0 = snapshot written
 and every check passed. 1 = snapshot written, but something needs a look (see
-its README). 2 = nothing written, because the site couldn't be read.
+its README). 2 = nothing written: the folder already exists, or the site couldn't
+be read.
 """
 
 from __future__ import annotations
@@ -52,7 +54,7 @@ SITE = "https://karaokeunderground.com"
 HOSTS = {"karaokeunderground.com", "www.karaokeunderground.com"}
 USER_AGENT = "KU-revamp-snapshot/1.0 (+https://github.com/Johnesco/karaokeunderground)"
 REPO = Path(__file__).resolve().parent.parent
-MARKER = "scripts/snapshot-content.py"  # recorded in index.json; the script only replaces folders it made
+MARKER = "scripts/snapshot-content.py"  # recorded in index.json, to show which script made a snapshot
 UPLOADS = "/wp-content/uploads/"
 THEME = "/wp-content/themes/KU/layout/"
 THEME_IMAGES = ["logo.png", "fb.png", "twitter.png", "instagram.png"]
@@ -743,23 +745,10 @@ def readme(r: dict, homepage: list[dict], calendar: list[dict]) -> str:
                   " so the copy leaves them out:", ""] + [f"- `{g}`" for g in gaps] + [""]
     lines += ["## Problems", ""]
     lines += [f"- {p}" for p in r["problems"]] or ["None."]
-    lines += ["", "## Regenerate", "", "```", "python scripts/snapshot-content.py", "```", ""]
+    lines += ["", "## Taking another snapshot", "",
+              "This one stays as it was taken. To take another, give it a folder of its own:", "",
+              "```", "python scripts/snapshot-content.py --out snapshots/YYYY-MM-DD", "```", ""]
     return "\n".join(lines)
-
-
-def replace_dir(partial: Path, out: Path) -> None:
-    """Swap the finished snapshot in, but only over a folder this script made."""
-    if out.exists():
-        index = out / "index.json"
-        try:
-            ours = json.loads(index.read_text(encoding="utf-8")).get("script") == MARKER
-        except (OSError, ValueError):
-            ours = False
-        if not ours:
-            raise SystemExit(f"{out} exists but this script didn't make it, so it's left alone. "
-                             f"The new snapshot is in {partial}.")
-        shutil.rmtree(out)
-    partial.rename(out)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -774,16 +763,23 @@ def main(argv: list[str] | None = None) -> int:
     out = args.out.resolve()
     if not out.name or out == REPO or out in REPO.parents:
         parser.error(f"--out can't be {out}")
+    if out.exists():
+        print(f"{out} already exists. A snapshot stays as it was taken, so this one is left alone.\n"
+              f"To take another, give it a folder of its own: --out snapshots/{dt.date.today()}", file=sys.stderr)
+        return 2
     partial = out.with_name(out.name + ".partial")
-    if partial.exists():
+    if partial.exists():  # left over from a run that failed
         shutil.rmtree(partial)
     try:
         report = build(Fetcher(args.delay), partial)
     except (FetchError, ValueError) as e:
         print(f"Snapshot failed: {e}", file=sys.stderr)
-        print(f"Nothing replaced; the partial copy is in {partial}.", file=sys.stderr)
+        print(f"Nothing written to {out}; the partial copy is in {partial}.", file=sys.stderr)
         return 2
-    replace_dir(partial, out)
+    if out.exists():  # something else wrote it during the run
+        print(f"{out} appeared during the run and is left alone. The new snapshot is in {partial}.", file=sys.stderr)
+        return 2
+    partial.rename(out)
     print(f"Wrote {out} ({report['requests']} requests).")
     for line in report["differences_from_audit"]:
         print(f"  differs from the audit: {line}")
