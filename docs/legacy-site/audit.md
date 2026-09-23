@@ -223,7 +223,7 @@ For the hosts, or for whoever has wp-admin and hosting access.
 
 1. Who updates what today: shows, the songlist, themed lists, posts and photos? From which device? (This is the deciding question for [#2](https://github.com/Johnesco/karaokeunderground/issues/2).)
 2. How does the homepage show list get edited today?
-3. Where does the master songlist live (which app, whose account or computer), and how does it become the page?
+3. Where does the master songlist live (which app, whose account or computer), and how does it become the page? Does that export keep accented letters? The live list has lost them ([§3](#3-the-songlist)).
 4. What's painful about the current site? What do they want from the new one? What do fans ask for?
 
 **Contact and email**
