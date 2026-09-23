@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseFrontMatter } from '../scripts/lib/front-matter.js';
+import { parseFrontMatter } from '../site/js/front-matter.js';
 
 describe('parseFrontMatter', () => {
   it('reads the fields, the body and the line the body starts on', () => {

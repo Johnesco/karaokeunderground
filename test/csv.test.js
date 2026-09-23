@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseCsv, isEmptyRecord } from '../scripts/lib/csv.js';
+import { parseCsv, isEmptyRecord } from '../site/js/csv.js';
 
 const fields = (text) => parseCsv(text).map((r) => r.fields);
 

@@ -17,14 +17,16 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { readSonglist, sameKey, isListed, UNLISTED } from './songlist.js';
-import { parseFrontMatter } from './front-matter.js';
+import { readSonglist, sameKey, isListed, UNLISTED } from '../../site/js/songlist.js';
+import { parseFrontMatter } from '../../site/js/front-matter.js';
 
 /** Fewer songs than this is a cut-off or filtered export, not the songlist. */
 export const MIN_SONGS = 1000;
 export const IMAGE_TYPES = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 const TOP_LEVEL = ['songlist.csv', 'pages', 'posts', 'images'];
 const FRONT_MATTER_KEYS = ['title', 'date', 'updated', 'old_url'];
+// The line under a table's header row, like |---|:---:|. The renderer (ADR-004) has no tables.
+const TABLE_RULE = /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)+\|?[ \t]*$/;
 const PAGE_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 const POST_NAME = /^(\d{4}-\d{2}-\d{2})-[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
 
@@ -257,8 +259,15 @@ function checkMarkdown(dir, rel, kind, files, oldUrls, error, warn) {
     for (const tag of htmlIn(line)) {
       error(rel, lineNo, `${tag} is HTML. Pages and posts are plain Markdown, so write it without HTML`);
     }
+    if (TABLE_RULE.test(line)) {
+      error(rel, lineNo, 'this is a table, which the site can\u{2019}t show. Write it as a list, or as lines ending in a backslash');
+    }
     for (const ref of referencesIn(line)) {
-      checkReference(rel, lineNo, ref, files, error, warn);
+      if (ref.definition) {
+        error(rel, lineNo, 'the site can\u{2019}t show reference-style links. Put the address in the link itself, like [text](address)');
+      } else {
+        checkReference(rel, lineNo, ref, files, error, warn);
+      }
     }
   });
 }
@@ -286,7 +295,7 @@ export function htmlIn(line) {
 export function referencesIn(line) {
   const refs = [];
   const definition = /^ {0,3}\[(?:\\.|[^\]\\])+\]:[ \t]*(<[^>]*>|\S+)/.exec(line);
-  if (definition) refs.push({ image: false, alt: null, target: unwrap(definition[1]) });
+  if (definition) refs.push({ image: false, alt: null, target: unwrap(definition[1]), definition: true });
 
   for (let i = line.indexOf(']('); i !== -1; i = line.indexOf('](', i + 1)) {
     if (isEscaped(line, i)) continue;

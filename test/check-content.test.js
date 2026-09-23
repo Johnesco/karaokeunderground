@@ -96,6 +96,13 @@ describe('checkContent on broken copies of the example', () => {
     assert.equal(errors.split('\n').length, 1);
   });
 
+  it('fails a table and a reference-style link, which the renderer has no rules for', () => {
+    const { errors } = check({ 'posts/2026-01-02-first-post.md': post('| a | b |\n|---|:-:|\n[text][ref]\n\n[ref]: https://e.com') });
+    assert.match(errors, /:6 this is a table/);
+    assert.match(errors, /:9 the site can\u{2019}t show reference-style links/u);
+    assert.equal(errors.split('\n').length, 2);
+  });
+
   it('fails a link or image to a file that does not exist, or has the wrong case', () => {
     const { errors } = check({
       'posts/2026-01-02-first-post.md': post('![Flyer](../images/2026/01/Flyer.png)\n[About](../pages/missing.md)'),
@@ -157,7 +164,7 @@ describe('referencesIn', () => {
       { image: false, alt: null, target: 'x.md' },
       { image: true, alt: 'Alt text', target: '../images/a.png' },
     ]);
-    assert.deepEqual(referencesIn('[name]: ../pages/about.md'), [{ image: false, alt: null, target: '../pages/about.md' }]);
+    assert.deepEqual(referencesIn('[name]: ../pages/about.md'), [{ image: false, alt: null, target: '../pages/about.md', definition: true }]);
   });
 
   it('reads parentheses and angle brackets in targets, and skips escaped brackets', () => {

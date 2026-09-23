@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { readSonglist, splitValues, sameKey, isListed } from '../scripts/lib/songlist.js';
+import { readSonglist, splitValues, sameKey, isListed } from '../site/js/songlist.js';
 
 describe('splitValues', () => {
   it('splits on semicolons, trims, and drops blanks', () => {
