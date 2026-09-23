@@ -46,6 +46,8 @@ if [ "$CLEAN" = true ]; then
   echo "=== Removing default labels ==="
   echo ""
 
+  # GitHub's defaults also include "accessibility". It is deliberately not
+  # listed: the taxonomy keeps it as a cross-cutting label (created below).
   DEFAULT_LABELS=(
     "enhancement"
     "good first issue"
@@ -55,7 +57,6 @@ if [ "$CLEAN" = true ]; then
     "wontfix"
     "duplicate"
     "documentation"
-    "accessibility"
   )
 
   for label in "${DEFAULT_LABELS[@]}"; do
@@ -89,6 +90,16 @@ run gh label create "area:infra"    --color "f9d0c4" --description "\"CI/CD, dep
 run gh label create "area:testing"  --color "e6e6e6" --description "\"Tests, test infrastructure\""       --force $REPO_FLAG
 run gh label create "area:design"   --color "fbca04" --description "\"UI/UX design, styling\""            --force $REPO_FLAG
 
+# ── Cross-cutting labels ─────────────────────────────────────────────
+# GitHub's own name, color and description, so repos created before GitHub
+# added this default end up with the identical label.
+
+echo ""
+echo "=== Creating cross-cutting labels ==="
+echo ""
+
+run gh label create "accessibility" --color "f143ab" --description "\"Barrier affecting people with disabilities\"" --force $REPO_FLAG
+
 # ── Priority labels ──────────────────────────────────────────────────
 
 echo ""
@@ -116,6 +127,6 @@ run gh label create "resolution:superseded"        --color "d1d5db" --descriptio
 echo ""
 echo "=== Done ==="
 echo ""
-echo "Created 20 labels (5 type + 7 area + 2 priority + 6 resolution)."
+echo "Created 21 labels (5 type + 7 area + 1 cross-cutting + 2 priority + 6 resolution)."
 echo ""
 echo "Customize area labels for your project — see docs/labels.md for guidance."
