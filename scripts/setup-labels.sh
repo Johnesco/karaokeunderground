@@ -55,6 +55,7 @@ if [ "$CLEAN" = true ]; then
     "wontfix"
     "duplicate"
     "documentation"
+    "accessibility"
   )
 
   for label in "${DEFAULT_LABELS[@]}"; do
