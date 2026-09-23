@@ -27,7 +27,8 @@ Every entry is tagged:
 | 2026-09-23 | [The copy frozen, and a working copy started](#2026-09-23--frozen-copy-working-copy) ([#7]) |
 | 2026-09-23 | [The stack chosen: ADR-001](#2026-09-23--choosing-the-stack) ([#2]) |
 | 2026-09-23 | [The content converted into core files, with a check to guard them](#2026-09-23--the-core-files) ([#10]) |
-| Next | The site scaffolded, starting with the songlist page ([#11]) |
+| 2026-09-23 | [The new site renders, phone-first, with a searchable songlist](#2026-09-23--the-new-site-renders) ([#13], [#11]) |
+| Next | The shows, once we decide how events get updated ([#12]), and redirects for every old URL ([#14]) |
 | Later | A preview ready to show |
 | Later | Presented to the owner |
 
@@ -212,6 +213,67 @@ The conversion changed the format and nothing else. The fixes to the content wen
 
 - **It fails** on anything that would break the site, lose something, or publish something it shouldn't: a missing or extra column, a duplicate song, garbled characters, HTML in a post, a broken image link, or a cut-off songlist.
 - **It warns** about things worth a look. Right now that's 8 images with no description for screen readers, and the empty Photos page.
+
+### 2026-09-23 · The new site renders
+
+**Milestone · Decision · Challenge** · [#13] · [#11] · [ADR-003](adr/003-clean-paths-one-shell.md) · [ADR-004](adr/004-own-markdown-renderer.md)
+
+John set three priorities:
+
+1. Get the new site rendering.
+2. Make it responsive.
+3. Make the songlists work with themes and tags.
+
+Until then, the local preview showed only a folder listing of the content.
+
+**The decisions.** Claude proposed options, and John chose:
+
+- **Re-scoped tickets.** The site shell and the pages come first ([#13]), then the songlist ([#11]).
+- **Clean paths** like `/songlist/`, all served by one page shell ([ADR-003](adr/003-clean-paths-one-shell.md)). Locally, a small Node server does what Netlify's rewrite rule will do later.
+- **A Markdown renderer of our own** instead of a library ([ADR-004](adr/004-own-markdown-renderer.md)).
+- **Plain styling for now.** The design comes later, with the owner.
+
+**Priority 1: every page renders.** One HTML shell reads the address and renders the matching core file:
+
+- the home page, with the latest posts
+- the six pages
+- an archive of all 46 posts, by year
+- each post
+- a not-found page
+
+Links in the Markdown point at files, so they also work in GitHub's preview, and the site turns them into paths.
+
+**Testing the renderer against a reference.** A hand-written Markdown renderer is easy to get almost right, so its output was compared with markdown-it, a widely used implementation of the CommonMark standard.
+
+- **The real content:** all 52 pages and posts came out identical.
+- **Random input:** 36,000 random strings of Markdown syntax went through both, built from asterisks, brackets, backslashes, line breaks, and list and quote markers.
+
+This differential testing found four real bugs, all in how a line that has lost its quote or list marker continues a paragraph. All four were fixed before anything shipped. The 22 differences left are corners where markdown-it itself departs from the standard, or where the two reasonably differ, and none of them appears in the content. The comparison also caught the markdown-it quirk from the conversion, where escaped characters vanish from image descriptions. Our renderer doesn't have it.
+
+**Priority 2: responsive.** The styles start from a phone, and wider screens only add room. All 55 paths were loaded at 320, 375 and 768 pixels wide and measured. Nothing scrolls sideways, text stays at 16px, and touch targets are at least 44px. The old site, by contrast, shrank its fixed 960px layout to 38% on a phone.
+
+**Priority 3: the songlist.** Search narrows the 1,853 songs as you type.
+
+- **Every word counts, in any order.** Each word has to appear in the artist, title or album, and accents, case and punctuation don't count. "ryan adams" finds "Adams, Ryan", and "bjork" finds Björk. That only works because the conversion restored the accents the old export had dropped.
+- **Themed lists.** Buttons switch between the whole list and the themed lists: Sad (542) and Scary (166). Each list has an address to share, like `/songlist/?theme=sad`, so the December show can link straight to its list.
+- **Hidden and tagged songs.** Songs marked `unlisted` appear nowhere, and tag filters appear once songs have tags.
+- **Screen readers.** A status line tells screen reader users how many songs match, once typing pauses.
+- **Nothing typed by hand.** The count and the "updated" date are computed, the date from the content repo's history.
+
+On a phone the page renders in about half a second.
+
+**Challenges:**
+
+- **A bug only a screenshot showed.** Opening a shared address showed "Showing all 1,853 songs" for 0.4 seconds before correcting itself. The status line waited for typing to pause even when the page first opened.
+- **A stale server.** The dev server doesn't reload its own code. A change to how it builds the content index looked like a bug in the page, until the server was restarted.
+
+**The Media and Photos pages.** Every press link on the Media page was checked by hand:
+
+- **Dead or misdirected:** four links were dead, and three landed on a section front page or on someone else's site. Those now point to the Wayback Machine's copies.
+- **Moved:** four articles had moved, and their links point to the new addresses.
+- **Missing:** one entry that never had a link got one.
+
+The empty Photos page now links to Instagram.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2

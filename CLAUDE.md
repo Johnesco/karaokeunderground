@@ -32,7 +32,9 @@ The owner has to be able to take it over: the stack runs in accounts they contro
 - **Code and content live apart until the owner agrees.** Code is in this public repo, the core files in the private content repo, and the Netlify build combines them
 - **An owner login comes later.** A git-based editor, such as TinaCMS or Decap, edits the same files
 - **Watch the credits.** The free plan gives 300 credits a month: 15 per production deploy, 20 per GB of traffic. When they run out, every site on the account is paused. Batch content updates, and develop on deploy previews, which are free
-- **Local for now.** The site is built and previewed on John's machine, reading the core files from `work/content/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
+- **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/songlist/`, `/about/`, `/posts/<file>/`. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
+- **Our own Markdown renderer** ([ADR-004](docs/adr/004-own-markdown-renderer.md)), with no dependencies, checked against markdown-it
+- **Local for now.** `npm run dev` previews the site on 127.0.0.1:8001, reading the core files from `work/content/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
 
 ### The current site
 
@@ -62,16 +64,24 @@ karaokeunderground/
 │   ├── adr/
 │   │   ├── README.md              # ADR index
 │   │   ├── 001-static-netlify-core-files.md   # The stack: static on Netlify, core files read in the browser
-│   │   └── 002-core-file-formats.md           # The formats of the core files (#10)
+│   │   ├── 002-core-file-formats.md           # The formats of the core files (#10)
+│   │   ├── 003-clean-paths-one-shell.md       # Clean paths, served by one page shell (#13)
+│   │   └── 004-own-markdown-renderer.md       # Our own Markdown renderer (#13)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
 │   │   └── urls.csv               # Every known legacy URL; becomes the redirect map
 │   └── research/
 │       └── stack-and-hosting.md   # The sourced findings behind ADR-001 (spike #2)
+├── site/                          # What the browser loads: the page shell, its styles and scripts (#13, #11)
+│   ├── index.html                 # The one page shell for every path (ADR-003)
+│   ├── css/site.css               # Plain, phone-first styles. The design comes later, with the owner
+│   └── js/                        # ES modules. app.js runs the page; router.js, views.js, markdown.js (ADR-004) and
+│                                  #   songlist-page.js render it; csv.js, front-matter.js and songlist.js are shared with the check
 ├── scripts/
 │   ├── check-content.js           # Ours: the content check, which npm test runs (#10)
-│   ├── lib/                       # Its parts. csv.js, front-matter.js and songlist.js use no Node APIs, so the site can share them
+│   ├── dev-server.js              # Ours: the local preview, npm run dev (ADR-003)
+│   ├── lib/                       # Their parts: check-content.js, dev-server.js, and content-index.js, which builds /content/index.json
 │   ├── convert-working-copy.py    # Ours, one-off: turned the working copy into the core files (#10)
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
 │   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
@@ -85,14 +95,17 @@ karaokeunderground/
 
 ## Key Technical Patterns
 
-From [ADR-001](docs/adr/001-static-netlify-core-files.md) and [ADR-002](docs/adr/002-core-file-formats.md):
+From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-004](docs/adr/004-own-markdown-renderer.md):
 
 - **The core files are the only source.** Nothing that changes is typed into HTML or JavaScript. It comes from `content/`
 - **Nothing reaches production unchecked.** The deploy-time Node check is the safety net for uploads made in GitHub's web editor, which bypass the local gate
 - **Plain Node for tooling,** with no dependencies where possible, like the directory's build scripts. ES modules throughout (`"type": "module"`)
-- **The check and the site share their parsers.** `scripts/lib/csv.js`, `front-matter.js` and `songlist.js` use no Node APIs, so the browser runs the same code the check tested. #11 can move them to where the site loads them
+- **The check and the site share their parsers.** `site/js/csv.js`, `front-matter.js`, `songlist.js` and `markdown.js` use no browser or Node APIs, so the browser runs the same code the tests and the check run
+- **Views are plain functions.** `views.js` and `songlist-page.js` turn core files into `{ title, html }`, so the tests run them. Only `app.js` and `enhanceSonglist()` touch the page
+- **Links load pages normally** (ADR-003). There's no client-side routing, except that the songlist keeps its search in the address with `history.replaceState`
 - **Errors and warnings.** The check fails on an error: something that would break the site, lose content or publish something it shouldn't. A warning is worth a look but doesn't stop anything
 - **No HTML in the content.** The check rejects HTML in pages and posts, and the renderer still escapes it, because uploads can bypass the local gate
+- **Phone-first.** Base styles are for a phone, and wider screens only add room. Nothing may scroll sideways at 320px, and touch targets are at least 44px
 
 ## Data Formats
 
@@ -104,7 +117,7 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) and [ADR-002](docs/adr
   - Themes and Tags can be blank, or hold several values separated by semicolons: `sad; scary`. Themes are the themed lists (`sad` and `scary` so far). Tags are categories for browsing, all empty so far
   - Every song is on the main list. The theme `unlisted` takes a song off every list, themed ones included, until the word is removed
   - No other columns, because everything in the file is public once deployed. At least 1,000 songs, so a cut-off or filtered export can't replace the list
-- **`pages/<slug>.md`, `posts/<YYYY-MM-DD>-<slug>.md`:** plain Markdown (CommonMark, plus `~~strikethrough~~`) with no HTML. A line break inside a paragraph is a backslash at the end of the line
+- **`pages/<slug>.md`, `posts/<YYYY-MM-DD>-<slug>.md`:** plain Markdown (CommonMark, plus `~~strikethrough~~`) with no HTML, no tables and no reference-style links ([ADR-004](docs/adr/004-own-markdown-renderer.md)). A line break inside a paragraph is a backslash at the end of the line. A page's `#` headings sit under its title, as `h2`
   - Front matter between two `---` lines: `title` (required), `date` (required for posts, and the same as the file name's), `updated`, and `old_url`, the legacy address without the domain, in the same form as `urls.csv` (`/?p=835`). A value with `: ` or ` #` in it goes in double quotes, and the converted files quote every title
   - Links to other pages and posts point at their `.md` files, and images use paths from the file: `![Alt text](../images/2014/04/poster.jpg)`. Links are checked exactly, upper and lower case included, because the web host is case-sensitive
 - **`images/`:** WordPress's year/month folders, plus `site/` for the logo and icons. jpg, jpeg, png, gif or webp
@@ -115,6 +128,8 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) and [ADR-002](docs/adr
 **Local gate:** `npm test` ([ADR-001](docs/adr/001-static-netlify-core-files.md)). It runs the unit tests in `test/` with `node --test`, then `scripts/check-content.js` on `work/content/`. It must pass before any release tag, and it's deterministic: local files only, with no network and no clock, so a show in the past is never an error. It needs the private content in `work/`, and says so when it's missing.
 
 - `npm run check` runs the content check alone, and `node scripts/check-content.js <folder>` checks any other content folder
+- `npm run dev` previews the site on 127.0.0.1:8001. The unit tests cover the renderer, the paths, the views, the songlist search and the dev server, which they start on a free port on 127.0.0.1
+- **Check it in a browser too:** every page at 320, 375 and 768px wide with no sideways scrolling, and the songlist's search and lists. #13 and #11 did it by loading each path into an iframe at each width
 
 ## Releases
 
@@ -199,6 +214,8 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 
 - [ADR-001](docs/adr/001-static-netlify-core-files.md): a static site on Netlify that reads its core files in the browser. *Accepted* 2026-09-23 (spike [#2](https://github.com/Johnesco/karaokeunderground/issues/2)); revisit after the owner interview, [#3](https://github.com/Johnesco/karaokeunderground/issues/3)
 - [ADR-002](docs/adr/002-core-file-formats.md): the formats of the core files, including the Themes and Tags columns and plain Markdown. *Accepted* 2026-09-23 ([#10](https://github.com/Johnesco/karaokeunderground/issues/10)); the shows wait for the decision on events
+- [ADR-003](docs/adr/003-clean-paths-one-shell.md): clean paths, served by one page shell, with a Node dev server locally. *Accepted* 2026-09-23 ([#13](https://github.com/Johnesco/karaokeunderground/issues/13))
+- [ADR-004](docs/adr/004-own-markdown-renderer.md): our own Markdown renderer, with no dependencies. *Accepted* 2026-09-23 ([#13](https://github.com/Johnesco/karaokeunderground/issues/13))
 
 ### The diary
 
@@ -212,6 +229,8 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: Built the songlist page with search, themes and tags (#11)
+- **2026-09-23**: Built the site shell, clean paths, our own Markdown renderer and the local preview, phone-first (#13): [ADR-003](docs/adr/003-clean-paths-one-shell.md), [ADR-004](docs/adr/004-own-markdown-renderer.md)
 - **2026-09-23**: Converted the working copy into the core files (#10). [ADR-002](docs/adr/002-core-file-formats.md) sets their formats, and `npm test` checks them
 - **2026-09-23**: Chose the stack (#2): [ADR-001](docs/adr/001-static-netlify-core-files.md), a static site on Netlify that reads its core files in the browser
 - **2026-09-23**: Started the revamp diary for the portfolio (#8): [`docs/diary.md`](docs/diary.md)
