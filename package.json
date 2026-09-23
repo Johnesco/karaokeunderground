@@ -1,0 +1,14 @@
+{
+  "name": "karaokeunderground",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A revamp of karaokeunderground.com: a static site that reads its core files in the browser",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\" && node scripts/check-content.js",
+    "check": "node scripts/check-content.js"
+  }
+}

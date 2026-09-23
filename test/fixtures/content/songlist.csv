@@ -1,0 +1,5 @@
+Artist,Title,Album,Themes,Tags
+Example Band,First Song,Demo Album,,
+Example Band,Second Song (by Other Band),Demo Album,sad,duet
+"Sample, Solo",Third Song,"Tape, Vol. 1",sad; scary,
+Test Group,Hidden Song,Demo Album,unlisted; scary,duet
