@@ -89,22 +89,22 @@ a {
 
 /* ---- the corner logo (#26) ---- */
 
-/* A faded copy of the logo sits fixed in the lower right, pushed half off the
-   corner, so only its top-left part shows. It's the logo the header already
-   loads, drawn behind everything, and it never catches a tap. Grey text over
-   its brightest part still has about 7:1 contrast. Anyone who asks their
-   system for more contrast, or forced colours, doesn't get it. */
+/* A faded copy of the logo sits fixed in the lower right, pushed about a third
+   off the corner, so its top-left two thirds show. It's the logo the header
+   already loads, drawn behind everything, and it never catches a tap. Grey
+   text over its brightest part still has about 7:1 contrast. Anyone who asks
+   their system for more contrast, or forced colours, doesn't get it. */
 body::after {
   content: "";
   position: fixed;
   right: 0;
   bottom: 0;
   z-index: -1;
-  width: clamp(14rem, 45vw, 30rem);
+  width: clamp(16rem, 50vw, 34rem);
   aspect-ratio: 250 / 243;
   background: url("/content/images/site/logo.png") center / contain no-repeat;
   opacity: 0.12;
-  transform: translate(50%, 50%);
+  transform: translate(35%, 35%);
   pointer-events: none;
 }
 
