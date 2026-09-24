@@ -68,7 +68,8 @@ karaokeunderground/
 │   │   ├── 003-clean-paths-one-shell.md       # Clean paths, served by one page shell (#13)
 │   │   ├── 004-own-markdown-renderer.md       # Our own Markdown renderer (#13)
 │   │   ├── 005-photos-gallery.md              # The Photos page: a gallery and an Instagram card (#18)
-│   │   └── 006-sort-by-moving-a-column.md     # Sorting the songlist by moving a column to the front (#22)
+│   │   ├── 006-sort-by-moving-a-column.md     # Sorting the songlist by moving a column to the front (#22)
+│   │   └── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -78,6 +79,7 @@ karaokeunderground/
 ├── site/                          # What the browser loads: the page shell, its styles and scripts (#13, #11)
 │   ├── index.html                 # The one page shell for every path (ADR-003)
 │   ├── css/site.css               # Plain, phone-first styles, white on black. The design comes later, with the owner
+│   ├── fonts/                     # SprayME, the wide-screen menu's font, with a note of its CC BY-SA licence (ADR-007)
 │   └── js/                        # ES modules. app.js runs the page; router.js, views.js, markdown.js (ADR-004),
 │                                  #   songlist-page.js and photos-page.js (ADR-005) render it; csv.js, front-matter.js
 │                                  #   and songlist.js are shared with the check
@@ -99,7 +101,7 @@ karaokeunderground/
 
 ## Key Technical Patterns
 
-From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-006](docs/adr/006-sort-by-moving-a-column.md):
+From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-007](docs/adr/007-left-menu-in-sprayme.md):
 
 - **The core files are the only source.** Nothing that changes is typed into HTML or JavaScript. It comes from `content/`
 - **Nothing reaches production unchecked.** The deploy-time Node check is the safety net for uploads made in GitHub's web editor, which bypass the local gate
@@ -111,6 +113,7 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-006](docs/adr/
 - **No HTML in the content.** The check rejects HTML in pages and posts, and the renderer still escapes it, because uploads can bypass the local gate
 - **Phone-first.** Base styles are for a phone, and wider screens only add room. Nothing may scroll sideways at 320px, and touch targets are at least 44px
 - **White text on black, everywhere we can,** at the owner's request, as the old site was. No inverted panels: a picked control shows a white border, bold text and its own state. Text colours stay at WCAG AA or better on black, and so do the borders of controls. The colours are the variables at the top of `site.css`
+- **Borrowed assets carry their licence.** A font or image from outside the owner's content sits with a note of its licence, and gets a credit where the licence asks for one. SprayME's credit is in the footer ([ADR-007](docs/adr/007-left-menu-in-sprayme.md)). The old menu font, ALL AGES, is licensed for personal use only, so it isn't used
 - **The songlist stays quick at 1,853 songs** ([ADR-006](docs/adr/006-sort-by-moving-a-column.md)). Its rows use `content-visibility: auto`, so the browser lays out only the ones near the screen, and an animation reads every position before starting any. Reading a position between animations once made a sort take 1.2 seconds
 
 ## Data Formats
@@ -226,6 +229,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-004](docs/adr/004-own-markdown-renderer.md): our own Markdown renderer, with no dependencies. *Accepted* 2026-09-23 ([#13](https://github.com/Johnesco/karaokeunderground/issues/13))
 - [ADR-005](docs/adr/005-photos-gallery.md): the Photos page, a gallery of the owner's photos with small copies, and an Instagram card that loads nothing from Instagram. *Accepted* 2026-09-23 ([#18](https://github.com/Johnesco/karaokeunderground/issues/18))
 - [ADR-006](docs/adr/006-sort-by-moving-a-column.md): sorting the songlist by moving a column to the front, John's design. *Accepted* 2026-09-24 ([#22](https://github.com/Johnesco/karaokeunderground/issues/22))
+- [ADR-007](docs/adr/007-left-menu-in-sprayme.md): on wide screens, the menu stands in a left column, set in SprayME, a Creative Commons font credited in the footer. *Accepted* 2026-09-24 ([#23](https://github.com/Johnesco/karaokeunderground/issues/23))
 
 ### The diary
 
@@ -239,6 +243,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-24**: On wide screens the menu stands in a left column, as on the old site, set in SprayME (#23): [ADR-007](docs/adr/007-left-menu-in-sprayme.md)
 - **2026-09-24**: The songlist sorts by artist, title or album, by moving a column to the front (#22): [ADR-006](docs/adr/006-sort-by-moving-a-column.md)
 - **2026-09-23**: The Photos page shows the owner's photos and an Instagram card (#18): [ADR-005](docs/adr/005-photos-gallery.md). Posts joined the menu (#13)
 - **2026-09-23**: Built the songlist page with search, themes and tags (#11)

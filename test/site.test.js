@@ -84,6 +84,15 @@ describe('site.css', () => {
   });
 });
 
+describe('the page shell', () => {
+  it('credits SprayME and its licence, as the licence asks (ADR-007)', () => {
+    const shell = fs.readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
+    assert.match(shell, /SprayME<\/a> font is by Micha\u{142} Nowak/u);
+    assert.match(shell, /<a href="https:\/\/creativecommons\.org\/licenses\/by-sa\/3\.0\/">CC BY-SA 3\.0<\/a>/);
+    assert.match(fs.readFileSync(path.join(ROOT, 'site', 'fonts', 'README.md'), 'utf8'), /Attribution-ShareAlike 3\.0/);
+  });
+});
+
 describe('buildIndex', () => {
   it('lists every page and post with its front matter', () => {
     assert.deepEqual(buildIndex(FIXTURE, { git: false }), {
@@ -129,6 +138,13 @@ describe('the dev server', () => {
       const index = await (await fetch(`${base}/content/index.json`)).json();
       assert.equal(index.posts[0].name, '2026-01-02-first-post');
       assert.equal((await fetch(`${base}/content/nope.md`)).status, 404);
+    });
+
+    it('serves the font as a font', async () => {
+      const font = await fetch(`${base}/fonts/sprayme.woff`);
+      assert.equal(font.status, 200);
+      assert.equal(font.headers.get('content-type'), 'font/woff');
+      assert.equal((await font.arrayBuffer()).byteLength, 17356);
     });
   });
 });

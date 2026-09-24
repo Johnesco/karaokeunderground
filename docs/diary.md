@@ -352,6 +352,19 @@ John asked for a minimal way to sort the songlist by title or album, not only by
 
 **Then a prune.** John noticed the song count showing three times: in the line under the title, on the All songs button, and in the status line. Claude mocked up a rule, each fact shown once, where it's most useful, and John kept one exception: the Sad and Scary buttons keep their counts. The count lives in the status line above the songs, the one line that follows the lists and the search. The date sits alone under the title. The page's own text, a link to a Spotify playlist, now comes after the songs. On a 375px phone the first song moved up 114px, and the first screen shows four songs instead of two.
 
+### 2026-09-24 · The old left menu, in the old site's other font
+
+**Decision · Finding** · [#23] · [ADR-007](adr/007-left-menu-in-sprayme.md)
+
+On wide screens the menu ran long across the top. The old site had stood its logo and menu in a column on the left, with the menu in a big, distressed punk face, and John asked about bringing both back. We're still prototyping, so the question was only what we're allowed to use.
+
+**The fonts' own files answered it.** The old theme carries two fonts, and each file states its licence:
+
+- **ALL AGES,** the menu's, is the demo version of a font by KC Fonts: "for personal use only", with commercial use arranged through the designer. A business's site isn't personal use.
+- **SprayME,** the titles', is Creative Commons BY-SA 3.0: any use, with a credit.
+
+So the left column came back in SprayME, with the credit in the footer and a note of the licence beside the font file. Reading the font's character map showed it covers only letters and digits, with no accents, dashes or curly quotes, so it sets the seven menu words and nothing else. Titles keep the system font. Phones keep the top menu and never download the font. If the owner ever licenses ALL AGES, it replaces SprayME in one line of CSS.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -370,3 +383,4 @@ John asked for a minimal way to sort the songlist by title or album, not only by
 [#19]: https://github.com/Johnesco/karaokeunderground/issues/19
 [#21]: https://github.com/Johnesco/karaokeunderground/issues/21
 [#22]: https://github.com/Johnesco/karaokeunderground/issues/22
+[#23]: https://github.com/Johnesco/karaokeunderground/issues/23

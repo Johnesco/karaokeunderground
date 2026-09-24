@@ -21,6 +21,15 @@
   --measure: 42rem;
 }
 
+/* SprayME, the old site's title font, sets the menu on wide screens (ADR-007).
+   It's Creative Commons BY-SA 3.0: the footer credits it, and
+   site/fonts/README.md has the details. Phones never download it. */
+@font-face {
+  font-family: "SprayME";
+  src: url("/fonts/sprayme.woff") format("woff");
+  font-display: swap;
+}
+
 *,
 *::before,
 *::after {
@@ -552,6 +561,14 @@ main.wide {
   text-align: center;
 }
 
+.site-footer p {
+  margin: 0.25rem 0;
+}
+
+.site-footer .credit {
+  font-size: 0.8rem;
+}
+
 @media (min-width: 48rem) {
   .site-header {
     gap: 0.5rem 1.25rem;
@@ -578,5 +595,67 @@ main.wide {
 
   main {
     padding-top: 2.5rem;
+  }
+}
+
+/* On wide screens the logo and menu stand in a column on the left, as on the
+   old site, and stay in view as the page scrolls (#23, ADR-007). The menu is
+   set in SprayME, which covers letters and digits only, so nothing else is. */
+@media (min-width: 64rem) {
+  body {
+    display: grid;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    grid-template-rows: 1fr auto;
+    min-height: 100vh;
+  }
+
+  .site-header {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 1.5rem;
+    max-height: 100vh;
+    overflow-y: auto; /* a short window can still reach every link */
+    padding: 2rem 1rem;
+    border-bottom: 0;
+  }
+
+  main {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%; /* in a grid, auto margins would otherwise shrink it to its content */
+  }
+
+  .site-footer {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .site-logo img {
+    width: 10rem;
+  }
+
+  .site-header nav {
+    flex: none;
+  }
+
+  .menu {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .menu a {
+    padding: 0.25rem 0.5rem;
+    font-family: "SprayME", system-ui, sans-serif;
+    font-size: 2rem;
+    font-weight: 400; /* SprayME has one weight; a drawn-on bold would smear it */
+    font-synthesis: none;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    text-align: center;
   }
 }
