@@ -307,11 +307,11 @@ Second, the Photos page should be more than a link to Instagram. Could it frame 
 
 **A plan that changed while building:** the idea was that the owner could add a photo just by dropping it into a folder. But every photo needs a description, and the description needs a place. So a photo gets one line in the Photos page's Markdown, with its description, next to where it's listed.
 
-### 2026-09-24 · The sad list lives in one place
+### 2026-09-24 · A historical post, and a link to the current list
 
-**Decision** · [#19]
+**Decision · Process** · [#19]
 
-The SAD SONGS ONLY 2025 post carried its own copy of the list, 542 songs pasted one per line. This is exactly what the Themes column was meant to end ([2026-09-23 · The core files](#2026-09-23--the-core-files)). John asked for the post to point at the songlist instead, if the two lists matched.
+The SAD SONGS ONLY 2025 post carries its own copy of that year's list, 542 songs pasted one per line, and the songlist now holds the same songs as its Sad list ([2026-09-23 · The core files](#2026-09-23--the-core-files)). John asked for the post to point at the songlist instead, if the two lists matched.
 
 **Comparing first.** A script paired every song in the post with a song on the songlist's Sad list, one to one:
 
@@ -319,7 +319,12 @@ The SAD SONGS ONLY 2025 post carried its own copy of the list, 542 songs pasted 
 - **537 matched exactly.** Several of them only because the conversion had restored the accents the old export dropped.
 - **5 were the same songs, spelled differently,** like "National" against "The National".
 
-**Then the rewrite.** The post now links to the songlist filtered to the Sad list, which is searchable and stays current as songs get tagged. The owner's own sentence stays as it was, and the hand-typed "542 songs" goes, because the songlist counts for itself. The pasted list isn't lost: it stays in the content repo's history.
+**Then a change of mind.** The first rewrite swapped the pasted list for a link to the songlist filtered to the Sad list. But a link shows the Sad list as it is when someone clicks it, so next year the 2025 post would have shown the 2026 list. John decided the post is historical:
+
+- **The 2025 list stays,** word for word, as the record of that show.
+- **A note at the top** links to the current Sad list at `/songlist/?theme=sad`, for anyone who wants this year's list.
+
+Both versions are in the content repo's history. Trying the first version is what showed the problem.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
