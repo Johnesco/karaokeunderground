@@ -137,7 +137,7 @@ body::after {
 
 .site-logo img {
   display: block;
-  width: 2.75rem; /* the link home, and so to the posts (ADR-008): a touch target at least 44px */
+  width: 2.75rem; /* the link home, to the songlist (ADR-009): a touch target at least 44px */
 }
 
 .site-header nav {
@@ -162,6 +162,14 @@ body::after {
   letter-spacing: 0.02em;
   text-decoration: none;
   text-transform: uppercase;
+}
+
+/* From 360px wide the four links fit on one row with room to spare, so they
+   spread across it. At 320px they take two rows and stay packed. */
+@media (min-width: 22.5rem) {
+  .menu {
+    justify-content: space-between;
+  }
 }
 
 .menu a:hover,
@@ -613,7 +621,8 @@ main.wide {
   }
 
   .menu {
-    gap: 0 0.25rem;
+    justify-content: flex-start;
+    gap: 0 1.5rem; /* four links leave room for some air between them */
   }
 
   .menu a {
@@ -675,6 +684,7 @@ main.wide {
   .menu {
     flex-direction: column;
     align-items: center;
+    gap: 0.75rem;
   }
 
   .menu a {
