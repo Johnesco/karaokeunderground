@@ -303,6 +303,8 @@ Second, the Photos page should be more than a link to Instagram. Could it frame 
 - **Described.** Each photo has a written description for screen readers. The descriptions leave out the lyrics on the screens and any guess about who's singing.
 - **Nothing from Instagram loads.** The card is a link, so there's no third-party script and no tracking.
 
+**A bug John found, and why the checks missed it.** On a desktop, choosing the Sad or Scary list changed the count but not the list. The filter hid each row with HTML's `hidden` attribute. But on wide screens the stylesheet laid the rows out with `display: grid`, and a site's own CSS overrides the browser's rule that hides `hidden` elements. On phones it worked, and every automated check had read the `hidden` attribute rather than what was actually drawn, so they all passed. The fix is one line of CSS, and a test now guards it. The lesson: check what the reader sees, not what the code set.
+
 **A plan that changed while building:** the idea was that the owner could add a photo just by dropping it into a folder. But every photo needs a description, and the description needs a place. So a photo gets one line in the Photos page's Markdown, with its description, next to where it's listed.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1

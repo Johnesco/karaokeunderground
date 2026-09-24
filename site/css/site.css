@@ -46,6 +46,13 @@ img {
   height: auto;
 }
 
+/* The hidden attribute always hides. Without !important, any rule that sets
+   display (like the songlist's grid rows on wide screens) would show hidden
+   elements, which is how the songlist's filters stopped working there (#11). */
+[hidden] {
+  display: none !important;
+}
+
 a {
   color: inherit;
   text-underline-offset: 0.15em;

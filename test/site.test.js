@@ -1,5 +1,6 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { route, sitePath } from '../site/js/router.js';
@@ -73,6 +74,13 @@ describe('views', () => {
     assert.equal(view.title, null);
     assert.match(view.html, /<a href="\/posts\/2026-01-02-first-post\/">First post: an example<\/a>/);
     assert.match(view.html, /All 1 posts/);
+  });
+});
+
+describe('site.css', () => {
+  it('keeps the hidden attribute hiding, whatever display a rule sets (#11)', () => {
+    const css = fs.readFileSync(path.join(ROOT, 'site', 'css', 'site.css'), 'utf8');
+    assert.match(css, /\[hidden\]\s*\{\s*display:\s*none\s*!important;\s*\}/);
   });
 });
 
