@@ -65,16 +65,14 @@ describe('the example songlist', () => {
     assert.deepEqual(valuesOf(songs, 'tags'), [{ key: 'duet', name: 'duet', count: 1 }]);
   });
 
-  it('renders the page: date, lists, tags, count, every song, then the page\u{2019}s text', () => {
+  it('renders the page: lists, tags, count, every song, the date, then the page\u{2019}s text', () => {
     const doc = parseFrontMatter('---\ntitle: Songlist\n---\nMost of these are on [a playlist](https://e.com).\n');
     const view = songlistView(doc, songs, '2026-09-05');
     assert.equal(view.title, 'Songlist');
     assert.equal(view.wide, true);
-    assert.match(view.html, /<h1>Songlist<\/h1>\n<p class="song-summary">Updated <time datetime="2026-09-05">September 5, 2026<\/time><\/p>/);
-    assert.match(view.html, /<span>All songs<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s, 'the themed lists keep their counts');
+    assert.match(view.html, /<legend>Lists<\/legend>\n.*<span>All songs \(3\)<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s, 'every list shows its size');
     assert.match(view.html, /<p class="song-count" role="status">3 songs<\/p>/);
-    assert.equal(view.html.match(/\b3 songs?\b|\(3\)/g).length, 1, 'the whole list is counted once');
-    assert.ok(view.html.indexOf('</ul>') < view.html.indexOf('Most of these are on'), 'the page\u{2019}s text comes after the songs');
+    assert.match(view.html, /<\/ul>\n<\/div>\n<p class="song-summary">Updated <time datetime="2026-09-05">September 5, 2026<\/time><\/p>\n<p>Most of these are on/, 'the date sits at the foot of the songs, before the page\u{2019}s text');
     assert.match(view.html, /<legend>Tags<\/legend>/);
     assert.equal(view.html.match(/<li>/g).length, 3);
     assert.match(view.html, /<li><span class="song-artist song-first">Sample, Solo<\/span><span class="song-sep" aria-hidden="true"> \u{2013} <\/span><span class="song-title song-second"><span class="visually-hidden">, <\/span>Third Song<\/span> <span class="song-album song-third"><span class="visually-hidden">, from <\/span>Tape, Vol. 1<\/span><\/li>/u);
@@ -89,7 +87,7 @@ describe('the example songlist', () => {
   it('puts the search box under the list and tag buttons, in the page order too', () => {
     const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
     const at = (s) => html.indexOf(s);
-    assert.ok(at('<legend>List</legend>') < at('<legend>Tags</legend>'));
+    assert.ok(at('<legend>Lists</legend>') < at('<legend>Tags</legend>'));
     assert.ok(at('<legend>Tags</legend>') < at('<input id="song-query"'));
     assert.ok(at('<input id="song-query"') < at('</form>'));
   });

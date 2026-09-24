@@ -150,22 +150,20 @@ function sortButton(column) {
 }
 
 /**
- * The page: its title from pages/songlist.md, the date the list last changed,
- * the search and filters, the count of what's showing, every song, and then
- * the page's own text. Each fact shows once: the count lives in the status
- * line above the songs, which follows the lists and the search.
+ * The page: its title from pages/songlist.md, the lists with their sizes, the
+ * search, the count of what's showing, every song, the date the list last
+ * changed, and then the page's own text.
  */
 export function songlistView(doc, songs, updated) {
   const byArtist = sortSongs(songs, 'artist');
   const themes = valuesOf(songs, 'themes');
   const tags = valuesOf(songs, 'tags');
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n`
-    + (updated ? `<p class="song-summary">Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time></p>\n` : '')
     // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
     + '<form class="song-search" role="search" action="/">\n'
     + (themes.length
-      ? '<fieldset class="choices"><legend>List</legend>\n'
-        + choice('radio', 'theme', '', 'All songs', true)
+      ? '<fieldset class="choices"><legend>Lists</legend>\n'
+        + choice('radio', 'theme', '', `All songs (${count(songs.length)})`, true)
         + themes.map((t) => choice('radio', 'theme', t.key, `${label(t.name)} (${count(t.count)})`, false)).join('')
         + '</fieldset>\n'
       : '')
@@ -184,7 +182,7 @@ export function songlistView(doc, songs, updated) {
     + '</div>\n'
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
-    // The column names are the sort buttons, named "Sort by" as the list buttons are named "List",
+    // The column names are the sort buttons, named "Sort by" as the list buttons are named "Lists",
     // and the list starts sorted by artist. On a phone they pile up as each song does,
     // with the same dash after the first.
     + '<div class="song-table" data-sort="artist">\n'
@@ -193,7 +191,9 @@ export function songlistView(doc, songs, updated) {
     + '</fieldset>\n'
     + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
     + '</div>\n'
-    // The page's own text, like where to stream the songs, comes after them, so the list starts sooner.
+    // When the list last changed sits at its foot, and the page's own text, like where
+    // to stream the songs, comes after that, so the list starts sooner.
+    + (updated ? `<p class="song-summary">Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time></p>\n` : '')
     + markdownHtml(doc.body, 'pages');
   return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
 }
