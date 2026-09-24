@@ -2,7 +2,7 @@
 
 A revamp of [karaokeunderground.com](https://karaokeunderground.com), the site for Karaoke Underground: punk and indie video karaoke in Austin, Texas. It's being built for the site's owner, to offer as a replacement for the current site.
 
-> **Status: building.** The new site renders every page, post and song from its core files, phone-first, with a searchable songlist and its themed lists. It's previewed locally for now. The live site is the owner's WordPress install, and it stays as it is unless the owner adopts this revamp. Nothing in this repo is deployed yet.
+> **Status: building.** The new site renders every page, post and song from its core files, phone-first, with a searchable, sortable songlist and its themed lists. It's previewed locally for now. The live site is the owner's WordPress install, and it stays as it is unless the owner adopts this revamp. Nothing in this repo is deployed yet.
 
 ## Where things are
 

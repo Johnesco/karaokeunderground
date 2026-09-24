@@ -328,6 +328,24 @@ Both versions are in the content repo's history. Trying the first version is wha
 
 **Then Scary-oke, the same way** ([#21]). The songlist's other themed list came from a post too: Scary-oke, from October 2022. Its 166 songs still match the Scary list one to one, every name identical, so this time no spellings needed matching. It got the same treatment: the 2022 list stays, and a note at the top links to the current list at `/songlist/?theme=scary`.
 
+### 2026-09-24 · Sorting by moving a column
+
+**Decision · Challenge** · [#22] · [ADR-006](adr/006-sort-by-moving-a-column.md)
+
+John asked for a minimal way to sort the songlist by title or album, not only by artist, and sketched the design himself: the column names above the list are the control. Touch Title, and the Title column moves to the front with an animated shift, and it becomes the bold one, as Artist was.
+
+**The details, settled in ADR-006 before any code:**
+
+- **The column names show on phones too.** Phones had none: each song read "Artist – Title", with the album below. Now a row of three names sits above the songs, and whichever is first leads each song, in bold.
+- **Words count, punctuation doesn't.** Sorting ignores case, accents and punctuation. We tried two rules against the owner's own order. Ignoring a leading "The" or "A" in titles would have moved 82 songs, mostly within one artist's songs. Counting every word moves 16, all because of punctuation or case, like a title that starts with a bracket. The owner already files "Zombies, The" under Z, so their list agreed with the second rule.
+- **One direction.** A to Z only, so a second touch doesn't need a second meaning.
+- **Screen readers hear each song in the order shown,** as "title, by artist, from album", from words hidden on screen, and the status line says how the list is sorted.
+- **The address keeps it.** `/songlist/?theme=sad&sort=title` opens the Sad list sorted by title.
+
+**A slow first version.** The first working version took 1.2 seconds to sort. The animation measured where the songs on screen had moved to, and it started each song's animation as soon as it had measured that song. Every measurement after an animation started made the browser lay out all 1,853 songs again, once for every song on screen. Measuring everything first and then starting the animations brought a sort under 200ms. Most of what was left was the browser laying out every song after each sort, the hundreds off screen included. A CSS setting, `content-visibility: auto`, lets it skip the songs nowhere near the screen. Timed side by side, alternating the two versions, a sort went from 697ms to 169ms, and with the page loaded normally it takes about 44ms. Single timings in a background tab varied fivefold from one run to the next, so only the alternating runs could be trusted.
+
+**Around it, the same page got smaller changes** ([#11]). The list buttons pack tighter, since more themed lists are coming. The search box has an X to clear it. "Search" now sits beside the box as a one-word label, where "Search the songlist" used to sit above it, and screen readers still hear the whole phrase.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -345,3 +363,4 @@ Both versions are in the content repo's history. Trying the first version is wha
 [#18]: https://github.com/Johnesco/karaokeunderground/issues/18
 [#19]: https://github.com/Johnesco/karaokeunderground/issues/19
 [#21]: https://github.com/Johnesco/karaokeunderground/issues/21
+[#22]: https://github.com/Johnesco/karaokeunderground/issues/22
