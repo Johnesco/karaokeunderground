@@ -281,6 +281,21 @@ main.wide {
   color: var(--muted);
 }
 
+/* The lists, the search, the status line and the column names stay at the top
+   of the screen as the songs scroll under them (#11), but only where the window
+   is tall enough to spare the room. On a short window, a phone on its side, or
+   with the text made bigger, they stay in the page, so they never cover most of
+   the screen. */
+@media (min-height: 40rem) {
+  .song-controls {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding-top: 0.25rem;
+    background: var(--bg);
+  }
+}
+
 .song-search {
   display: grid;
   gap: 0.5rem;

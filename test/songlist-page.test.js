@@ -80,8 +80,15 @@ describe('the example songlist', () => {
 
   it('heads the songs with the sort buttons, a group screen readers hear as "Sort by", with the songs\u{2019} dash after the first', () => {
     const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
-    assert.match(html, /<div class="song-table" data-sort="artist">\n<div class="songs-head" role="group" aria-label="Sort by">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<span class="song-sep" aria-hidden="true"> \u{2013} <\/span>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<ul class="songs"/u);
+    assert.match(html, /<div class="songs-head" role="group" aria-label="Sort by">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<span class="song-sep" aria-hidden="true"> \u{2013} <\/span>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<\/div>\n<ul class="songs"/u);
     assert.ok(html.indexOf('class="songs-head"') < html.indexOf('<ul class="songs"'), 'the buttons come before the songs');
+  });
+
+  it('keeps every control in one block before the songs, so they can stay on screen together', () => {
+    const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
+    const block = html.slice(html.indexOf('<div class="song-controls">'), html.indexOf('<ul class="songs"'));
+    for (const part of ['<legend>Lists</legend>', 'id="song-query"', 'class="song-status"', 'class="song-hint"', 'class="songs-head"']) assert.ok(block.includes(part), part);
+    assert.ok(html.indexOf('<div class="song-table" data-sort="artist">') < html.indexOf('<div class="song-controls">'), 'the columns\u{2019} widths reach the column names');
   });
 
   it('puts the search box under the list and tag buttons, in the page order too', () => {

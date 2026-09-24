@@ -169,6 +169,10 @@ export function songlistView(doc, songs, updated) {
   const themes = valuesOf(songs, 'themes');
   const tags = valuesOf(songs, 'tags');
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n`
+    // The controls, from the list buttons to the column names, share one block, which stays
+    // at the top of the screen as the songs scroll under it.
+    + '<div class="song-table" data-sort="artist">\n'
+    + '<div class="song-controls">\n'
     // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
     + '<form class="song-search" role="search" action="/">\n'
     + (themes.length
@@ -197,8 +201,8 @@ export function songlistView(doc, songs, updated) {
     + ` <span class="song-hint">${sortHint('artist')}</span></p>\n`
     // The column names are the sort buttons, and the list starts sorted by artist.
     // On a phone they pile up as each song does, with the same dash after the first.
-    + '<div class="song-table" data-sort="artist">\n'
     + `<div class="songs-head" role="group" aria-label="Sort by">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
+    + '</div>\n'
     + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
     + '</div>\n'
     // When the list last changed sits at its foot, and the page's own text, like where
@@ -272,10 +276,23 @@ export function enhanceSonglist(main, songs, themes) {
     else say();
   };
 
-  form.addEventListener('input', update);
+  // The controls stay at the top of the screen as the songs scroll. So when a list, a
+  // search or a sort changes the songs, the first one moves up to just under them,
+  // rather than leaving the reader wherever the page had scrolled to.
+  const controls = table.querySelector('.song-controls');
+  const toListStart = () => {
+    const gap = list.getBoundingClientRect().top - controls.getBoundingClientRect().bottom;
+    if (gap < 0) window.scrollBy(0, gap);
+  };
+
+  form.addEventListener('input', (event) => {
+    update(event);
+    toListStart();
+  });
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     update(event);
+    toListStart();
   });
   // The X empties the search box and puts the cursor back in it, and so does Escape.
   // The picked list and tags stay picked.
@@ -283,6 +300,7 @@ export function enhanceSonglist(main, songs, themes) {
     input.value = '';
     input.focus();
     update();
+    toListStart();
   };
   clear.addEventListener('click', empty);
   input.addEventListener('keydown', (event) => {
@@ -342,6 +360,7 @@ export function enhanceSonglist(main, songs, themes) {
     items = [...list.children];
     focused?.focus({ preventScroll: true }); // moving a button drops its focus, so it goes back
     update();
+    toListStart();
     if (before) slide(before);
   };
 
