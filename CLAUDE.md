@@ -69,7 +69,8 @@ karaokeunderground/
 │   │   ├── 004-own-markdown-renderer.md       # Our own Markdown renderer (#13)
 │   │   ├── 005-photos-gallery.md              # The Photos page: a gallery and an Instagram card (#18)
 │   │   ├── 006-sort-by-moving-a-column.md     # Sorting the songlist by moving a column to the front (#22)
-│   │   └── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
+│   │   ├── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
+│   │   └── 008-posts-from-the-home-page.md    # Posts reached from the home page, not the menu (#24)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -230,6 +231,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-005](docs/adr/005-photos-gallery.md): the Photos page, a gallery of the owner's photos with small copies, and an Instagram card that loads nothing from Instagram. *Accepted* 2026-09-23 ([#18](https://github.com/Johnesco/karaokeunderground/issues/18))
 - [ADR-006](docs/adr/006-sort-by-moving-a-column.md): sorting the songlist by moving a column to the front, John's design. *Accepted* 2026-09-24 ([#22](https://github.com/Johnesco/karaokeunderground/issues/22))
 - [ADR-007](docs/adr/007-left-menu-in-sprayme.md): on wide screens, the menu stands in a left column, set in SprayME, a Creative Commons font credited in the footer. *Accepted* 2026-09-24 ([#23](https://github.com/Johnesco/karaokeunderground/issues/23))
+- [ADR-008](docs/adr/008-posts-from-the-home-page.md): Posts leaves the menu, and the home page, a logo's touch away, is the way to the posts. *Accepted* 2026-09-24 ([#24](https://github.com/Johnesco/karaokeunderground/issues/24))
 
 ### The diary
 
@@ -243,6 +245,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-24**: Posts left the menu, back to the old site's six links, and the home page leads to them (#24): [ADR-008](docs/adr/008-posts-from-the-home-page.md)
 - **2026-09-24**: On wide screens the menu stands in a left column, as on the old site, set in SprayME (#23): [ADR-007](docs/adr/007-left-menu-in-sprayme.md)
 - **2026-09-24**: The songlist sorts by artist, title or album, by moving a column to the front (#22): [ADR-006](docs/adr/006-sort-by-moving-a-column.md)
 - **2026-09-23**: The Photos page shows the owner's photos and an Instagram card (#18): [ADR-005](docs/adr/005-photos-gallery.md). Posts joined the menu (#13)

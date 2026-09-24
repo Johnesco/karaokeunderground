@@ -365,6 +365,12 @@ On wide screens the menu ran long across the top. The old site had stood its log
 
 So the left column came back in SprayME, with the credit in the footer and a note of the licence beside the font file. Reading the font's character map showed it covers only letters and digits, with no accents, dashes or curly quotes, so it sets the seven menu words and nothing else. Titles keep the system font. Phones keep the top menu and never download the font. If the owner ever licenses ALL AGES, it replaces SprayME in one line of CSS.
 
+### 2026-09-24 · Posts leave the menu
+
+**Decision** · [#24] · [ADR-008](adr/008-posts-from-the-home-page.md)
+
+To cut the menu down, John took Posts out of it. The home page already listed the five latest posts with a link to all of them, so it became the way in, and the logo leads there from every page. The menu is back to the old site's six links, and on the narrowest phones it now fits in two rows instead of three. Now that the logo is the way home, it got a full 44px touch target, and the home page marks it as the current page, as the menu does for the others.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -384,3 +390,4 @@ So the left column came back in SprayME, with the credit in the footer and a not
 [#21]: https://github.com/Johnesco/karaokeunderground/issues/21
 [#22]: https://github.com/Johnesco/karaokeunderground/issues/22
 [#23]: https://github.com/Johnesco/karaokeunderground/issues/23
+[#24]: https://github.com/Johnesco/karaokeunderground/issues/24

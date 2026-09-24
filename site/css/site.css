@@ -89,9 +89,9 @@ a {
 
 /* ---- header and menu ---- */
 
-/* On a phone the header stays tight: a small logo beside a menu in two rows
-   from 360px wide up (three at 320px), about 105px tall in all. Each link keeps
-   a touch target 44px tall. Wider screens get the roomier header below. */
+/* On a phone the header stays tight: a small logo beside a menu in two rows,
+   about 105px tall in all, down to 320px wide. Each link keeps a touch target
+   44px tall, the logo too. Wider screens get the roomier header below. */
 .site-header {
   display: flex;
   flex-wrap: wrap;
@@ -104,11 +104,12 @@ a {
 .site-logo {
   display: block;
   flex: none;
+  min-height: 2.75rem; /* the logo is a touch short of square, so the link makes up the 44px */
 }
 
 .site-logo img {
   display: block;
-  width: 2.5rem;
+  width: 2.75rem; /* the link home, and so to the posts (ADR-008): a touch target at least 44px */
 }
 
 .site-header nav {

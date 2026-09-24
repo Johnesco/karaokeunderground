@@ -85,6 +85,13 @@ describe('site.css', () => {
 });
 
 describe('the page shell', () => {
+  it('has the old site\u{2019}s six menu links, with the posts reached from the home page (ADR-008)', () => {
+    const shell = fs.readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
+    const menu = [...shell.matchAll(/<li><a href="([^"]+)">([^<]+)<\/a><\/li>/g)].map((m) => `${m[2]} ${m[1]}`);
+    assert.deepEqual(menu, ['Songlist /songlist/', 'Calendar /calendar/', 'Photos /photos/', 'Contact /contact/', 'Media /media/', 'About /about/']);
+    assert.match(shell, /<a class="site-logo" href="\/">/, 'the logo leads home');
+  });
+
   it('credits SprayME and its licence, as the licence asks (ADR-007)', () => {
     const shell = fs.readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
     assert.match(shell, /SprayME<\/a> font is by Micha\u{142} Nowak/u);
