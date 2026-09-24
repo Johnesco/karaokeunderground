@@ -1,0 +1,6 @@
+# ADR-009: The songlist is the home page, and the site has four sections
+**Status:** Proposed · **Date:** 2026-09-24 · **Issue(s):** [#25](https://github.com/Johnesco/karaokeunderground/issues/25) · **Supersedes:** [ADR-008](008-posts-from-the-home-page.md)
+## Context
+The posts weigh on the site: 27 of the 46 are notices for past shows, 9 are song lists the songlist now holds, and the newest post that isn't a list is from March 2022. The songlist is what fans come for. Three pages are thin: Contact is 30 words, Media is a press list, and the "shows monthly, book us" paragraph appears on both About and Calendar. ADR-008 made the home page the way to the posts, hours earlier.
+## Decision
+The songlist is the home page, at `/`, and the menu has four links: Songlist, Shows, Photos and About. Calendar becomes Shows, which says the booking paragraph once and links to the posts for past shows. About takes in Contact, as "Get in touch", and Media, as "In the press", and the songlist page carries the "request a song" line. The posts stay as an archive at `/posts/`, linked from Shows and About, and every post keeps its address. The old paths `/songlist/`, `/calendar/`, `/contact/` and `/media/` lead to their new places. A content link to the archive is written `../posts/`, a path to the posts folder, like every other content link.
