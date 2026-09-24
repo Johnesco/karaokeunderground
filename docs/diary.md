@@ -365,6 +365,8 @@ On wide screens the menu ran long across the top. The old site had stood its log
 
 So the left column came back in SprayME, with the credit in the footer and a note of the licence beside the font file. Reading the font's character map showed it covers only letters and digits, with no accents, dashes or curly quotes, so it sets the seven menu words and nothing else. Titles keep the system font. Phones keep the top menu and never download the font. If the owner ever licenses ALL AGES, it replaces SprayME in one line of CSS.
 
+Later the same day, KU's mark went into the lower right corner of every page too ([#26]): a faded quarter of the logo, made in CSS from the same image the header loads, behind the text and out of the way of taps. Over its brightest part, grey text keeps 7:1 contrast. It disappears for anyone whose system asks for more contrast.
+
 ### 2026-09-24 · Posts leave the menu
 
 **Decision** · [#24] · [ADR-008](adr/008-posts-from-the-home-page.md)
@@ -412,3 +414,4 @@ The posts all keep their addresses, as an archive linked from Shows and About. T
 [#23]: https://github.com/Johnesco/karaokeunderground/issues/23
 [#24]: https://github.com/Johnesco/karaokeunderground/issues/24
 [#25]: https://github.com/Johnesco/karaokeunderground/issues/25
+[#26]: https://github.com/Johnesco/karaokeunderground/issues/26
