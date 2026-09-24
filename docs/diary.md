@@ -346,6 +346,8 @@ John asked for a minimal way to sort the songlist by title or album, not only by
 
 **Then John refined it for phones.** The column names now pile up the way each song does: the first two on the top line with a dash between them, and the third below. So the header reads as a key to the songs under it. Touching a name brings it to the front of the top line, and it slides there, across and between the lines. Each name still has a 44px target: the spare room sits above the top line and below the bottom one, so the two lines of names sit as close together as a song's two lines.
 
+**And a label, picked from mockups.** Nothing yet said the names sort. Claude mocked up three ways to show it: a "Sort by" label like the one over the List buttons, borders like the List buttons have, or both. John picked the label. It sits above the names in the same style as "List", so the page's three controls are named the same way: List, Search and Sort by. Screen readers hear it as the name of the group. To keep the label closer to the names than to the status line above it, the top line of names now splits its spare room above and below its words.
+
 **Around it, the same page got smaller changes** ([#11]). The list buttons pack tighter, since more themed lists are coming. The search box has an X to clear it. "Search" now sits beside the box as a one-word label, where "Search the songlist" used to sit above it, and screen readers still hear the whole phrase.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1

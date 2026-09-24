@@ -235,7 +235,8 @@ main.wide {
 }
 
 .song-query-label,
-.choices legend {
+.choices legend,
+.song-sort-set legend {
   font-weight: 700;
 }
 
@@ -305,9 +306,19 @@ main.wide {
   border: 0;
 }
 
-.choices legend {
+.choices legend,
+.song-sort-set legend {
   margin-bottom: 0.25rem;
   padding: 0;
+}
+
+/* "Sort by" names the column names, as "List" names the list buttons (#22).
+   The space above keeps it apart from the status line, and nearer the names. */
+.song-sort-set {
+  min-width: 0;
+  margin: 1rem 0 0;
+  padding: 0;
+  border: 0;
 }
 
 .choice {
@@ -368,13 +379,14 @@ main.wide {
   cursor: pointer;
 }
 
-/* Each name keeps its 44px, but the spare room goes above the top line and
-   below the bottom one, so the two lines sit as close as a song's two lines.
-   A name that starts a line reaches into the margin, so its word lines up
-   with the songs below. */
+/* Each name keeps its 44px. The top line's spare room is split above and
+   below its words, so "Sort by" sits close above them, and the bottom line's
+   goes below it, so the two lines stay close. A name that starts a line
+   reaches into the margin, so its word lines up with the songs below. */
 .song-sort:nth-of-type(1),
 .song-sort:nth-of-type(2) {
-  padding-top: 1.25rem;
+  padding-top: 0.625rem;
+  padding-bottom: 0.625rem;
 }
 
 .song-sort:nth-of-type(3) {

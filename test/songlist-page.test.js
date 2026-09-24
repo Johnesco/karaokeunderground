@@ -77,9 +77,9 @@ describe('the example songlist', () => {
     assert.match(view.html, /<li><span class="song-artist song-first">Sample, Solo<\/span><span class="song-sep" aria-hidden="true"> \u{2013} <\/span><span class="song-title song-second"><span class="visually-hidden">, <\/span>Third Song<\/span> <span class="song-album song-third"><span class="visually-hidden">, from <\/span>Tape, Vol. 1<\/span><\/li>/u);
   });
 
-  it('heads the songs with the sort buttons, sorted by artist to start, with the songs\u{2019} dash after the first', () => {
+  it('heads the songs with the sort buttons, named "Sort by", sorted by artist to start, with the songs\u{2019} dash after the first', () => {
     const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
-    assert.match(html, /<div class="song-table" data-sort="artist">\n<div class="songs-head" role="group" aria-label="Sort the songs by">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<span class="song-sep" aria-hidden="true"> \u{2013} <\/span>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<ul class="songs"/u);
+    assert.match(html, /<div class="song-table" data-sort="artist">\n<fieldset class="song-sort-set"><legend>Sort by<\/legend>\n<div class="songs-head">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<span class="song-sep" aria-hidden="true"> \u{2013} <\/span>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<\/fieldset>\n<ul class="songs"/u);
     assert.ok(html.indexOf('class="songs-head"') < html.indexOf('<ul class="songs"'), 'the buttons come before the songs');
   });
 

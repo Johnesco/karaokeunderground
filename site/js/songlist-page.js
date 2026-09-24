@@ -183,10 +183,13 @@ export function songlistView(doc, songs, updated) {
     + '</div>\n'
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
-    // The column names are the sort buttons, and the list starts sorted by artist.
-    // On a phone they pile up as each song does, with the same dash after the first.
+    // The column names are the sort buttons, named "Sort by" as the list buttons are named "List",
+    // and the list starts sorted by artist. On a phone they pile up as each song does,
+    // with the same dash after the first.
     + '<div class="song-table" data-sort="artist">\n'
-    + `<div class="songs-head" role="group" aria-label="Sort the songs by">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
+    + '<fieldset class="song-sort-set"><legend>Sort by</legend>\n'
+    + `<div class="songs-head">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
+    + '</fieldset>\n'
     + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
     + '</div>\n';
   return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
