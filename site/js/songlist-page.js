@@ -103,12 +103,12 @@ export function label(value) {
 
 const count = (n) => n.toLocaleString('en-US');
 
-/** What the status line says about what's showing, and how it's sorted when that isn't by artist. */
+/** What the status line says about what's showing, and how it's sorted. */
 export function describe(shown, { words = [], theme = '', tags = [], sort = 'artist' }, themes) {
   const list = theme ? ` on the ${label(themes.find((t) => t.key === theme)?.name ?? theme)} list` : '';
-  const order = sort === 'artist' ? '' : `, sorted by ${sort}`;
+  const order = `, sorted by ${sort}.`;
   if (!words.length && !tags.length) return `${count(shown)} song${shown === 1 ? '' : 's'}${list}${order}`;
-  if (shown === 0) return `No songs match${list}. Try fewer words, or check the spelling`;
+  if (shown === 0) return `No songs match${list}. Try fewer words, or check the spelling.`;
   return `${count(shown)} song${shown === 1 ? ' matches' : 's match'}${list}${order}`;
 }
 
@@ -126,6 +126,16 @@ const LEADS = { artist: ', by ', title: ', ', album: ', from ' };
 const PLACES = ['song-first', 'song-second', 'song-third'];
 const HEADINGS = { artist: 'Artist', title: 'Title', album: 'Album' };
 const SEP = '<span class="song-sep" aria-hidden="true"> \u{2013} </span>';
+
+/**
+ * The words after the status line that say how to sort another way, naming
+ * the other two columns as their buttons do: "Pick Title or Album to sort
+ * that way." They stand in for a "Sort by" label over the buttons.
+ */
+export function sortHint(sort) {
+  const [, one, other] = columnsFor(sort);
+  return `Pick ${HEADINGS[one]} or ${HEADINGS[other]} to sort that way.`;
+}
 
 /**
  * One song, its columns in the order given. Every column gets its cell, even
@@ -181,14 +191,14 @@ export function songlistView(doc, songs, updated) {
     + '</div>\n'
     + '</div>\n'
     + '</form>\n'
-    + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
-    // The column names are the sort buttons, named "Sort by" as the list buttons are named "Lists",
-    // and the list starts sorted by artist. On a phone they pile up as each song does,
-    // with the same dash after the first.
+    // The status line: what's showing, which screen readers hear as it changes, then how to
+    // sort another way, which they read with the page but don't hear on every keystroke.
+    + `<p class="song-count"><span class="song-status" role="status">${describe(songs.length, {}, themes)}</span>`
+    + ` <span class="song-hint">${sortHint('artist')}</span></p>\n`
+    // The column names are the sort buttons, and the list starts sorted by artist.
+    // On a phone they pile up as each song does, with the same dash after the first.
     + '<div class="song-table" data-sort="artist">\n'
-    + '<fieldset class="song-sort-set"><legend>Sort by</legend>\n'
-    + `<div class="songs-head">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
-    + '</fieldset>\n'
+    + `<div class="songs-head" role="group" aria-label="Sort by">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
     + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
     + '</div>\n'
     // When the list last changed sits at its foot, and the page's own text, like where
@@ -207,7 +217,8 @@ export function enhanceSonglist(main, songs, themes) {
   const form = main.querySelector('.song-search');
   const input = form.querySelector('#song-query');
   const clear = form.querySelector('.song-clear');
-  const status = main.querySelector('.song-count');
+  const status = main.querySelector('.song-status');
+  const hint = main.querySelector('.song-hint');
   const table = main.querySelector('.song-table');
   const head = table.querySelector('.songs-head');
   const sep = head.querySelector('.song-sep');
@@ -251,7 +262,12 @@ export function enhanceSonglist(main, songs, themes) {
     // While someone types, screen readers hear the count once typing pauses, not on every key.
     // When the page opens, it's right straight away.
     clearTimeout(announce);
-    const say = () => { status.textContent = describe(shown, state, themes); };
+    // The hint names the other two columns, and goes when there's nothing to sort.
+    const say = () => {
+      status.textContent = describe(shown, state, themes);
+      hint.textContent = sortHint(sort);
+      hint.hidden = shown === 0;
+    };
     if (event) announce = setTimeout(say, 400);
     else say();
   };

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fold, queryWords, listSongs, valuesOf, matches, describe as status, songlistView, columnsFor, sortSongs, songItem } from '../site/js/songlist-page.js';
+import { fold, queryWords, listSongs, valuesOf, matches, describe as status, sortHint, songlistView, columnsFor, sortSongs, songItem } from '../site/js/songlist-page.js';
 import { parseFrontMatter } from '../site/js/front-matter.js';
 
 const FIXTURE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'content');
@@ -71,16 +71,16 @@ describe('the example songlist', () => {
     assert.equal(view.title, 'Songlist');
     assert.equal(view.wide, true);
     assert.match(view.html, /<legend>Lists<\/legend>\n.*<span>All songs \(3\)<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s, 'every list shows its size');
-    assert.match(view.html, /<p class="song-count" role="status">3 songs<\/p>/);
+    assert.match(view.html, /<p class="song-count"><span class="song-status" role="status">3 songs, sorted by artist\.<\/span> <span class="song-hint">Pick Title or Album to sort that way\.<\/span><\/p>/, 'only the count is announced as it changes');
     assert.match(view.html, /<\/ul>\n<\/div>\n<p class="song-summary">Updated <time datetime="2026-09-05">September 5, 2026<\/time><\/p>\n<p>Most of these are on/, 'the date sits at the foot of the songs, before the page\u{2019}s text');
     assert.match(view.html, /<legend>Tags<\/legend>/);
     assert.equal(view.html.match(/<li>/g).length, 3);
     assert.match(view.html, /<li><span class="song-artist song-first">Sample, Solo<\/span><span class="song-sep" aria-hidden="true"> \u{2013} <\/span><span class="song-title song-second"><span class="visually-hidden">, <\/span>Third Song<\/span> <span class="song-album song-third"><span class="visually-hidden">, from <\/span>Tape, Vol. 1<\/span><\/li>/u);
   });
 
-  it('heads the songs with the sort buttons, named "Sort by", sorted by artist to start, with the songs\u{2019} dash after the first', () => {
+  it('heads the songs with the sort buttons, a group screen readers hear as "Sort by", with the songs\u{2019} dash after the first', () => {
     const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
-    assert.match(html, /<div class="song-table" data-sort="artist">\n<fieldset class="song-sort-set"><legend>Sort by<\/legend>\n<div class="songs-head">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<span class="song-sep" aria-hidden="true"> \u{2013} <\/span>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<\/fieldset>\n<ul class="songs"/u);
+    assert.match(html, /<div class="song-table" data-sort="artist">\n<div class="songs-head" role="group" aria-label="Sort by">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<span class="song-sep" aria-hidden="true"> \u{2013} <\/span>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<ul class="songs"/u);
     assert.ok(html.indexOf('class="songs-head"') < html.indexOf('<ul class="songs"'), 'the buttons come before the songs');
   });
 
@@ -180,19 +180,22 @@ describe('sorting', () => {
 describe('the status line', () => {
   const themes = [{ key: 'sad', name: 'sad', count: 542 }];
 
-  it('says what is showing, in plain words', () => {
-    assert.equal(status(1853, {}, themes), '1,853 songs');
-    assert.equal(status(1, {}, themes), '1 song');
-    assert.equal(status(542, { theme: 'sad' }, themes), '542 songs on the Sad list');
-    assert.equal(status(1, { words: ['bjork'] }, themes), '1 song matches');
-    assert.equal(status(12, { words: ['love'], theme: 'sad' }, themes), '12 songs match on the Sad list');
-    assert.equal(status(0, { words: ['zzz'] }, themes), 'No songs match. Try fewer words, or check the spelling');
+  it('says what is showing, and how it is sorted, in plain words', () => {
+    assert.equal(status(1853, {}, themes), '1,853 songs, sorted by artist.');
+    assert.equal(status(1, {}, themes), '1 song, sorted by artist.');
+    assert.equal(status(542, { theme: 'sad' }, themes), '542 songs on the Sad list, sorted by artist.');
+    assert.equal(status(1, { words: ['bjork'] }, themes), '1 song matches, sorted by artist.');
+    assert.equal(status(1853, { sort: 'title' }, themes), '1,853 songs, sorted by title.');
+    assert.equal(status(12, { words: ['love'], theme: 'sad', sort: 'album' }, themes), '12 songs match on the Sad list, sorted by album.');
   });
 
-  it('says how the list is sorted, unless it is by artist', () => {
-    assert.equal(status(1853, { sort: 'artist' }, themes), '1,853 songs');
-    assert.equal(status(1853, { sort: 'title' }, themes), '1,853 songs, sorted by title');
-    assert.equal(status(12, { words: ['love'], theme: 'sad', sort: 'album' }, themes), '12 songs match on the Sad list, sorted by album');
-    assert.equal(status(0, { words: ['zzz'], sort: 'title' }, themes), 'No songs match. Try fewer words, or check the spelling');
+  it('says nothing of sorting when nothing matches', () => {
+    assert.equal(status(0, { words: ['zzz'], sort: 'title' }, themes), 'No songs match. Try fewer words, or check the spelling.');
+  });
+
+  it('follows it with how to sort another way, naming the other two buttons', () => {
+    assert.equal(sortHint('artist'), 'Pick Title or Album to sort that way.');
+    assert.equal(sortHint('title'), 'Pick Artist or Album to sort that way.');
+    assert.equal(sortHint('album'), 'Pick Artist or Title to sort that way.');
   });
 });
