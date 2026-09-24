@@ -172,10 +172,13 @@ export function songlistView(doc, songs, updated) {
         + tags.map((t) => choice('checkbox', 'tag', t.key, `${label(t.name)} (${count(t.count)})`, false)).join('')
         + '</fieldset>\n'
       : '')
-    + '<label class="song-query-label" for="song-query">Search the songlist</label>\n'
+    // "Search" sits beside the box, and screen readers hear "Search the songlist".
+    + '<div class="song-query-row">\n'
+    + '<label class="song-query-label" for="song-query">Search<span class="visually-hidden"> the songlist</span></label>\n'
     + '<div class="song-query">\n'
     + '<input id="song-query" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Artist, title or album">\n'
     + `<button class="song-clear" type="button" hidden><span class="visually-hidden">Clear the search</span>${CLEAR_ICON}</button>\n`
+    + '</div>\n'
     + '</div>\n'
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`

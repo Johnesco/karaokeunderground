@@ -239,9 +239,17 @@ main.wide {
   font-weight: 700;
 }
 
+/* "Search" sits beside its box, on the same line. */
+.song-query-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 .song-query {
   position: relative;
-  margin-top: -0.25rem;
+  flex: 1;
+  min-width: 0;
 }
 
 .song-search input[type="search"] {

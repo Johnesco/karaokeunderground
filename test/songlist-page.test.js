@@ -91,6 +91,11 @@ describe('the example songlist', () => {
     assert.ok(at('<input id="song-query"') < at('</form>'));
   });
 
+  it('labels the search box "Search", beside it, and screen readers hear "Search the songlist"', () => {
+    const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
+    assert.match(html, /<div class="song-query-row">\n<label class="song-query-label" for="song-query">Search<span class="visually-hidden"> the songlist<\/span><\/label>\n<div class="song-query">\n<input id="song-query"/);
+  });
+
   it('puts a named clear button in the search box, hidden until there is text', () => {
     const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
     const button = html.match(/<button class="song-clear"[^>]*>.*?<\/button>/s)?.[0];
