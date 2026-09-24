@@ -309,7 +309,7 @@ Second, the Photos page should be more than a link to Instagram. Could it frame 
 
 ### 2026-09-24 · A historical post, and a link to the current list
 
-**Decision · Process** · [#19]
+**Decision · Process** · [#19], [#21]
 
 The SAD SONGS ONLY 2025 post carries its own copy of that year's list, 542 songs pasted one per line, and the songlist now holds the same songs as its Sad list ([2026-09-23 · The core files](#2026-09-23--the-core-files)). John asked for the post to point at the songlist instead, if the two lists matched.
 
@@ -325,6 +325,8 @@ The SAD SONGS ONLY 2025 post carries its own copy of that year's list, 542 songs
 - **A note at the top** links to the current Sad list at `/songlist/?theme=sad`, for anyone who wants this year's list.
 
 Both versions are in the content repo's history. Trying the first version is what showed the problem.
+
+**Then Scary-oke, the same way** ([#21]). The songlist's other themed list came from a post too: Scary-oke, from October 2022. Its 166 songs still match the Scary list one to one, every name identical, so this time no spellings needed matching. It got the same treatment: the 2022 list stays, and a note at the top links to the current list at `/songlist/?theme=scary`.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
@@ -342,3 +344,4 @@ Both versions are in the content repo's history. Trying the first version is wha
 [#14]: https://github.com/Johnesco/karaokeunderground/issues/14
 [#18]: https://github.com/Johnesco/karaokeunderground/issues/18
 [#19]: https://github.com/Johnesco/karaokeunderground/issues/19
+[#21]: https://github.com/Johnesco/karaokeunderground/issues/21
