@@ -107,7 +107,7 @@ const count = (n) => n.toLocaleString('en-US');
 export function describe(shown, { words = [], theme = '', tags = [], sort = 'artist' }, themes) {
   const list = theme ? ` on the ${label(themes.find((t) => t.key === theme)?.name ?? theme)} list` : '';
   const order = sort === 'artist' ? '' : `, sorted by ${sort}`;
-  if (!words.length && !tags.length) return `Showing all ${count(shown)} song${shown === 1 ? '' : 's'}${list}${order}`;
+  if (!words.length && !tags.length) return `${count(shown)} song${shown === 1 ? '' : 's'}${list}${order}`;
   if (shown === 0) return `No songs match${list}. Try fewer words, or check the spelling`;
   return `${count(shown)} song${shown === 1 ? ' matches' : 's match'}${list}${order}`;
 }
@@ -150,21 +150,22 @@ function sortButton(column) {
 }
 
 /**
- * The page: its title and intro from pages/songlist.md, the song count and the
- * date the list last changed, the search and filters, and every song.
+ * The page: its title from pages/songlist.md, the date the list last changed,
+ * the search and filters, the count of what's showing, every song, and then
+ * the page's own text. Each fact shows once: the count lives in the status
+ * line above the songs, which follows the lists and the search.
  */
 export function songlistView(doc, songs, updated) {
   const byArtist = sortSongs(songs, 'artist');
   const themes = valuesOf(songs, 'themes');
   const tags = valuesOf(songs, 'tags');
-  const when = updated ? ` Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time>.` : '';
-  const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n${markdownHtml(doc.body, 'pages')}`
-    + `<p class="song-summary">${count(songs.length)} songs.${when}</p>\n`
+  const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n`
+    + (updated ? `<p class="song-summary">Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time></p>\n` : '')
     // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
     + '<form class="song-search" role="search" action="/songlist/">\n'
     + (themes.length
       ? '<fieldset class="choices"><legend>List</legend>\n'
-        + choice('radio', 'theme', '', `All songs (${count(songs.length)})`, true)
+        + choice('radio', 'theme', '', 'All songs', true)
         + themes.map((t) => choice('radio', 'theme', t.key, `${label(t.name)} (${count(t.count)})`, false)).join('')
         + '</fieldset>\n'
       : '')
@@ -191,7 +192,9 @@ export function songlistView(doc, songs, updated) {
     + `<div class="songs-head">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
     + '</fieldset>\n'
     + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
-    + '</div>\n';
+    + '</div>\n'
+    // The page's own text, like where to stream the songs, comes after them, so the list starts sooner.
+    + markdownHtml(doc.body, 'pages');
   return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
 }
 

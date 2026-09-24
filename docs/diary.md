@@ -350,6 +350,8 @@ John asked for a minimal way to sort the songlist by title or album, not only by
 
 **Around it, the same page got smaller changes** ([#11]). The list buttons pack tighter, since more themed lists are coming. The search box has an X to clear it. "Search" now sits beside the box as a one-word label, where "Search the songlist" used to sit above it, and screen readers still hear the whole phrase.
 
+**Then a prune.** John noticed the song count showing three times: in the line under the title, on the All songs button, and in the status line. Claude mocked up a rule, each fact shown once, where it's most useful, and John kept one exception: the Sad and Scary buttons keep their counts. The count lives in the status line above the songs, the one line that follows the lists and the search. The date sits alone under the title. The page's own text, a link to a Spotify playlist, now comes after the songs. On a 375px phone the first song moved up 114px, and the first screen shows four songs instead of two.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3

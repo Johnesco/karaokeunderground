@@ -65,13 +65,16 @@ describe('the example songlist', () => {
     assert.deepEqual(valuesOf(songs, 'tags'), [{ key: 'duet', name: 'duet', count: 1 }]);
   });
 
-  it('renders the page: intro, count, date, lists, tags and every song', () => {
+  it('renders the page: date, lists, tags, count, every song, then the page\u{2019}s text', () => {
     const doc = parseFrontMatter('---\ntitle: Songlist\n---\nMost of these are on [a playlist](https://e.com).\n');
     const view = songlistView(doc, songs, '2026-09-05');
     assert.equal(view.title, 'Songlist');
     assert.equal(view.wide, true);
-    assert.match(view.html, /<p class="song-summary">3 songs. Updated <time datetime="2026-09-05">September 5, 2026<\/time>.<\/p>/);
-    assert.match(view.html, /<span>All songs \(3\)<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s);
+    assert.match(view.html, /<h1>Songlist<\/h1>\n<p class="song-summary">Updated <time datetime="2026-09-05">September 5, 2026<\/time><\/p>/);
+    assert.match(view.html, /<span>All songs<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s, 'the themed lists keep their counts');
+    assert.match(view.html, /<p class="song-count" role="status">3 songs<\/p>/);
+    assert.equal(view.html.match(/\b3 songs?\b|\(3\)/g).length, 1, 'the whole list is counted once');
+    assert.ok(view.html.indexOf('</ul>') < view.html.indexOf('Most of these are on'), 'the page\u{2019}s text comes after the songs');
     assert.match(view.html, /<legend>Tags<\/legend>/);
     assert.equal(view.html.match(/<li>/g).length, 3);
     assert.match(view.html, /<li><span class="song-artist song-first">Sample, Solo<\/span><span class="song-sep" aria-hidden="true"> \u{2013} <\/span><span class="song-title song-second"><span class="visually-hidden">, <\/span>Third Song<\/span> <span class="song-album song-third"><span class="visually-hidden">, from <\/span>Tape, Vol. 1<\/span><\/li>/u);
@@ -105,6 +108,10 @@ describe('the example songlist', () => {
     assert.match(button, /<span class="visually-hidden">Clear the search<\/span>/);
     assert.match(button, /<svg[^>]* aria-hidden="true"/, 'screen readers hear its name, not the drawing');
     assert.ok(html.indexOf('<input id="song-query"') < html.indexOf('<button class="song-clear"'), 'Tab reaches it after the box');
+  });
+
+  it('leaves the date line out when the list has no date', () => {
+    assert.doesNotMatch(songlistView(parseFrontMatter('---\ntitle: S\n---\n'), songs, null).html, /song-summary/);
   });
 
   it('shows no tag filter until a song has a tag', () => {
@@ -176,16 +183,17 @@ describe('the status line', () => {
   const themes = [{ key: 'sad', name: 'sad', count: 542 }];
 
   it('says what is showing, in plain words', () => {
-    assert.equal(status(1853, {}, themes), 'Showing all 1,853 songs');
-    assert.equal(status(542, { theme: 'sad' }, themes), 'Showing all 542 songs on the Sad list');
+    assert.equal(status(1853, {}, themes), '1,853 songs');
+    assert.equal(status(1, {}, themes), '1 song');
+    assert.equal(status(542, { theme: 'sad' }, themes), '542 songs on the Sad list');
     assert.equal(status(1, { words: ['bjork'] }, themes), '1 song matches');
     assert.equal(status(12, { words: ['love'], theme: 'sad' }, themes), '12 songs match on the Sad list');
     assert.equal(status(0, { words: ['zzz'] }, themes), 'No songs match. Try fewer words, or check the spelling');
   });
 
   it('says how the list is sorted, unless it is by artist', () => {
-    assert.equal(status(1853, { sort: 'artist' }, themes), 'Showing all 1,853 songs');
-    assert.equal(status(1853, { sort: 'title' }, themes), 'Showing all 1,853 songs, sorted by title');
+    assert.equal(status(1853, { sort: 'artist' }, themes), '1,853 songs');
+    assert.equal(status(1853, { sort: 'title' }, themes), '1,853 songs, sorted by title');
     assert.equal(status(12, { words: ['love'], theme: 'sad', sort: 'album' }, themes), '12 songs match on the Sad list, sorted by album');
     assert.equal(status(0, { words: ['zzz'], sort: 'title' }, themes), 'No songs match. Try fewer words, or check the spelling');
   });
