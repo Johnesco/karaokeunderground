@@ -165,8 +165,14 @@ body::after {
 }
 
 /* From 360px wide the four links fit on one row with room to spare, so they
-   spread across it. At 320px they take two rows and stay packed. */
+   spread out, but only across a menu up to 21rem wide: 6px apart at 360px,
+   and about 24px from 414px up, where they stay beside the logo rather than
+   drifting across a wide screen. At 320px they take two rows, packed. */
 @media (min-width: 22.5rem) {
+  .site-header nav {
+    max-width: 21rem;
+  }
+
   .menu {
     justify-content: space-between;
   }
@@ -618,6 +624,7 @@ main.wide {
 
   .site-header nav {
     flex-basis: 15rem;
+    max-width: none;
   }
 
   .menu {
