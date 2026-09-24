@@ -100,9 +100,8 @@ export function songlistView(doc, songs, updated) {
   const when = updated ? ` Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time>.` : '';
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n${markdownHtml(doc.body, 'pages')}`
     + `<p class="song-summary">${count(songs.length)} songs.${when}</p>\n`
+    // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
     + '<form class="song-search" role="search" action="/songlist/">\n'
-    + '<label class="song-query-label" for="song-query">Search the songlist</label>\n'
-    + '<input id="song-query" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Artist, title or album">\n'
     + (themes.length
       ? '<fieldset class="choices"><legend>List</legend>\n'
         + choice('radio', 'theme', '', `All songs (${count(songs.length)})`, true)
@@ -114,6 +113,8 @@ export function songlistView(doc, songs, updated) {
         + tags.map((t) => choice('checkbox', 'tag', t.key, `${label(t.name)} (${count(t.count)})`, false)).join('')
         + '</fieldset>\n'
       : '')
+    + '<label class="song-query-label" for="song-query">Search the songlist</label>\n'
+    + '<input id="song-query" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Artist, title or album">\n'
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
     + '<div class="songs-head" aria-hidden="true"><span>Artist</span><span>Title</span><span>Album</span></div>\n'

@@ -77,6 +77,14 @@ describe('the example songlist', () => {
     assert.match(view.html, /<span class="song-artist">Sample, Solo<\/span>.*<span class="song-title">Third Song<\/span> <span class="song-album"><span class="visually-hidden">from <\/span>Tape, Vol. 1<\/span>/);
   });
 
+  it('puts the search box under the list and tag buttons, in the page order too', () => {
+    const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
+    const at = (s) => html.indexOf(s);
+    assert.ok(at('<legend>List</legend>') < at('<legend>Tags</legend>'));
+    assert.ok(at('<legend>Tags</legend>') < at('<input id="song-query"'));
+    assert.ok(at('<input id="song-query"') < at('</form>'));
+  });
+
   it('shows no tag filter until a song has a tag', () => {
     const untagged = listSongs(csv(['A,B,C,sad,', 'D,E,F,,']));
     assert.doesNotMatch(songlistView(parseFrontMatter('---\ntitle: S\n---\n'), untagged, null).html, /Tags/);
