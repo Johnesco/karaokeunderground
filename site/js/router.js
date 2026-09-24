@@ -12,16 +12,6 @@
  * them into the site's paths.
  */
 
-/** The menu, in the old site's order. */
-export const MENU = [
-  { name: 'songlist', label: 'Songlist' },
-  { name: 'calendar', label: 'Calendar' },
-  { name: 'photos', label: 'Photos' },
-  { name: 'contact', label: 'Contact' },
-  { name: 'media', label: 'Media' },
-  { name: 'about', label: 'About' },
-];
-
 const NAME = '[a-z0-9]+(?:-[a-z0-9]+)*';
 
 /**

@@ -116,7 +116,7 @@ a {
 }
 
 .menu a:hover,
-.menu a[aria-current="page"] {
+.menu a[aria-current] {
   text-decoration: underline;
   text-decoration-thickness: 0.15em;
   text-underline-offset: 0.3em;

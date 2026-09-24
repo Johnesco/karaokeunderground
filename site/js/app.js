@@ -50,7 +50,9 @@ async function start() {
     window.history.replaceState(null, '', r.path + window.location.search + window.location.hash);
   }
   for (const link of document.querySelectorAll('.menu a')) {
-    if (link.getAttribute('href') === r.path) link.setAttribute('aria-current', 'page');
+    const href = link.getAttribute('href');
+    if (href === r.path) link.setAttribute('aria-current', 'page');
+    else if (r.view === 'post' && href === '/posts/') link.setAttribute('aria-current', 'true'); // the section a post is in
   }
 
   let view;
