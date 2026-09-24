@@ -125,6 +125,7 @@ function choice(type, name, value, text, checked) {
 const LEADS = { artist: ', by ', title: ', ', album: ', from ' };
 const PLACES = ['song-first', 'song-second', 'song-third'];
 const HEADINGS = { artist: 'Artist', title: 'Title', album: 'Album' };
+const SEP = '<span class="song-sep" aria-hidden="true"> \u{2013} </span>';
 
 /**
  * One song, its columns in the order given. Every column gets its cell, even
@@ -140,7 +141,7 @@ export function songItem(song, columns = SORTS) {
     return `<span class="song-${column} ${PLACES[i]}">${lead}${escapeHtml(text)}</span>`;
   };
   const [first, second, third] = columns;
-  const sep = song[first] && song[second] ? `<span class="song-sep" aria-hidden="true"> \u{2013} </span>` : '';
+  const sep = song[first] && song[second] ? SEP : '';
   return `<li>${cell(first, 0)}${sep}${cell(second, 1)} ${cell(third, 2)}</li>\n`;
 }
 
@@ -183,8 +184,9 @@ export function songlistView(doc, songs, updated) {
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
     // The column names are the sort buttons, and the list starts sorted by artist.
+    // On a phone they pile up as each song does, with the same dash after the first.
     + '<div class="song-table" data-sort="artist">\n'
-    + `<div class="songs-head" role="group" aria-label="Sort the songs by">\n${SORTS.map(sortButton).join('')}</div>\n`
+    + `<div class="songs-head" role="group" aria-label="Sort the songs by">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
     + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
     + '</div>\n';
   return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
@@ -202,6 +204,7 @@ export function enhanceSonglist(main, songs, themes) {
   const status = main.querySelector('.song-count');
   const table = main.querySelector('.song-table');
   const head = table.querySelector('.songs-head');
+  const sep = head.querySelector('.song-sep');
   const list = table.querySelector('.songs');
   const buttons = new Map([...head.querySelectorAll('.song-sort')].map((button) => [button.dataset.sort, button]));
   let sort = 'artist';
@@ -267,16 +270,21 @@ export function enhanceSonglist(main, songs, themes) {
     }
   });
 
-  // Sorting (#22, ADR-006). Where each column name starts, to slide from.
-  const columnStarts = () => new Map([...buttons].map(([column, button]) => [column, button.getBoundingClientRect().left]));
+  // Sorting (#22, ADR-006). Where the text of each thing in the header sits, to slide from.
+  const places = () => new Map([...head.children].map((element) => {
+    const box = element.getBoundingClientRect();
+    const style = getComputedStyle(element);
+    return [element, { x: box.left + parseFloat(style.paddingLeft), y: box.top + parseFloat(style.paddingTop) }];
+  }));
 
-  // Each column name slides from where it was. On wide screens the songs on
-  // screen slide with their columns. On a phone, where a song wraps as text,
-  // they fade in instead.
+  // Each column name slides from where it was: along the line on wide screens,
+  // and on a phone, where the names pile up like the songs, between the lines
+  // too. On wide screens the songs on screen slide with their columns. On a
+  // phone, where a song wraps as text, they fade in instead.
   const slide = (before) => {
     // Every position is read before any animation starts. Reading one between
     // animations would make the browser lay out all the songs again each time.
-    const after = columnStarts();
+    const after = places();
     const inColumns = getComputedStyle(head).display === 'grid';
     const onScreen = [];
     for (const item of items) {
@@ -287,24 +295,24 @@ export function enhanceSonglist(main, songs, themes) {
       onScreen.push(item);
     }
     const timing = { duration: 200, easing: 'ease-out' };
-    const move = (element, column) => {
-      const dx = before.get(column) - after.get(column);
-      if (Math.abs(dx) >= 1) element.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], timing);
+    const shift = (element, dx, dy) => {
+      if (Math.abs(dx) >= 1 || Math.abs(dy) >= 1) element.animate([{ transform: `translate(${dx}px, ${dy}px)` }, { transform: 'none' }], timing);
     };
-    for (const [column, button] of buttons) move(button, column);
+    for (const [element, was] of before) shift(element, was.x - after.get(element).x, was.y - after.get(element).y);
     for (const item of onScreen) {
-      if (inColumns) for (const column of SORTS) move(item.querySelector(`.song-${column}`), column);
-      else item.animate([{ opacity: 0 }, { opacity: 1 }], timing);
+      if (!inColumns) item.animate([{ opacity: 0 }, { opacity: 1 }], timing);
+      else for (const [column, button] of buttons) shift(item.querySelector(`.song-${column}`), before.get(button).x - after.get(button).x, 0);
     }
   };
 
   // The picked column moves to the front of the header and of every row, and the list sorts by it.
   const sortBy = (column, animate) => {
-    const before = animate ? columnStarts() : null;
+    const before = animate ? places() : null;
     const focused = head.contains(document.activeElement) ? document.activeElement : null;
     sort = column;
     const columns = columnsFor(sort);
     for (const each of columns) head.append(buttons.get(each));
+    buttons.get(sort).after(sep); // the dash stays between the first two names
     for (const [each, button] of buttons) button.setAttribute('aria-pressed', String(each === sort));
     table.dataset.sort = sort;
     rows = sortSongs(songs, sort);

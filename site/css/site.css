@@ -343,26 +343,46 @@ main.wide {
   color: var(--muted);
 }
 
-/* The column names are the sort buttons (#22, ADR-006): a row of three above
-   the songs on a phone, and the heads of the columns on wider screens. The
-   one the list is sorted by is bold, as its column is. */
+/* The column names are the sort buttons (#22, ADR-006), and the one the list
+   is sorted by is bold, as its column is. On a phone they pile up the way each
+   song does: the first two share the top line, with a dash between them, and
+   the third sits below. On wider screens they head the columns. */
 .songs-head {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 1rem;
+  align-items: baseline;
   border-bottom: 2px solid var(--text);
 }
 
 .song-sort {
   min-width: 2.75rem;
   min-height: 2.75rem; /* a touch target at least 44px tall */
-  padding: 0;
+  padding: 0 0.5rem; /* and wider than its word */
   border: 0;
   background: none;
   color: var(--text);
   font: inherit;
   text-align: left;
   cursor: pointer;
+}
+
+/* Each name keeps its 44px, but the spare room goes above the top line and
+   below the bottom one, so the two lines sit as close as a song's two lines.
+   A name that starts a line reaches into the margin, so its word lines up
+   with the songs below. */
+.song-sort:nth-of-type(1),
+.song-sort:nth-of-type(2) {
+  padding-top: 1.25rem;
+}
+
+.song-sort:nth-of-type(3) {
+  flex-basis: 100%;
+  padding-bottom: 1.25rem;
+}
+
+.song-sort:nth-of-type(1),
+.song-sort:nth-of-type(3) {
+  margin-left: -0.5rem;
 }
 
 .song-sort[aria-pressed="true"] {
@@ -423,6 +443,11 @@ main.wide {
 
   .songs li {
     contain-intrinsic-size: auto 2.25rem;
+  }
+
+  .song-sort:nth-of-type(n) {
+    margin-left: 0;
+    padding: 0;
   }
 
   .song-sep {
