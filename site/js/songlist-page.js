@@ -36,12 +36,43 @@ export function queryWords(query) {
   return fold(query).split(' ').filter(Boolean);
 }
 
-/** The songs the page lists: all but the unlisted ones, each with the text search looks through. */
+/** The songs the page lists: all but the unlisted ones, each with the text search looks through and what each column sorts by. */
 export function listSongs(csvText) {
   return readSonglist(csvText).songs.filter(isListed).map((song) => ({
     ...song,
     key: fold(`${song.artist} ${song.title} ${song.album}`),
+    sortKeys: { artist: fold(song.artist), title: fold(song.title), album: fold(song.album) },
   }));
+}
+
+/** The columns, in their usual order. Any of them can sort the list (#22, ADR-006). */
+export const SORTS = ['artist', 'title', 'album'];
+
+/** The columns in the order shown: the one the list is sorted by first, then the other two in their usual order. */
+export function columnsFor(sort) {
+  return [sort, ...SORTS.filter((column) => column !== sort)];
+}
+
+/**
+ * The songs sorted A to Z by one column, ignoring case, accents and
+ * punctuation but not words, so "Zombies, The" stays under Z. Ties go by the
+ * next column shown, then the file's order, and blanks go last.
+ */
+export function sortSongs(songs, sort) {
+  const columns = columnsFor(sort);
+  return songs
+    .map((song, index) => ({ song, index }))
+    .sort((a, b) => {
+      for (const column of columns) {
+        const x = a.song.sortKeys[column];
+        const y = b.song.sortKeys[column];
+        if (x === y) continue;
+        if (!x || !y) return x ? -1 : 1;
+        return x < y ? -1 : 1;
+      }
+      return a.index - b.index;
+    })
+    .map(({ song }) => song);
 }
 
 /** The themes or tags the songs use, with how many songs have each, in alphabetical order. */
@@ -72,12 +103,13 @@ export function label(value) {
 
 const count = (n) => n.toLocaleString('en-US');
 
-/** What the status line says about what's showing. */
-export function describe(shown, { words = [], theme = '', tags = [] }, themes) {
+/** What the status line says about what's showing, and how it's sorted when that isn't by artist. */
+export function describe(shown, { words = [], theme = '', tags = [], sort = 'artist' }, themes) {
   const list = theme ? ` on the ${label(themes.find((t) => t.key === theme)?.name ?? theme)} list` : '';
-  if (!words.length && !tags.length) return `Showing all ${count(shown)} song${shown === 1 ? '' : 's'}${list}`;
+  const order = sort === 'artist' ? '' : `, sorted by ${sort}`;
+  if (!words.length && !tags.length) return `Showing all ${count(shown)} song${shown === 1 ? '' : 's'}${list}${order}`;
   if (shown === 0) return `No songs match${list}. Try fewer words, or check the spelling`;
-  return `${count(shown)} song${shown === 1 ? ' matches' : 's match'}${list}`;
+  return `${count(shown)} song${shown === 1 ? ' matches' : 's match'}${list}${order}`;
 }
 
 // The clear button's X, drawn as two lines so it's crisp and centred in any font.
@@ -88,10 +120,32 @@ function choice(type, name, value, text, checked) {
   return `<label class="choice"><input type="${type}" name="${name}" value="${escapeHtml(value)}"${checked ? ' checked' : ''}> <span>${escapeHtml(text)}</span></label>\n`;
 }
 
-function songItem(song) {
-  const album = song.album ? ` <span class="song-album"><span class="visually-hidden">from </span>${escapeHtml(song.album)}</span>` : '';
-  return `<li><span class="song-artist">${escapeHtml(song.artist)}</span><span class="song-sep" aria-hidden="true"> \u{2013} </span>`
-    + `<span class="visually-hidden">, </span><span class="song-title">${escapeHtml(song.title)}</span>${album}</li>\n`;
+// What a screen reader hears before a column that isn't first, so a song reads
+// "Come Pick Me Up, by Adams, Ryan, from Heartbreaker" in any order.
+const LEADS = { artist: ', by ', title: ', ', album: ', from ' };
+const PLACES = ['song-first', 'song-second', 'song-third'];
+const HEADINGS = { artist: 'Artist', title: 'Title', album: 'Album' };
+
+/**
+ * One song, its columns in the order given. Every column gets its cell, even
+ * a blank one, so wide screens keep each in its place. On a phone the first
+ * two share a line, with a dash between them, and the third sits below.
+ */
+export function songItem(song, columns = SORTS) {
+  const cell = (column, i) => {
+    const text = song[column];
+    const lead = text && columns.slice(0, i).some((before) => song[before])
+      ? `<span class="visually-hidden">${LEADS[column]}</span>`
+      : '';
+    return `<span class="song-${column} ${PLACES[i]}">${lead}${escapeHtml(text)}</span>`;
+  };
+  const [first, second, third] = columns;
+  const sep = song[first] && song[second] ? `<span class="song-sep" aria-hidden="true"> \u{2013} </span>` : '';
+  return `<li>${cell(first, 0)}${sep}${cell(second, 1)} ${cell(third, 2)}</li>\n`;
+}
+
+function sortButton(column) {
+  return `<button class="song-sort" type="button" data-sort="${column}" aria-pressed="${column === 'artist'}">${HEADINGS[column]}</button>\n`;
 }
 
 /**
@@ -99,6 +153,7 @@ function songItem(song) {
  * date the list last changed, the search and filters, and every song.
  */
 export function songlistView(doc, songs, updated) {
+  const byArtist = sortSongs(songs, 'artist');
   const themes = valuesOf(songs, 'themes');
   const tags = valuesOf(songs, 'tags');
   const when = updated ? ` Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time>.` : '';
@@ -124,21 +179,31 @@ export function songlistView(doc, songs, updated) {
     + '</div>\n'
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
-    + '<div class="songs-head" aria-hidden="true"><span>Artist</span><span>Title</span><span>Album</span></div>\n'
-    + `<ul class="songs" aria-label="Songs">\n${songs.map(songItem).join('')}</ul>\n`;
-  return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, songs, themes) };
+    // The column names are the sort buttons, and the list starts sorted by artist.
+    + '<div class="song-table" data-sort="artist">\n'
+    + `<div class="songs-head" role="group" aria-label="Sort the songs by">\n${SORTS.map(sortButton).join('')}</div>\n`
+    + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
+    + '</div>\n';
+  return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
 }
 
 /**
- * Makes the page's search and filters work: rows show and hide as you type,
- * and the address keeps the search, so /songlist/?theme=sad can be shared.
+ * Makes the page's search, filters and sorting work: rows show and hide as
+ * you type, a column's name sorts the list by it, and the address keeps it
+ * all, so /songlist/?theme=sad&sort=title can be shared.
  */
 export function enhanceSonglist(main, songs, themes) {
   const form = main.querySelector('.song-search');
   const input = form.querySelector('#song-query');
   const clear = form.querySelector('.song-clear');
   const status = main.querySelector('.song-count');
-  const items = [...main.querySelectorAll('.songs > li')];
+  const table = main.querySelector('.song-table');
+  const head = table.querySelector('.songs-head');
+  const list = table.querySelector('.songs');
+  const buttons = new Map([...head.querySelectorAll('.song-sort')].map((button) => [button.dataset.sort, button]));
+  let sort = 'artist';
+  let rows = songs; // the songs in the order of their rows, which starts by artist
+  let items = [...list.children];
 
   const params = new URLSearchParams(window.location.search);
   input.value = params.get('q') ?? '';
@@ -155,10 +220,11 @@ export function enhanceSonglist(main, songs, themes) {
       words: queryWords(input.value),
       theme: form.querySelector('input[name="theme"]:checked')?.value ?? '',
       tags: [...form.querySelectorAll('input[name="tag"]:checked')].map((box) => box.value),
+      sort,
     };
     clear.hidden = !input.value;
     let shown = 0;
-    songs.forEach((song, i) => {
+    rows.forEach((song, i) => {
       const show = matches(song, state);
       items[i].hidden = !show;
       if (show) shown++;
@@ -167,6 +233,7 @@ export function enhanceSonglist(main, songs, themes) {
     if (input.value.trim()) query.set('q', input.value.trim());
     if (state.theme) query.set('theme', state.theme);
     for (const tag of state.tags) query.append('tag', tag);
+    if (sort !== 'artist') query.set('sort', sort);
     const search = query.toString();
     window.history.replaceState(null, '', `/songlist/${search ? `?${search}` : ''}`);
     // While someone types, screen readers hear the count once typing pauses, not on every key.
@@ -196,5 +263,62 @@ export function enhanceSonglist(main, songs, themes) {
       empty();
     }
   });
+
+  // Sorting (#22, ADR-006). Where each column name starts, to slide from.
+  const columnStarts = () => new Map([...buttons].map(([column, button]) => [column, button.getBoundingClientRect().left]));
+
+  // Each column name slides from where it was. On wide screens the songs on
+  // screen slide with their columns. On a phone, where a song wraps as text,
+  // they fade in instead.
+  const slide = (before) => {
+    // Every position is read before any animation starts. Reading one between
+    // animations would make the browser lay out all the songs again each time.
+    const after = columnStarts();
+    const inColumns = getComputedStyle(head).display === 'grid';
+    const onScreen = [];
+    for (const item of items) {
+      if (item.hidden) continue;
+      const box = item.getBoundingClientRect();
+      if (box.bottom < 0) continue;
+      if (box.top > window.innerHeight) break;
+      onScreen.push(item);
+    }
+    const timing = { duration: 200, easing: 'ease-out' };
+    const move = (element, column) => {
+      const dx = before.get(column) - after.get(column);
+      if (Math.abs(dx) >= 1) element.animate([{ transform: `translateX(${dx}px)` }, { transform: 'none' }], timing);
+    };
+    for (const [column, button] of buttons) move(button, column);
+    for (const item of onScreen) {
+      if (inColumns) for (const column of SORTS) move(item.querySelector(`.song-${column}`), column);
+      else item.animate([{ opacity: 0 }, { opacity: 1 }], timing);
+    }
+  };
+
+  // The picked column moves to the front of the header and of every row, and the list sorts by it.
+  const sortBy = (column, animate) => {
+    const before = animate ? columnStarts() : null;
+    const focused = head.contains(document.activeElement) ? document.activeElement : null;
+    sort = column;
+    const columns = columnsFor(sort);
+    for (const each of columns) head.append(buttons.get(each));
+    for (const [each, button] of buttons) button.setAttribute('aria-pressed', String(each === sort));
+    table.dataset.sort = sort;
+    rows = sortSongs(songs, sort);
+    list.innerHTML = rows.map((song) => songItem(song, columns)).join('');
+    items = [...list.children];
+    focused?.focus({ preventScroll: true }); // moving a button drops its focus, so it goes back
+    update();
+    if (before) slide(before);
+  };
+
+  head.addEventListener('click', (event) => {
+    const button = event.target.closest('.song-sort');
+    if (!button || button.dataset.sort === sort) return;
+    sortBy(button.dataset.sort, !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  });
+
+  const wanted = params.get('sort');
+  if (buttons.has(wanted) && wanted !== sort) sortBy(wanted, false);
   update();
 }

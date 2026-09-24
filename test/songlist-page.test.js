@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fold, queryWords, listSongs, valuesOf, matches, describe as status, songlistView } from '../site/js/songlist-page.js';
+import { fold, queryWords, listSongs, valuesOf, matches, describe as status, songlistView, columnsFor, sortSongs, songItem } from '../site/js/songlist-page.js';
 import { parseFrontMatter } from '../site/js/front-matter.js';
 
 const FIXTURE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'content');
@@ -74,7 +74,13 @@ describe('the example songlist', () => {
     assert.match(view.html, /<span>All songs \(3\)<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s);
     assert.match(view.html, /<legend>Tags<\/legend>/);
     assert.equal(view.html.match(/<li>/g).length, 3);
-    assert.match(view.html, /<span class="song-artist">Sample, Solo<\/span>.*<span class="song-title">Third Song<\/span> <span class="song-album"><span class="visually-hidden">from <\/span>Tape, Vol. 1<\/span>/);
+    assert.match(view.html, /<li><span class="song-artist song-first">Sample, Solo<\/span><span class="song-sep" aria-hidden="true"> \u{2013} <\/span><span class="song-title song-second"><span class="visually-hidden">, <\/span>Third Song<\/span> <span class="song-album song-third"><span class="visually-hidden">, from <\/span>Tape, Vol. 1<\/span><\/li>/u);
+  });
+
+  it('heads the songs with the sort buttons, sorted by artist to start', () => {
+    const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
+    assert.match(html, /<div class="song-table" data-sort="artist">\n<div class="songs-head" role="group" aria-label="Sort the songs by">\n<button class="song-sort" type="button" data-sort="artist" aria-pressed="true">Artist<\/button>\n<button class="song-sort" type="button" data-sort="title" aria-pressed="false">Title<\/button>\n<button class="song-sort" type="button" data-sort="album" aria-pressed="false">Album<\/button>\n<\/div>\n<ul class="songs"/);
+    assert.ok(html.indexOf('class="songs-head"') < html.indexOf('<ul class="songs"'), 'the buttons come before the songs');
   });
 
   it('puts the search box under the list and tag buttons, in the page order too', () => {
@@ -102,6 +108,65 @@ describe('the example songlist', () => {
   });
 });
 
+describe('sorting', () => {
+  const songs = listSongs(csv([
+    '"Zombies, The",(I Got A) Mojo,Begin Here,,',
+    '\u{C9}lan Vital,Waiting For The Sun,Solar,,',
+    'Bj\u{F6}rk,Human Behavior,Debut,sad,',
+    'Cover Band,Human Behavior,,,',
+    'bjork tribute,The Book Of Love,Army,,',
+    '"Adams, Ryan",Come Pick Me Up,Heartbreaker,sad,',
+  ]));
+  const order = (sort) => sortSongs(songs, sort).map((s) => `${s.artist} / ${s.title}`);
+
+  it('puts the picked column first, and keeps the other two in their usual order', () => {
+    assert.deepEqual(columnsFor('artist'), ['artist', 'title', 'album']);
+    assert.deepEqual(columnsFor('title'), ['title', 'artist', 'album']);
+    assert.deepEqual(columnsFor('album'), ['album', 'artist', 'title']);
+  });
+
+  it('sorts A to Z, ignoring case, accents and punctuation but not words', () => {
+    assert.deepEqual(order('artist'), [
+      'Adams, Ryan / Come Pick Me Up',
+      'Bj\u{F6}rk / Human Behavior',
+      'bjork tribute / The Book Of Love', // before Cover Band: case doesn't count
+      'Cover Band / Human Behavior',
+      '\u{C9}lan Vital / Waiting For The Sun', // under E, not after Z: accents don't count
+      'Zombies, The / (I Got A) Mojo', // under Z: words count
+    ]);
+    assert.deepEqual(order('title'), [
+      'Adams, Ryan / Come Pick Me Up',
+      'Bj\u{F6}rk / Human Behavior', // a tie goes by the next column shown, the artist
+      'Cover Band / Human Behavior',
+      'Zombies, The / (I Got A) Mojo', // under I: the brackets don't count
+      'bjork tribute / The Book Of Love', // under T: "The" counts
+      '\u{C9}lan Vital / Waiting For The Sun',
+    ]);
+  });
+
+  it('puts songs with no album last when sorting by album', () => {
+    assert.deepEqual(order('album').slice(-2), ['\u{C9}lan Vital / Waiting For The Sun', 'Cover Band / Human Behavior']);
+  });
+
+  it('shows each song in the columns\u{2019} order, and reads it that way too', () => {
+    const song = songs.find((s) => s.title === 'Come Pick Me Up');
+    const seen = (html) => html.replace(/<span class="visually-hidden">.*?<\/span>/g, '').replace(/<[^>]+>/g, '').trim();
+    const heard = (html) => html.replace(/<span[^>]*aria-hidden="true">.*?<\/span>/g, '').replace(/<[^>]+>/g, '').replace(/\s+,/g, ',').trim();
+    assert.equal(seen(songItem(song, columnsFor('artist'))), 'Adams, Ryan \u{2013} Come Pick Me Up Heartbreaker');
+    assert.equal(heard(songItem(song, columnsFor('artist'))), 'Adams, Ryan, Come Pick Me Up, from Heartbreaker');
+    assert.equal(heard(songItem(song, columnsFor('title'))), 'Come Pick Me Up, by Adams, Ryan, from Heartbreaker');
+    assert.equal(heard(songItem(song, columnsFor('album'))), 'Heartbreaker, by Adams, Ryan, Come Pick Me Up');
+    assert.match(songItem(song, columnsFor('title')), /^<li><span class="song-title song-first">Come Pick Me Up<\/span>/);
+  });
+
+  it('keeps a cell for a blank column, so wide screens keep each column in its place', () => {
+    const song = songs.find((s) => s.artist === 'Cover Band');
+    const html = songItem(song, columnsFor('album'));
+    assert.match(html, /^<li><span class="song-album song-first"><\/span><span class="song-artist song-second">Cover Band<\/span>/, 'no dash, and nothing read before the artist');
+    assert.equal(html.match(/class="song-/g).length, 3);
+  });
+});
+
 describe('the status line', () => {
   const themes = [{ key: 'sad', name: 'sad', count: 542 }];
 
@@ -111,5 +176,12 @@ describe('the status line', () => {
     assert.equal(status(1, { words: ['bjork'] }, themes), '1 song matches');
     assert.equal(status(12, { words: ['love'], theme: 'sad' }, themes), '12 songs match on the Sad list');
     assert.equal(status(0, { words: ['zzz'] }, themes), 'No songs match. Try fewer words, or check the spelling');
+  });
+
+  it('says how the list is sorted, unless it is by artist', () => {
+    assert.equal(status(1853, { sort: 'artist' }, themes), 'Showing all 1,853 songs');
+    assert.equal(status(1853, { sort: 'title' }, themes), 'Showing all 1,853 songs, sorted by title');
+    assert.equal(status(12, { words: ['love'], theme: 'sad', sort: 'album' }, themes), '12 songs match on the Sad list, sorted by album');
+    assert.equal(status(0, { words: ['zzz'], sort: 'title' }, themes), 'No songs match. Try fewer words, or check the spelling');
   });
 });
