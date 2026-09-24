@@ -246,6 +246,7 @@ For the hosts, or for whoever has wp-admin and hosting access.
 14. Keep all 46 posts? Which themed lists matter most?
 15. Which accounts are still active: X/Twitter, the Facebook page, Instagram? Which should the site link to?
 16. Would they want to publish the play-tracking data they've kept since 2014, like most-sung and never-sung lists?
+17. Would they want the Photos page to show their latest Instagram posts by itself? Today it shows their photos from the site and a link to Instagram ([#18](https://github.com/Johnesco/karaokeunderground/issues/18), [ADR-005](../adr/005-photos-gallery.md)). A feed that updates itself needs the account to be a professional one (Business or Creator, a free switch in the app), and a one-time connection they make with their own login.
 
 ## About `urls.csv`
 
