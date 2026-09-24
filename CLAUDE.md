@@ -76,13 +76,15 @@ karaokeunderground/
 ├── site/                          # What the browser loads: the page shell, its styles and scripts (#13, #11)
 │   ├── index.html                 # The one page shell for every path (ADR-003)
 │   ├── css/site.css               # Plain, phone-first styles, white on black. The design comes later, with the owner
-│   └── js/                        # ES modules. app.js runs the page; router.js, views.js, markdown.js (ADR-004) and
-│                                  #   songlist-page.js render it; csv.js, front-matter.js and songlist.js are shared with the check
+│   └── js/                        # ES modules. app.js runs the page; router.js, views.js, markdown.js (ADR-004),
+│                                  #   songlist-page.js and photos-page.js (ADR-005) render it; csv.js, front-matter.js
+│                                  #   and songlist.js are shared with the check
 ├── scripts/
 │   ├── check-content.js           # Ours: the content check, which npm test runs (#10)
 │   ├── dev-server.js              # Ours: the local preview, npm run dev (ADR-003)
 │   ├── lib/                       # Their parts: check-content.js, dev-server.js, and content-index.js, which builds /content/index.json
 │   ├── convert-working-copy.py    # Ours, one-off: turned the working copy into the core files (#10)
+│   ├── make-thumbnails.py         # Ours: the Photos page's small copies, in images/thumbs/ (ADR-005). Needs Pillow
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
 │   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
 │   └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
@@ -121,7 +123,9 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-004](docs/adr/
 - **`pages/<slug>.md`, `posts/<YYYY-MM-DD>-<slug>.md`:** plain Markdown (CommonMark, plus `~~strikethrough~~`) with no HTML, no tables and no reference-style links ([ADR-004](docs/adr/004-own-markdown-renderer.md)). A line break inside a paragraph is a backslash at the end of the line. A page's `#` headings sit under its title, as `h2`
   - Front matter between two `---` lines: `title` (required), `date` (required for posts, and the same as the file name's), `updated`, and `old_url`, the legacy address without the domain, in the same form as `urls.csv` (`/?p=835`). A value with `: ` or ` #` in it goes in double quotes, and the converted files quote every title
   - Links to other pages and posts point at their `.md` files, and images use paths from the file: `![Alt text](../images/2014/04/poster.jpg)`. Links are checked exactly, upper and lower case included, because the web host is case-sensitive
+  - **`pages/photos.md`** ([ADR-005](docs/adr/005-photos-gallery.md)): each image alone on its line is a photo in the gallery, with its description as the alt text. Its front matter's `instagram` field, an account name like `karaokeunderground`, shows a card that links to Instagram. The check allows `instagram` on any page
 - **`images/`:** WordPress's year/month folders, plus `site/` for the logo and icons. jpg, jpeg, png, gif or webp
+  - **`images/thumbs/`** holds the small copies of the Photos page's photos, at the same paths as the originals, made by `scripts/make-thumbnails.py`. Where a photo has none, the grid shows the original
 - **The shows wait.** `work/shows.json` stays as the snapshot wrote it (`homepage` and `calendar` lists of `{date, weekday, venue, details, link, text}`, with each year inferred) until we decide how events get updated
 
 ## Testing
@@ -217,6 +221,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-002](docs/adr/002-core-file-formats.md): the formats of the core files, including the Themes and Tags columns and plain Markdown. *Accepted* 2026-09-23 ([#10](https://github.com/Johnesco/karaokeunderground/issues/10)); the shows wait for the decision on events
 - [ADR-003](docs/adr/003-clean-paths-one-shell.md): clean paths, served by one page shell, with a Node dev server locally. *Accepted* 2026-09-23 ([#13](https://github.com/Johnesco/karaokeunderground/issues/13))
 - [ADR-004](docs/adr/004-own-markdown-renderer.md): our own Markdown renderer, with no dependencies. *Accepted* 2026-09-23 ([#13](https://github.com/Johnesco/karaokeunderground/issues/13))
+- [ADR-005](docs/adr/005-photos-gallery.md): the Photos page, a gallery of the owner's photos with small copies, and an Instagram card that loads nothing from Instagram. *Accepted* 2026-09-23 ([#18](https://github.com/Johnesco/karaokeunderground/issues/18))
 
 ### The diary
 
@@ -230,6 +235,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-23**: The Photos page shows the owner's photos and an Instagram card (#18): [ADR-005](docs/adr/005-photos-gallery.md). Posts joined the menu (#13)
 - **2026-09-23**: Built the songlist page with search, themes and tags (#11)
 - **2026-09-23**: Built the site shell, clean paths, our own Markdown renderer and the local preview, phone-first (#13): [ADR-003](docs/adr/003-clean-paths-one-shell.md), [ADR-004](docs/adr/004-own-markdown-renderer.md)
 - **2026-09-23**: Converted the working copy into the core files (#10). [ADR-002](docs/adr/002-core-file-formats.md) sets their formats, and `npm test` checks them

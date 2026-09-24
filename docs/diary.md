@@ -285,6 +285,26 @@ The owner asked for white text on black, wherever possible. That's how the old s
 - **No inverted panels:** a picked songlist button shows a white border, bold text and its filled radio button, instead of turning white.
 - **Accessible:** every text colour was measured on every page. White text on black is 21:1 and the gray for dates and counts is 9:1, where WCAG asks for at least 4.5:1.
 
+### 2026-09-23 · A Photos page worth visiting
+
+**Decision · Finding** · [#18] · [#13] · [ADR-005](adr/005-photos-gallery.md)
+
+Two requests from John. First, the post archive gets a place in the menu. It was only reachable from the home page and from each post.
+
+Second, the Photos page should be more than a link to Instagram. Could it frame the Instagram page? We checked, and it can't:
+
+- **No framing.** Instagram sends `X-Frame-Options: DENY` on its profile pages, so browsers refuse to show them inside another site.
+- **Embeds are post by post.** Instagram's official embeds work for single posts only.
+- **A live feed needs the owner's account.** It means connecting the account to a widget service. A lapsed connection like that is exactly why the old Photos page went blank.
+
+**Chose:** a gallery of the owner's own photos, plus a card linking to their Instagram. The photos were already in the content, unshown: the old homepage slideshow had shown 8 of them, from uploads that held 11 more. All 19 are the night itself, singers mid-song with the lyrics on the wall behind them.
+
+- **Small copies.** At full size the 19 photos are 19.3 MB, too much for a phone at a bar. A small script makes copies that total 838 KB. It strips each photo's metadata, so no camera or location data goes with it, and rerunning it gives the same bytes.
+- **Described.** Each photo has a written description for screen readers. The descriptions leave out the lyrics on the screens and any guess about who's singing.
+- **Nothing from Instagram loads.** The card is a link, so there's no third-party script and no tracking.
+
+**A plan that changed while building:** the idea was that the owner could add a photo just by dropping it into a folder. But every photo needs a description, and the description needs a place. So a photo gets one line in the Photos page's Markdown, with its description, next to where it's listed.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -299,3 +319,4 @@ The owner asked for white text on black, wherever possible. That's how the old s
 [#12]: https://github.com/Johnesco/karaokeunderground/issues/12
 [#13]: https://github.com/Johnesco/karaokeunderground/issues/13
 [#14]: https://github.com/Johnesco/karaokeunderground/issues/14
+[#18]: https://github.com/Johnesco/karaokeunderground/issues/18
