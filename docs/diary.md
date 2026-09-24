@@ -307,6 +307,20 @@ Second, the Photos page should be more than a link to Instagram. Could it frame 
 
 **A plan that changed while building:** the idea was that the owner could add a photo just by dropping it into a folder. But every photo needs a description, and the description needs a place. So a photo gets one line in the Photos page's Markdown, with its description, next to where it's listed.
 
+### 2026-09-24 · The sad list lives in one place
+
+**Decision** · [#19]
+
+The SAD SONGS ONLY 2025 post carried its own copy of the list, 542 songs pasted one per line. This is exactly what the Themes column was meant to end ([2026-09-23 · The core files](#2026-09-23--the-core-files)). John asked for the post to point at the songlist instead, if the two lists matched.
+
+**Comparing first.** A script paired every song in the post with a song on the songlist's Sad list, one to one:
+
+- **542 and 542,** with no duplicates and nothing left over on either side.
+- **537 matched exactly.** Several of them only because the conversion had restored the accents the old export dropped.
+- **5 were the same songs, spelled differently,** like "National" against "The National".
+
+**Then the rewrite.** The post now links to the songlist filtered to the Sad list, which is searchable and stays current as songs get tagged. The owner's own sentence stays as it was, and the hand-typed "542 songs" goes, because the songlist counts for itself. The pasted list isn't lost: it stays in the content repo's history.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -322,3 +336,4 @@ Second, the Photos page should be more than a link to Instagram. Could it frame 
 [#13]: https://github.com/Johnesco/karaokeunderground/issues/13
 [#14]: https://github.com/Johnesco/karaokeunderground/issues/14
 [#18]: https://github.com/Johnesco/karaokeunderground/issues/18
+[#19]: https://github.com/Johnesco/karaokeunderground/issues/19
