@@ -85,6 +85,17 @@ describe('the example songlist', () => {
     assert.ok(at('<input id="song-query"') < at('</form>'));
   });
 
+  it('puts a named clear button in the search box, hidden until there is text', () => {
+    const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
+    const button = html.match(/<button class="song-clear"[^>]*>.*?<\/button>/s)?.[0];
+    assert.ok(button, 'the search box has a clear button');
+    assert.match(button, / type="button"/, 'it never sends the form');
+    assert.match(button, / hidden>/, 'it shows once there is text to clear');
+    assert.match(button, /<span class="visually-hidden">Clear the search<\/span>/);
+    assert.match(button, /<svg[^>]* aria-hidden="true"/, 'screen readers hear its name, not the drawing');
+    assert.ok(html.indexOf('<input id="song-query"') < html.indexOf('<button class="song-clear"'), 'Tab reaches it after the box');
+  });
+
   it('shows no tag filter until a song has a tag', () => {
     const untagged = listSongs(csv(['A,B,C,sad,', 'D,E,F,,']));
     assert.doesNotMatch(songlistView(parseFrontMatter('---\ntitle: S\n---\n'), untagged, null).html, /Tags/);

@@ -80,6 +80,10 @@ export function describe(shown, { words = [], theme = '', tags = [] }, themes) {
   return `${count(shown)} song${shown === 1 ? ' matches' : 's match'}${list}`;
 }
 
+// The clear button's X, drawn as two lines so it's crisp and centred in any font.
+// Screen readers skip it and read the button's hidden text instead.
+const CLEAR_ICON = '<svg viewBox="0 0 16 16" width="18" height="18" aria-hidden="true"><path d="M3 3 13 13M13 3 3 13" stroke="currentColor" stroke-width="2" fill="none"/></svg>';
+
 function choice(type, name, value, text, checked) {
   return `<label class="choice"><input type="${type}" name="${name}" value="${escapeHtml(value)}"${checked ? ' checked' : ''}> <span>${escapeHtml(text)}</span></label>\n`;
 }
@@ -114,7 +118,10 @@ export function songlistView(doc, songs, updated) {
         + '</fieldset>\n'
       : '')
     + '<label class="song-query-label" for="song-query">Search the songlist</label>\n'
+    + '<div class="song-query">\n'
     + '<input id="song-query" name="q" type="search" autocomplete="off" spellcheck="false" placeholder="Artist, title or album">\n'
+    + `<button class="song-clear" type="button" hidden><span class="visually-hidden">Clear the search</span>${CLEAR_ICON}</button>\n`
+    + '</div>\n'
     + '</form>\n'
     + `<p class="song-count" role="status">${describe(songs.length, {}, themes)}</p>\n`
     + '<div class="songs-head" aria-hidden="true"><span>Artist</span><span>Title</span><span>Album</span></div>\n'
@@ -129,6 +136,7 @@ export function songlistView(doc, songs, updated) {
 export function enhanceSonglist(main, songs, themes) {
   const form = main.querySelector('.song-search');
   const input = form.querySelector('#song-query');
+  const clear = form.querySelector('.song-clear');
   const status = main.querySelector('.song-count');
   const items = [...main.querySelectorAll('.songs > li')];
 
@@ -148,6 +156,7 @@ export function enhanceSonglist(main, songs, themes) {
       theme: form.querySelector('input[name="theme"]:checked')?.value ?? '',
       tags: [...form.querySelectorAll('input[name="tag"]:checked')].map((box) => box.value),
     };
+    clear.hidden = !input.value;
     let shown = 0;
     songs.forEach((song, i) => {
       const show = matches(song, state);
@@ -172,6 +181,20 @@ export function enhanceSonglist(main, songs, themes) {
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     update(event);
+  });
+  // The X empties the search box and puts the cursor back in it, and so does Escape.
+  // The picked list and tags stay picked.
+  const empty = () => {
+    input.value = '';
+    input.focus();
+    update();
+  };
+  clear.addEventListener('click', empty);
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && input.value) {
+      event.preventDefault();
+      empty();
+    }
   });
   update();
 }
