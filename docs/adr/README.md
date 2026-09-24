@@ -13,4 +13,5 @@ Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-base
 | [005](005-photos-gallery.md) | The Photos page: a gallery from the content, and an Instagram card | Accepted |
 | [006](006-sort-by-moving-a-column.md) | Sort the songlist by moving a column to the front | Accepted |
 | [007](007-left-menu-in-sprayme.md) | On wide screens, the menu stands in a left column, set in SprayME | Accepted |
-| [008](008-posts-from-the-home-page.md) | Posts are reached from the home page, not the menu | Accepted |
+| [008](008-posts-from-the-home-page.md) | Posts are reached from the home page, not the menu | Superseded by 009 |
+| [009](009-songlist-home-four-sections.md) | The songlist is the home page, and the site has four sections | Accepted |

@@ -6,7 +6,7 @@
 
 import { route } from './router.js';
 import { parseFrontMatter } from './front-matter.js';
-import { homeView, pageView, postView, postsView, missingView, errorView } from './views.js';
+import { pageView, postView, postsView, missingView, errorView } from './views.js';
 import { listSongs, songlistView } from './songlist-page.js';
 import { photosView } from './photos-page.js';
 
@@ -25,11 +25,6 @@ const fetchIndex = async () => JSON.parse(await fetchText('/content/index.json')
 
 async function load(r) {
   switch (r.view) {
-    case 'home': {
-      const index = await fetchIndex();
-      const hasIntro = index.pages.some((p) => p.name === 'home');
-      return homeView(index, hasIntro ? parseFrontMatter(await fetchText('/content/pages/home.md')) : null);
-    }
     case 'page':
       if (r.name === 'songlist') {
         const [page, csv, index] = await Promise.all([fetchText('/content/pages/songlist.md'), fetchText('/content/songlist.csv'), fetchIndex()]);
@@ -54,7 +49,7 @@ async function start() {
   if (r.path && r.path !== window.location.pathname) {
     window.history.replaceState(null, '', r.path + window.location.search + window.location.hash);
   }
-  // The logo is the link home, and home is the way to the posts (ADR-008), so it's marked there like a menu link.
+  // The logo and Songlist both lead home, to the songlist (ADR-009), so both are marked there.
   for (const link of document.querySelectorAll('.site-logo, .menu a')) {
     if (link.getAttribute('href') === r.path) link.setAttribute('aria-current', 'page');
   }

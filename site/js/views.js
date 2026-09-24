@@ -58,20 +58,10 @@ export function postsView(index) {
   return { title: 'Posts', html };
 }
 
-/** The home page: its intro, once there's a pages/home.md (#17), then the latest posts. */
-export function homeView(index, intro) {
-  const latest = index.posts.slice(0, 5);
-  const html = '<h1>Karaoke Underground</h1>\n'
-    + (intro ? markdownHtml(intro.body, 'pages') : '')
-    + `<h2>Latest posts</h2>\n<ul class="post-list">\n${latest.map(postItem).join('')}</ul>\n`
-    + `<p><a href="/posts/">All ${index.posts.length} posts</a></p>\n`;
-  return { title: null, html };
-}
-
 export function missingView() {
   return {
     title: 'Page not found',
-    html: '<h1>Page not found</h1>\n<p>There\u{2019}s no page at this address. Try the <a href="/songlist/">songlist</a>, the <a href="/posts/">posts</a> or the <a href="/">home page</a>.</p>\n',
+    html: '<h1>Page not found</h1>\n<p>There\u{2019}s no page at this address. Try the <a href="/">songlist</a> or the <a href="/posts/">posts</a>.</p>\n',
   };
 }
 

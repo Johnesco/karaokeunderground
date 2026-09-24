@@ -1,24 +1,30 @@
 /**
- * The site's paths (ADR-003). Every page has a clean path, and one page shell,
- * index.html, renders them all:
+ * The site's paths (ADR-003, ADR-009). Every page has a clean path, and one
+ * page shell, index.html, renders them all:
  *
- *   /                 the home page
+ *   /                 the songlist, which is the home page (ADR-009)
  *   /<name>/          a page, from content/pages/<name>.md, like /about/
  *   /posts/           the post archive
  *   /posts/<name>/    a post, from content/posts/<name>.md
  *
  * Links in pages and posts point at files, so they read well on GitHub too:
- * media.md, ../posts/<name>.md, ../images/2014/04/poster.jpg. sitePath() turns
- * them into the site's paths.
+ * about.md, ../posts/<name>.md, ../images/2014/04/poster.jpg, and ../posts/
+ * for the archive. sitePath() turns them into the site's paths.
  */
 
 const NAME = '[a-z0-9]+(?:-[a-z0-9]+)*';
+
+// The songlist lives at / (ADR-009). Every other page lives at /<name>/.
+const pagePath = (name) => (name === 'songlist' ? '/' : `/${name}/`);
+
+// Pages folded into others when the site regrouped (ADR-009): their old paths land on the page that took them in.
+const MERGED = { calendar: 'shows', contact: 'about', media: 'about' };
 
 /**
  * Which view a path shows, and its canonical form (with the trailing slash).
  *
  * @param {string} pathname location.pathname
- * @returns {{ view: 'home' | 'page' | 'posts' | 'post' | 'missing', name?: string, path?: string }}
+ * @returns {{ view: 'page' | 'posts' | 'post' | 'missing', name?: string, path?: string }}
  */
 export function route(pathname) {
   let path;
@@ -27,12 +33,15 @@ export function route(pathname) {
   } catch {
     return { view: 'missing' };
   }
-  if (path === '/' || path === '/index.html') return { view: 'home', path: '/' };
+  if (path === '/' || path === '/index.html') return { view: 'page', name: 'songlist', path: '/' };
   if (/^\/posts\/?$/.test(path)) return { view: 'posts', path: '/posts/' };
   let m = new RegExp(`^/posts/(${NAME})/?$`).exec(path);
   if (m) return { view: 'post', name: m[1], path: `/posts/${m[1]}/` };
   m = new RegExp(`^/(${NAME})/?$`).exec(path);
-  if (m) return { view: 'page', name: m[1], path: `/${m[1]}/` };
+  if (m) {
+    const name = MERGED[m[1]] ?? m[1];
+    return { view: 'page', name, path: pagePath(name) };
+  }
   return { view: 'missing' };
 }
 
@@ -49,9 +58,10 @@ export function sitePath(href, from) {
   const suffix = cut === -1 ? '' : href.slice(cut);
   const resolved = normalize(`${from}/${file}`);
   let m = new RegExp(`^pages/(${NAME})\\.md$`).exec(resolved);
-  if (m) return `/${m[1]}/${suffix}`;
+  if (m) return `${pagePath(m[1])}${suffix}`;
   m = new RegExp(`^posts/(${NAME})\\.md$`).exec(resolved);
   if (m) return `/posts/${m[1]}/${suffix}`;
+  if (resolved === 'posts') return `/posts/${suffix}`; // ../posts/, the archive
   return `/content/${resolved}${suffix}`;
 }
 

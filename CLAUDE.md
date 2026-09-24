@@ -32,7 +32,7 @@ The owner has to be able to take it over: the stack runs in accounts they contro
 - **Code and content live apart until the owner agrees.** Code is in this public repo, the core files in the private content repo, and the Netlify build combines them
 - **An owner login comes later.** A git-based editor, such as TinaCMS or Decap, edits the same files
 - **Watch the credits.** The free plan gives 300 credits a month: 15 per production deploy, 20 per GB of traffic. When they run out, every site on the account is paused. Batch content updates, and develop on deploy previews, which are free
-- **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/songlist/`, `/about/`, `/posts/<file>/`. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
+- **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/` (the songlist, which is the home page, [ADR-009](docs/adr/009-songlist-home-four-sections.md)), `/shows/`, `/photos/`, `/about/`, `/posts/<file>/`, and the archive at `/posts/`. Old paths like `/songlist/` and `/calendar/` land on their new pages. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
 - **Our own Markdown renderer** ([ADR-004](docs/adr/004-own-markdown-renderer.md)), with no dependencies, checked against markdown-it
 - **Local for now.** `npm run dev` previews the site on 127.0.0.1:8001, reading the core files from `work/content/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
 
@@ -70,7 +70,8 @@ karaokeunderground/
 │   │   ├── 005-photos-gallery.md              # The Photos page: a gallery and an Instagram card (#18)
 │   │   ├── 006-sort-by-moving-a-column.md     # Sorting the songlist by moving a column to the front (#22)
 │   │   ├── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
-│   │   └── 008-posts-from-the-home-page.md    # Posts reached from the home page, not the menu (#24)
+│   │   ├── 008-posts-from-the-home-page.md    # Posts reached from the home page (#24). Superseded by ADR-009
+│   │   └── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -129,7 +130,7 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-007](docs/adr/
   - No other columns, because everything in the file is public once deployed. At least 1,000 songs, so a cut-off or filtered export can't replace the list
 - **`pages/<slug>.md`, `posts/<YYYY-MM-DD>-<slug>.md`:** plain Markdown (CommonMark, plus `~~strikethrough~~`) with no HTML, no tables and no reference-style links ([ADR-004](docs/adr/004-own-markdown-renderer.md)). A line break inside a paragraph is a backslash at the end of the line. A page's `#` headings sit under its title, as `h2`
   - Front matter between two `---` lines: `title` (required), `date` (required for posts, and the same as the file name's), `updated`, and `old_url`, the legacy address without the domain, in the same form as `urls.csv` (`/?p=835`). A value with `: ` or ` #` in it goes in double quotes, and the converted files quote every title
-  - Links to other pages and posts point at their `.md` files, and images use paths from the file: `![Alt text](../images/2014/04/poster.jpg)`. Links are checked exactly, upper and lower case included, because the web host is case-sensitive
+  - Links to other pages and posts point at their `.md` files, and images use paths from the file: `![Alt text](../images/2014/04/poster.jpg)`. A link to the posts archive points at the folder, `../posts/` ([ADR-009](docs/adr/009-songlist-home-four-sections.md)). Links are checked exactly, upper and lower case included, because the web host is case-sensitive
   - **`pages/photos.md`** ([ADR-005](docs/adr/005-photos-gallery.md)): each image alone on its line is a photo in the gallery, with its description as the alt text. Its front matter's `instagram` field, an account name like `karaokeunderground`, shows a card that links to Instagram. The check allows `instagram` on any page
 - **`images/`:** WordPress's year/month folders, plus `site/` for the logo and icons. jpg, jpeg, png, gif or webp
   - **`images/thumbs/`** holds the small copies of the Photos page's photos, at the same paths as the originals, made by `scripts/make-thumbnails.py`. Where a photo has none, the grid shows the original
@@ -231,7 +232,8 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-005](docs/adr/005-photos-gallery.md): the Photos page, a gallery of the owner's photos with small copies, and an Instagram card that loads nothing from Instagram. *Accepted* 2026-09-23 ([#18](https://github.com/Johnesco/karaokeunderground/issues/18))
 - [ADR-006](docs/adr/006-sort-by-moving-a-column.md): sorting the songlist by moving a column to the front, John's design. *Accepted* 2026-09-24 ([#22](https://github.com/Johnesco/karaokeunderground/issues/22))
 - [ADR-007](docs/adr/007-left-menu-in-sprayme.md): on wide screens, the menu stands in a left column, set in SprayME, a Creative Commons font credited in the footer. *Accepted* 2026-09-24 ([#23](https://github.com/Johnesco/karaokeunderground/issues/23))
-- [ADR-008](docs/adr/008-posts-from-the-home-page.md): Posts leaves the menu, and the home page, a logo's touch away, is the way to the posts. *Accepted* 2026-09-24 ([#24](https://github.com/Johnesco/karaokeunderground/issues/24))
+- [ADR-008](docs/adr/008-posts-from-the-home-page.md): Posts leaves the menu, and the home page, a logo's touch away, is the way to the posts. *Superseded* by ADR-009 the same day ([#24](https://github.com/Johnesco/karaokeunderground/issues/24))
+- [ADR-009](docs/adr/009-songlist-home-four-sections.md): the songlist is the home page, and the site has four sections, Songlist, Shows, Photos and About, with the posts as an archive. *Accepted* 2026-09-24 ([#25](https://github.com/Johnesco/karaokeunderground/issues/25))
 
 ### The diary
 
@@ -245,7 +247,8 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
-- **2026-09-24**: Posts left the menu, back to the old site's six links, and the home page leads to them (#24): [ADR-008](docs/adr/008-posts-from-the-home-page.md)
+- **2026-09-24**: The songlist became the home page, and the site regrouped into Songlist, Shows, Photos and About, with the posts as an archive (#25): [ADR-009](docs/adr/009-songlist-home-four-sections.md)
+- **2026-09-24**: Posts left the menu, back to the old site's six links, and the home page leads to them (#24): [ADR-008](docs/adr/008-posts-from-the-home-page.md), superseded the same day
 - **2026-09-24**: On wide screens the menu stands in a left column, as on the old site, set in SprayME (#23): [ADR-007](docs/adr/007-left-menu-in-sprayme.md)
 - **2026-09-24**: The songlist sorts by artist, title or album, by moving a column to the front (#22): [ADR-006](docs/adr/006-sort-by-moving-a-column.md)
 - **2026-09-23**: The Photos page shows the owner's photos and an Instagram card (#18): [ADR-005](docs/adr/005-photos-gallery.md). Posts joined the menu (#13)

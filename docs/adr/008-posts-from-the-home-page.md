@@ -1,5 +1,5 @@
 # ADR-008: Posts are reached from the home page, not the menu
-**Status:** Accepted · **Date:** 2026-09-24 · **Issue(s):** [#24](https://github.com/Johnesco/karaokeunderground/issues/24)
+**Status:** Superseded by [ADR-009](009-songlist-home-four-sections.md) · **Date:** 2026-09-24 · **Issue(s):** [#24](https://github.com/Johnesco/karaokeunderground/issues/24)
 ## Context
 The menu runs to seven links, and John wants less on screen. The old site's menu had six, with no Posts. The home page already lists the five latest posts and links to all of them, and the logo, on every page, leads home.
 ## Decision

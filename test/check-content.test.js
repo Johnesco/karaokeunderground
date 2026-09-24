@@ -112,6 +112,12 @@ describe('checkContent on broken copies of the example', () => {
     assert.match(errors, /:6 \.\.\/pages\/missing\.md doesn't exist/);
   });
 
+  it('accepts ../posts/, the archive of posts, and fails a link to any other folder (ADR-009)', () => {
+    const { errors } = check({ 'pages/about.md': post('[the archive](../posts/) and [the photos](../images/)', 'title: About') });
+    assert.match(errors, /\.\.\/images\/ doesn't exist/);
+    assert.equal(errors.split('\n').length, 1);
+  });
+
   it('fails paths from the site root or outside the content folder', () => {
     const { errors } = check({ 'pages/about.md': post('[a](/images/2026/01/flyer.png) [b](../../README.md)', 'title: About') });
     assert.match(errors, /starts with \//);

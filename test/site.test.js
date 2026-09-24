@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { route, sitePath } from '../site/js/router.js';
-import { formatDate, pageView, postView, postsView, homeView } from '../site/js/views.js';
+import { formatDate, pageView, postView, postsView, missingView } from '../site/js/views.js';
 import { parseFrontMatter } from '../site/js/front-matter.js';
 import { buildIndex } from '../scripts/lib/content-index.js';
 import { resolve, createServer } from '../scripts/lib/dev-server.js';
@@ -15,10 +15,17 @@ const DIRS = { siteDir: path.join(ROOT, 'site'), contentDir: FIXTURE };
 
 describe('route', () => {
   it('maps clean paths to views, with the trailing slash as the canonical form', () => {
-    assert.deepEqual(route('/'), { view: 'home', path: '/' });
+    assert.deepEqual(route('/'), { view: 'page', name: 'songlist', path: '/' });
     assert.deepEqual(route('/about'), { view: 'page', name: 'about', path: '/about/' });
     assert.deepEqual(route('/posts/'), { view: 'posts', path: '/posts/' });
     assert.deepEqual(route('/posts/2025-12-27-sad-songs-only-2025/'), { view: 'post', name: '2025-12-27-sad-songs-only-2025', path: '/posts/2025-12-27-sad-songs-only-2025/' });
+  });
+
+  it('lands old paths on the page that took them in when the site regrouped (ADR-009)', () => {
+    assert.deepEqual(route('/songlist/'), { view: 'page', name: 'songlist', path: '/' });
+    assert.deepEqual(route('/calendar/'), { view: 'page', name: 'shows', path: '/shows/' });
+    assert.deepEqual(route('/contact'), { view: 'page', name: 'about', path: '/about/' });
+    assert.deepEqual(route('/media/'), { view: 'page', name: 'about', path: '/about/' });
   });
 
   it('sends anything else to the not-found page', () => {
@@ -28,9 +35,15 @@ describe('route', () => {
 
 describe('sitePath', () => {
   it('turns links to .md files into page and post paths', () => {
-    assert.equal(sitePath('media.md', 'pages'), '/media/');
-    assert.equal(sitePath('../pages/songlist.md', 'posts'), '/songlist/');
+    assert.equal(sitePath('about.md', 'pages'), '/about/');
+    assert.equal(sitePath('../pages/songlist.md', 'posts'), '/', 'the songlist is the home page');
+    assert.equal(sitePath('../pages/songlist.md?theme=sad', 'posts'), '/?theme=sad');
     assert.equal(sitePath('../posts/2019-01-03-2018-top-tens.md#songs', 'pages'), '/posts/2019-01-03-2018-top-tens/#songs');
+  });
+
+  it('turns a link to the posts folder into the archive', () => {
+    assert.equal(sitePath('../posts/', 'pages'), '/posts/');
+    assert.equal(sitePath('../posts', 'pages'), '/posts/');
   });
 
   it('serves other files from /content/, and leaves web addresses alone', () => {
@@ -40,8 +53,6 @@ describe('sitePath', () => {
 });
 
 describe('views', () => {
-  const index = buildIndex(FIXTURE, { git: false });
-
   it('writes dates out in English', () => {
     assert.equal(formatDate('2025-12-27'), 'December 27, 2025');
     assert.equal(formatDate('2014-03-01'), 'March 1, 2014');
@@ -69,11 +80,10 @@ describe('views', () => {
     assert.match(view.html, /<a href="\/posts\/2019-01-03-c\/">C &amp; D<\/a>/);
   });
 
-  it('puts the latest posts on the home page', () => {
-    const view = homeView(index, null);
-    assert.equal(view.title, null);
-    assert.match(view.html, /<a href="\/posts\/2026-01-02-first-post\/">First post: an example<\/a>/);
-    assert.match(view.html, /All 1 posts/);
+  it('points a lost visitor to the songlist, at home, and to the posts', () => {
+    const { html } = missingView();
+    assert.match(html, /<a href="\/">songlist<\/a>/);
+    assert.match(html, /<a href="\/posts\/">posts<\/a>/);
   });
 });
 
@@ -85,11 +95,11 @@ describe('site.css', () => {
 });
 
 describe('the page shell', () => {
-  it('has the old site\u{2019}s six menu links, with the posts reached from the home page (ADR-008)', () => {
+  it('has four menu links, with the songlist at home (ADR-009)', () => {
     const shell = fs.readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
     const menu = [...shell.matchAll(/<li><a href="([^"]+)">([^<]+)<\/a><\/li>/g)].map((m) => `${m[2]} ${m[1]}`);
-    assert.deepEqual(menu, ['Songlist /songlist/', 'Calendar /calendar/', 'Photos /photos/', 'Contact /contact/', 'Media /media/', 'About /about/']);
-    assert.match(shell, /<a class="site-logo" href="\/">/, 'the logo leads home');
+    assert.deepEqual(menu, ['Songlist /', 'Shows /shows/', 'Photos /photos/', 'About /about/']);
+    assert.match(shell, /<a class="site-logo" href="\/">/, 'the logo leads home, to the songlist');
   });
 
   it('credits SprayME and its licence, as the licence asks (ADR-007)', () => {

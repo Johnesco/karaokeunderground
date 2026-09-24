@@ -162,7 +162,7 @@ export function songlistView(doc, songs, updated) {
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n`
     + (updated ? `<p class="song-summary">Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time></p>\n` : '')
     // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
-    + '<form class="song-search" role="search" action="/songlist/">\n'
+    + '<form class="song-search" role="search" action="/">\n'
     + (themes.length
       ? '<fieldset class="choices"><legend>List</legend>\n'
         + choice('radio', 'theme', '', 'All songs', true)
@@ -201,7 +201,7 @@ export function songlistView(doc, songs, updated) {
 /**
  * Makes the page's search, filters and sorting work: rows show and hide as
  * you type, a column's name sorts the list by it, and the address keeps it
- * all, so /songlist/?theme=sad&sort=title can be shared.
+ * all, so /?theme=sad&sort=title can be shared. The songlist is the home page (ADR-009).
  */
 export function enhanceSonglist(main, songs, themes) {
   const form = main.querySelector('.song-search');
@@ -247,7 +247,7 @@ export function enhanceSonglist(main, songs, themes) {
     for (const tag of state.tags) query.append('tag', tag);
     if (sort !== 'artist') query.set('sort', sort);
     const search = query.toString();
-    window.history.replaceState(null, '', `/songlist/${search ? `?${search}` : ''}`);
+    window.history.replaceState(null, '', `/${search ? `?${search}` : ''}`);
     // While someone types, screen readers hear the count once typing pauses, not on every key.
     // When the page opens, it's right straight away.
     clearTimeout(announce);

@@ -371,6 +371,26 @@ So the left column came back in SprayME, with the credit in the footer and a not
 
 To cut the menu down, John took Posts out of it. The home page already listed the five latest posts with a link to all of them, so it became the way in, and the logo leads there from every page. The menu is back to the old site's six links, and on the narrowest phones it now fits in two rows instead of three. Now that the logo is the way home, it got a full 44px touch target, and the home page marks it as the current page, as the menu does for the others.
 
+### 2026-09-24 · The songlist becomes the home page
+
+**Decision · Process** · [#25] · [ADR-009](adr/009-songlist-home-four-sections.md)
+
+A few hours after the posts took over the home page, John looked again: the posts are either old or a lot of work to keep up, and the songlist should come first. Before suggesting anything, Claude sorted everything under each menu title:
+
+- **The posts are mostly history.** 27 of the 46 are notices for past shows and tours, 9 are themed song lists the songlist now holds, 5 are song spotlights from 2014, 4 are year-in-review posts, and 1 is site news. The newest one that isn't a list is from March 2022.
+- **Three pages were thin.** Contact was 30 words and Media a press list, and About and Calendar carried the same "shows monthly, book us" paragraph.
+
+Claude mocked up a regrouping in three sections, and John kept Photos in the menu, which made four:
+
+- **Songlist** is the home page.
+- **Shows**, once Calendar, says the booking paragraph once and links to past shows.
+- **Photos** stays as it was.
+- **About** takes in Contact, as "Get in touch", and Media, as "In the press".
+
+The posts all keep their addresses, as an archive linked from Shows and About. The old page paths land on their new homes, and the posts' links to the songlist now go straight to `/`. On a 375px phone the four links fit on one row, so the header dropped from 105px to 61px.
+
+**A decision that lasted an afternoon.** ADR-008, which made the home page the way to the posts, was superseded by ADR-009 the same day. Prototyping fast means some decisions turn over fast, and the ADRs keep the trail of why.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -391,3 +411,4 @@ To cut the menu down, John took Posts out of it. The home page already listed th
 [#22]: https://github.com/Johnesco/karaokeunderground/issues/22
 [#23]: https://github.com/Johnesco/karaokeunderground/issues/23
 [#24]: https://github.com/Johnesco/karaokeunderground/issues/24
+[#25]: https://github.com/Johnesco/karaokeunderground/issues/25

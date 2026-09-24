@@ -343,6 +343,7 @@ function checkReference(rel, lineNo, ref, files, error, warn) {
     error(rel, lineNo, `${target} points outside the content folder`);
     return;
   }
+  if (!ref.image && (resolved === 'posts' || resolved === 'posts/')) return; // ../posts/ links to the archive of posts (ADR-009)
   if (!files.has(resolved)) {
     error(rel, lineNo, `${target} doesn't exist. Check the path, and that upper and lower case match the file's name`);
     return;
