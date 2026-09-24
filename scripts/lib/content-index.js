@@ -37,7 +37,20 @@ export function buildIndex(dir, { git = true } = {}) {
     pages: read('pages'),
     posts: read('posts').sort(newestFirst),
     songlist: { updated: git ? lastChanged(dir, 'songlist.csv') : null },
+    thumbs: filesUnder(path.join(dir, 'images', 'thumbs')),
   };
+}
+
+/** Every file under a folder, as sorted paths relative to it: the Photos page's small copies (ADR-005). */
+function filesUnder(root, sub = '') {
+  const folder = path.join(root, sub);
+  if (!fs.existsSync(folder)) return [];
+  return fs.readdirSync(folder, { withFileTypes: true })
+    .sort((a, b) => (a.name < b.name ? -1 : 1))
+    .flatMap((entry) => {
+      const rel = sub ? `${sub}/${entry.name}` : entry.name;
+      return entry.isDirectory() ? filesUnder(root, rel) : [rel];
+    });
 }
 
 /** The date of the last commit that changed a file, or null outside a git repo. */

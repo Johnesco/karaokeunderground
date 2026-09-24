@@ -24,7 +24,8 @@ import { parseFrontMatter } from '../../site/js/front-matter.js';
 export const MIN_SONGS = 1000;
 export const IMAGE_TYPES = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
 const TOP_LEVEL = ['songlist.csv', 'pages', 'posts', 'images'];
-const FRONT_MATTER_KEYS = ['title', 'date', 'updated', 'old_url'];
+const FRONT_MATTER_KEYS = ['title', 'date', 'updated', 'old_url', 'instagram'];
+const INSTAGRAM_NAME = /^[A-Za-z0-9._]{1,30}$/; // an Instagram account name, as in its address (ADR-005)
 // The line under a table's header row, like |---|:---:|. The renderer (ADR-004) has no tables.
 const TABLE_RULE = /^ {0,3}\|?[ \t]*:?-+:?[ \t]*(?:\|[ \t]*:?-+:?[ \t]*)+\|?[ \t]*$/;
 const PAGE_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*\.md$/;
@@ -88,15 +89,18 @@ export function checkContent(dir, { minSongs = MIN_SONGS } = {}) {
     error('images/', null, 'the images folder is missing');
   } else {
     let count = 0;
+    let thumbs = 0;
     for (const rel of [...files].filter((f) => f.startsWith('images/'))) {
       if (!IMAGE_TYPES.includes(path.extname(rel).toLowerCase())) {
         warn(rel, null, `the site doesn't show this kind of file. Images can be ${IMAGE_TYPES.join(', ')}`);
         continue;
       }
-      count++;
+      if (rel.startsWith('images/thumbs/')) thumbs++;
+      else count++;
       if (fs.statSync(path.join(dir, rel)).size === 0) error(rel, null, 'the file is empty. The upload may have failed');
     }
     report.summary.images = count;
+    report.summary.thumbs = thumbs;
   }
 
   return report;
@@ -228,6 +232,9 @@ function checkMarkdown(dir, rel, kind, files, oldUrls, error, warn) {
   }
   if (isRealDate(data.date) && isRealDate(data.updated) && data.updated < data.date) {
     warn(rel, null, `updated (${data.updated}) is earlier than date (${data.date})`);
+  }
+  if (data.instagram !== undefined && !INSTAGRAM_NAME.test(data.instagram)) {
+    error(rel, null, `instagram is the account's name as in its address, like karaokeunderground, not "${data.instagram}"`);
   }
   if (data.old_url) {
     if (!data.old_url.startsWith('/')) {

@@ -343,6 +343,75 @@ main.wide {
   }
 }
 
+/* ---- the Photos page (#18, ADR-005) ---- */
+
+.social-card {
+  margin: 0 0 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 2px solid var(--text);
+}
+
+.social-card p {
+  margin: 0 0 0.75rem;
+}
+
+.social-card p:last-child {
+  margin-bottom: 0;
+}
+
+.social-card-title {
+  font-size: 1.15rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.button {
+  display: inline-block;
+  min-height: 2.75rem;
+  padding: 0.6rem 1rem;
+  border: 2px solid var(--text);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.button:hover {
+  text-decoration: underline;
+}
+
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.gallery a {
+  display: block;
+}
+
+.gallery img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  object-position: 50% 30%; /* square crops keep the upper part, where the singers' faces are */
+  background: var(--code-bg);
+}
+
+@media (min-width: 40rem) {
+  .gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 64rem) {
+  .gallery {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 /* ---- footer ---- */
 
 .site-footer {

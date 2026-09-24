@@ -20,7 +20,7 @@ const n = (x) => x.toLocaleString('en-US');
 
 console.log(`Checking the core files in ${shown}\n`);
 const report = checkContent(dir);
-const { songlist, pages, posts, images } = report.summary;
+const { songlist, pages, posts, images, thumbs } = report.summary;
 
 if (songlist) {
   const themes = Object.entries(songlist.themes).map(([t, c]) => `${t} (${n(c)})`).join(', ');
@@ -29,7 +29,7 @@ if (songlist) {
 }
 if (pages !== undefined) console.log(`  pages/        ${n(pages)}`);
 if (posts !== undefined) console.log(`  posts/        ${n(posts)}`);
-if (images !== undefined) console.log(`  images/       ${n(images)}`);
+if (images !== undefined) console.log(`  images/       ${n(images)}${thumbs ? `, plus ${n(thumbs)} small copies for the Photos page` : ''}`);
 
 const where = (p) => [p.file, p.line ? `line ${p.line}` : ''].filter(Boolean).join(' ');
 const print = (title, problems) => {

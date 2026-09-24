@@ -19,6 +19,7 @@ describe('checkContent on the example content folder', () => {
       pages: 1,
       posts: 1,
       images: 2,
+      thumbs: 1,
     });
   });
 
@@ -130,6 +131,11 @@ describe('checkContent on broken copies of the example', () => {
     const { errors } = check({ 'posts/2026-01-02-first-post.md': post('Hi', 'title: A post\ndate: 2026-01-03\nauthor: Me') });
     assert.match(errors, /the file name says 2026-01-02, but the date says 2026-01-03/);
     assert.match(errors, /"author" isn't a front matter field/);
+  });
+
+  it('accepts an Instagram account name, and fails anything else in the instagram field', () => {
+    assert.equal(check({ 'pages/about.md': post('Hi', 'title: About\ninstagram: karaoke.underground_1') }).errors, '');
+    assert.match(check({ 'pages/about.md': post('Hi', 'title: About\ninstagram: not a name') }).errors, /instagram is the account's name as in its address/);
   });
 
   it('fails a date that is not on the calendar, and an old_url used twice', () => {

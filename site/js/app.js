@@ -8,6 +8,7 @@ import { route } from './router.js';
 import { parseFrontMatter } from './front-matter.js';
 import { homeView, pageView, postView, postsView, missingView, errorView } from './views.js';
 import { listSongs, songlistView } from './songlist-page.js';
+import { photosView } from './photos-page.js';
 
 const SITE = 'Karaoke Underground';
 
@@ -33,6 +34,10 @@ async function load(r) {
       if (r.name === 'songlist') {
         const [page, csv, index] = await Promise.all([fetchText('/content/pages/songlist.md'), fetchText('/content/songlist.csv'), fetchIndex()]);
         return songlistView(parseFrontMatter(page), listSongs(csv), index.songlist?.updated ?? null);
+      }
+      if (r.name === 'photos') {
+        const [page, index] = await Promise.all([fetchText('/content/pages/photos.md'), fetchIndex()]);
+        return photosView(parseFrontMatter(page), index.thumbs ?? []);
       }
       return pageView(parseFrontMatter(await fetchText(`/content/pages/${r.name}.md`)));
     case 'posts':

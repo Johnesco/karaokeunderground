@@ -82,6 +82,7 @@ describe('buildIndex', () => {
       pages: [{ name: 'about', title: 'About', date: '2013-09-15', updated: '2021-11-13' }],
       posts: [{ name: '2026-01-02-first-post', title: 'First post: an example', date: '2026-01-02', updated: null }],
       songlist: { updated: null },
+      thumbs: ['2026/01/flyer.png'],
     });
   });
 });
