@@ -352,6 +352,8 @@ main.wide {
   flex-wrap: wrap;
   align-items: baseline;
   border-bottom: 2px solid var(--text);
+  font-size: 1.25rem; /* bigger than the songs, so the names read as their heads */
+  line-height: 1.2; /* so a name and its spare room on a phone still come to 44px */
 }
 
 .song-sort {
