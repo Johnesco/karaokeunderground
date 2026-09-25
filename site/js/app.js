@@ -4,7 +4,7 @@
  * no client-side routing.
  */
 
-import { route } from './router.js';
+import { route, siteUrl } from './router.js';
 import { parseFrontMatter } from './front-matter.js';
 import { pageView, postView, postsView, missingView, errorView } from './views.js';
 import { listSongs, songlistView } from './songlist-page.js';
@@ -21,24 +21,27 @@ async function fetchText(url) {
   return response.text();
 }
 
-const fetchIndex = async () => JSON.parse(await fetchText('/content/index.json'));
+// The core files, under wherever the site lives (ADR-010).
+const content = (file) => siteUrl(`/content/${file}`);
+
+const fetchIndex = async () => JSON.parse(await fetchText(content('index.json')));
 
 async function load(r) {
   switch (r.view) {
     case 'page':
       if (r.name === 'songlist') {
-        const [page, csv, index] = await Promise.all([fetchText('/content/pages/songlist.md'), fetchText('/content/songlist.csv'), fetchIndex()]);
+        const [page, csv, index] = await Promise.all([fetchText(content('pages/songlist.md')), fetchText(content('songlist.csv')), fetchIndex()]);
         return songlistView(parseFrontMatter(page), listSongs(csv), index.songlist?.updated ?? null);
       }
       if (r.name === 'photos') {
-        const [page, index] = await Promise.all([fetchText('/content/pages/photos.md'), fetchIndex()]);
+        const [page, index] = await Promise.all([fetchText(content('pages/photos.md')), fetchIndex()]);
         return photosView(parseFrontMatter(page), index.thumbs ?? []);
       }
-      return pageView(parseFrontMatter(await fetchText(`/content/pages/${r.name}.md`)));
+      return pageView(parseFrontMatter(await fetchText(content(`pages/${r.name}.md`))));
     case 'posts':
       return postsView(await fetchIndex());
     case 'post':
-      return postView(parseFrontMatter(await fetchText(`/content/posts/${r.name}.md`)));
+      return postView(parseFrontMatter(await fetchText(content(`posts/${r.name}.md`))));
     default:
       return missingView();
   }

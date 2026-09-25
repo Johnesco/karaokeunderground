@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { route, sitePath } from '../site/js/router.js';
+import { route, sitePath, siteUrl } from '../site/js/router.js';
 import { formatDate, pageView, postView, postsView, missingView } from '../site/js/views.js';
 import { parseFrontMatter } from '../site/js/front-matter.js';
 import { buildIndex } from '../scripts/lib/content-index.js';
@@ -26,6 +26,20 @@ describe('route', () => {
     assert.deepEqual(route('/calendar/'), { view: 'page', name: 'shows', path: '/shows/' });
     assert.deepEqual(route('/contact'), { view: 'page', name: 'about', path: '/about/' });
     assert.deepEqual(route('/media/'), { view: 'page', name: 'about', path: '/about/' });
+  });
+
+  it('works under a base path, as on GitHub Pages (ADR-010)', () => {
+    const base = '/karaokeunderground/';
+    assert.deepEqual(route('/karaokeunderground/', base), { view: 'page', name: 'songlist', path: base });
+    assert.deepEqual(route('/karaokeunderground', base), { view: 'page', name: 'songlist', path: base });
+    assert.deepEqual(route('/karaokeunderground/shows', base), { view: 'page', name: 'shows', path: '/karaokeunderground/shows/' });
+    assert.deepEqual(route('/karaokeunderground/calendar/', base), { view: 'page', name: 'shows', path: '/karaokeunderground/shows/' });
+    assert.equal(route('/shows/', base).view, 'missing', 'outside the base is no page of ours');
+    assert.equal(sitePath('about.md', 'pages', base), '/karaokeunderground/about/');
+    assert.equal(sitePath('../pages/songlist.md?theme=sad', 'posts', base), '/karaokeunderground/?theme=sad');
+    assert.equal(sitePath('../images/2014/04/poster.jpg', 'posts', base), '/karaokeunderground/content/images/2014/04/poster.jpg');
+    assert.equal(sitePath('../posts/', 'pages', base), '/karaokeunderground/posts/');
+    assert.equal(siteUrl('/', base), base);
   });
 
   it('sends anything else to the not-found page', () => {

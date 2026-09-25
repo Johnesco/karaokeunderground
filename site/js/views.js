@@ -4,7 +4,7 @@
  */
 
 import { renderMarkdown, escapeHtml } from './markdown.js';
-import { sitePath } from './router.js';
+import { sitePath, siteUrl } from './router.js';
 
 const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
@@ -33,12 +33,12 @@ export function postView(doc) {
   return {
     title,
     html: `<article class="post">\n<h1>${escapeHtml(title)}</h1>\n<p class="meta">Posted ${time(date)}${edited}</p>\n`
-      + `${markdownHtml(doc.body, 'posts')}</article>\n<p class="back"><a href="/posts/">All posts</a></p>\n`,
+      + `${markdownHtml(doc.body, 'posts')}</article>\n<p class="back"><a href="${siteUrl('/posts/')}">All posts</a></p>\n`,
   };
 }
 
 function postItem(post) {
-  return `<li><a href="/posts/${post.name}/">${escapeHtml(post.title)}</a> ${time(post.date)}</li>\n`;
+  return `<li><a href="${siteUrl(`/posts/${post.name}/`)}">${escapeHtml(post.title)}</a> ${time(post.date)}</li>\n`;
 }
 
 /** Every post, newest first, under a heading for each year. */
@@ -61,7 +61,7 @@ export function postsView(index) {
 export function missingView() {
   return {
     title: 'Page not found',
-    html: '<h1>Page not found</h1>\n<p>There\u{2019}s no page at this address. Try the <a href="/">songlist</a> or the <a href="/posts/">posts</a>.</p>\n',
+    html: `<h1>Page not found</h1>\n<p>There\u{2019}s no page at this address. Try the <a href="${siteUrl('/')}">songlist</a> or the <a href="${siteUrl('/posts/')}">posts</a>.</p>\n`,
   };
 }
 

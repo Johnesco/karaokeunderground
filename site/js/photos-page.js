@@ -8,7 +8,7 @@
 
 import { escapeHtml, safeUrl } from './markdown.js';
 import { markdownHtml } from './views.js';
-import { sitePath } from './router.js';
+import { sitePath, siteUrl } from './router.js';
 
 // An image alone on its line, ![description](path), with an optional line-break backslash.
 const IMAGE_LINE = /^ {0,3}!\[((?:\\.|[^\]\\])*)\]\((?:<([^>]*)>|([^\s)]+))\)[ \t]*\\?[ \t]*$/;
@@ -45,8 +45,9 @@ export function photosView(doc, thumbs = []) {
   const items = photos.flatMap(({ alt, src }) => {
     const full = safeUrl(sitePath(src, 'pages'));
     if (full === null) return [];
-    const rel = full.startsWith('/content/images/') ? full.slice('/content/images/'.length) : null;
-    const shown = rel && small.has(rel) ? `/content/images/thumbs/${rel}` : full;
+    const images = siteUrl('/content/images/');
+    const rel = full.startsWith(images) ? full.slice(images.length) : null;
+    const shown = rel && small.has(rel) ? `${images}thumbs/${rel}` : full;
     return [`<li><a href="${escapeHtml(full)}"><img src="${escapeHtml(shown)}" alt="${escapeHtml(alt)}" loading="lazy"></a></li>\n`];
   });
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n${card}${markdownHtml(rest, 'pages')}`

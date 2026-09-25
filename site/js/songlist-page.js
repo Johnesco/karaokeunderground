@@ -10,6 +10,7 @@
 import { readSonglist, isListed, sameKey, UNLISTED } from './songlist.js';
 import { escapeHtml } from './markdown.js';
 import { formatDate, markdownHtml } from './views.js';
+import { siteUrl } from './router.js';
 
 // Letters that Unicode doesn't split into a base letter and an accent.
 const LETTERS = { '\u{F8}': 'o', '\u{E6}': 'ae', '\u{153}': 'oe', '\u{DF}': 'ss', '\u{111}': 'd', '\u{F0}': 'd', '\u{142}': 'l', '\u{FE}': 'th', '\u{131}': 'i' };
@@ -185,7 +186,7 @@ export function songlistView(doc, songs, updated) {
     + '<div class="song-table" data-sort="artist">\n'
     + '<div class="song-controls">\n'
     // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
-    + '<form class="song-search" role="search" action="/">\n'
+    + `<form class="song-search" role="search" action="${siteUrl('/')}">\n`
     + (themes.length
       ? '<fieldset class="choices"><legend>Lists</legend>\n'
         + choice('radio', 'theme', '', `All (${count(songs.length)})`, true)
@@ -283,7 +284,7 @@ export function enhanceSonglist(main, songs, themes) {
     for (const tag of state.tags) query.append('tag', tag);
     if (sort !== 'artist') query.set('sort', sort);
     const search = query.toString();
-    window.history.replaceState(null, '', `/${search ? `?${search}` : ''}`);
+    window.history.replaceState(null, '', `${siteUrl('/')}${search ? `?${search}` : ''}`);
     // While someone types, screen readers hear the count once typing pauses, not on every key.
     // When the page opens, it's right straight away.
     clearTimeout(announce);

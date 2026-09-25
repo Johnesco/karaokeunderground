@@ -26,7 +26,7 @@
    site/fonts/README.md has the details. Phones never download it. */
 @font-face {
   font-family: "SprayME";
-  src: url("/fonts/sprayme.woff") format("woff");
+  src: url("../fonts/sprayme.woff") format("woff"); /* from this file, so it works under any base path (ADR-010) */
   font-display: swap;
 }
 
@@ -102,7 +102,7 @@ body::after {
   z-index: -1;
   width: clamp(16rem, 50vw, 34rem);
   aspect-ratio: 250 / 243;
-  background: url("/content/images/site/logo.png") center / contain no-repeat;
+  background: url("../content/images/site/logo.png") center / contain no-repeat;
   opacity: 0.12;
   transform: translate(35%, 35%);
   pointer-events: none;
@@ -640,6 +640,18 @@ main.wide {
   }
 }
 
+/* ---- the preview note (ADR-010) ---- */
+
+/* A preview build says what it is on every page: on its own line in the
+   header, and under the menu in the wide screens' column. */
+.preview-note {
+  flex-basis: 100%;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.8rem;
+  line-height: 1.4;
+}
+
 /* ---- footer ---- */
 
 .site-footer {
@@ -748,6 +760,11 @@ main.wide {
     font-synthesis: none;
     letter-spacing: 0.02em;
     line-height: 1.2;
+    text-align: center;
+  }
+
+  .preview-note {
+    flex-basis: auto;
     text-align: center;
   }
 }

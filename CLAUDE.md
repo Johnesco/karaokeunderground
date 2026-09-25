@@ -10,13 +10,14 @@
 **Owner:** the people who run Karaoke Underground. They hold the live site, the domain and the hosting, and they decide whether the revamp replaces the current site. John builds the revamp for them
 **Target Users:** Punk and indie fans checking where the next show is and what they can sing, mostly on phones and often at the show. Also the owner, who keeps shows and songlists current
 **Live Site:** https://karaokeunderground.com, the owner's current WordPress site (`www.` 301s to the apex). It stays as it is unless the owner adopts the revamp
+**Preview:** https://johnesco.github.io/karaokeunderground/, the revamp as a public prototype, kept out of search ([ADR-010](docs/adr/010-preview-on-github-pages.md))
 **Repo:** https://github.com/Johnesco/karaokeunderground (public)
 
 ## Approach
 
 1. **Copy.** Pull our own copy of the current site's public content (pages, posts, the songlist, shows, media). The copy from 2026-09-23 is frozen in `snapshot/` as the record of the site before the revamp. [`docs/legacy-site/`](docs/legacy-site/audit.md) maps what there is
-2. **Improve.** Edit the content in `work/`, a private repo. Rebuild the site from it on the stack [ADR-001](docs/adr/001-static-netlify-core-files.md) chose, fixing what the audit found
-3. **Present.** Show it to the owner privately as a replacement: from John's machine, or in person. Netlify's free plan can't password-protect a preview, and it's never shown at karaokeunderground.com
+2. **Improve.** Edit the content in `work/`, the content repo. Rebuild the site from it on the stack [ADR-001](docs/adr/001-static-netlify-core-files.md) chose, fixing what the audit found
+3. **Present.** Show it to the owner as a replacement, at the public preview on GitHub Pages ([ADR-010](docs/adr/010-preview-on-github-pages.md)) or from John's machine. The preview tells search engines to leave it out, says on every page that it's a prototype, and is never shown at karaokeunderground.com
 4. **Owner's call.** It replaces the current site only if the owner accepts. The owner, or someone they authorize, makes the switch: domain, DNS, email and hosting. [`urls.csv`](docs/legacy-site/urls.csv) becomes the redirect map, so old links keep working
 
 The owner has to be able to take it over: the stack runs in accounts they control, at a cost they accept, and it's easy for them to update.
@@ -29,12 +30,13 @@ The owner has to be able to take it over: the stack runs in accounts they contro
 - **The browser reads them.** The site's JavaScript fetches the core files and renders the songlist with its search, the shows and the pages
 - **Checked before every deploy.** A dependency-free Node script validates the core files and writes derived files such as `_redirects`. A failed check stops the deploy, so the live site keeps its last good version
 - **Netlify also provides the contact form and the 301s.** Netlify Forms handles the form, and `_redirects` sends old query-string URLs to their new pages
-- **Code and content live apart until the owner agrees.** Code is in this public repo, the core files in the private content repo, and the Netlify build combines them
+- **Code and content live apart.** Code is in this repo and the core files in the content repo, public since 2026-09-24 ([ADR-010](docs/adr/010-preview-on-github-pages.md)). The build combines them
 - **An owner login comes later.** A git-based editor, such as TinaCMS or Decap, edits the same files
 - **Watch the credits.** The free plan gives 300 credits a month: 15 per production deploy, 20 per GB of traffic. When they run out, every site on the account is paused. Batch content updates, and develop on deploy previews, which are free
 - **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/` (the songlist, which is the home page, [ADR-009](docs/adr/009-songlist-home-four-sections.md)), `/shows/`, `/photos/`, `/about/`, `/posts/<file>/`, and the archive at `/posts/`. Old paths like `/songlist/` and `/calendar/` land on their new pages. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
 - **Our own Markdown renderer** ([ADR-004](docs/adr/004-own-markdown-renderer.md)), with no dependencies, checked against markdown-it
-- **Local for now.** `npm run dev` previews the site on 127.0.0.1:8001, reading the core files from `work/content/`. Setting up Netlify comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
+- **Local, and a public preview.** `npm run dev` previews the site on 127.0.0.1:8001, reading the core files from `work/content/`. `npm run build` writes a static copy to `dist/`, with a page shell at every address ([ADR-010](docs/adr/010-preview-on-github-pages.md)). A GitHub Actions workflow runs `npm test`, builds with `--base /karaokeunderground/ --preview` and deploys to GitHub Pages: on a push, daily for content changes, and by hand. Setting up Netlify for the real site comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
+- **Links go through the base path.** The site works under any base, `/` locally and `/karaokeunderground/` on Pages. `router.js` works it out from where the scripts load, and every address comes from `siteUrl()` or `sitePath()`, never a hard-coded `/`. CSS `url()`s are relative to the stylesheet, and the build moves the shell's root links under the base
 
 ### The current site
 
@@ -57,9 +59,10 @@ karaokeunderground/
 ├── CHANGELOG.md                   # Keep a Changelog; entries accrue as issues close
 ├── package.json                   # npm test, the gate, and the version. No dependencies
 ├── .gitattributes                 # LF everywhere: vendored scripts break on CRLF
-├── .github/                       # Vendored from sdlc-baseline. Never hand-edit;
+├── .github/                       # Templates vendored from sdlc-baseline. Never hand-edit them;
 │   ├── ISSUE_TEMPLATE/            #   refresh with scripts/sync-github-templates.sh
-│   └── PULL_REQUEST_TEMPLATE.md
+│   ├── PULL_REQUEST_TEMPLATE.md
+│   └── workflows/pages.yml        # Ours, not vendored: test, build and deploy the preview (ADR-010)
 ├── docs/
 │   ├── adr/
 │   │   ├── README.md              # ADR index
@@ -71,7 +74,8 @@ karaokeunderground/
 │   │   ├── 006-sort-by-moving-a-column.md     # Sorting the songlist by moving a column to the front (#22)
 │   │   ├── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
 │   │   ├── 008-posts-from-the-home-page.md    # Posts reached from the home page (#24). Superseded by ADR-009
-│   │   └── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25)
+│   │   ├── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25)
+│   │   └── 010-preview-on-github-pages.md     # The public preview on GitHub Pages, kept out of search (#27)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -86,9 +90,10 @@ karaokeunderground/
 │                                  #   songlist-page.js and photos-page.js (ADR-005) render it; csv.js, front-matter.js
 │                                  #   and songlist.js are shared with the check
 ├── scripts/
+│   ├── build-site.js              # Ours: the static build, npm run build, into dist/ (ADR-010)
 │   ├── check-content.js           # Ours: the content check, which npm test runs (#10)
 │   ├── dev-server.js              # Ours: the local preview, npm run dev (ADR-003)
-│   ├── lib/                       # Their parts: check-content.js, dev-server.js, and content-index.js, which builds /content/index.json
+│   ├── lib/                       # Their parts: build-site.js, check-content.js, dev-server.js, and content-index.js, which builds /content/index.json
 │   ├── convert-working-copy.py    # Ours, one-off: turned the working copy into the core files (#10)
 │   ├── make-thumbnails.py         # Ours: the Photos page's small copies, in images/thumbs/ (ADR-005). Needs Pillow
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
@@ -234,6 +239,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-007](docs/adr/007-left-menu-in-sprayme.md): on wide screens, the menu stands in a left column, set in SprayME, a Creative Commons font credited in the footer. *Accepted* 2026-09-24 ([#23](https://github.com/Johnesco/karaokeunderground/issues/23))
 - [ADR-008](docs/adr/008-posts-from-the-home-page.md): Posts leaves the menu, and the home page, a logo's touch away, is the way to the posts. *Superseded* by ADR-009 the same day ([#24](https://github.com/Johnesco/karaokeunderground/issues/24))
 - [ADR-009](docs/adr/009-songlist-home-four-sections.md): the songlist is the home page, and the site has four sections, Songlist, Shows, Photos and About, with the posts as an archive. *Accepted* 2026-09-24 ([#25](https://github.com/Johnesco/karaokeunderground/issues/25))
+- [ADR-010](docs/adr/010-preview-on-github-pages.md): a public preview on GitHub Pages, built by a workflow from both repos, kept out of search and marked as a preview. The real site stays ADR-001's, and the owner's. *Accepted* 2026-09-24 ([#27](https://github.com/Johnesco/karaokeunderground/issues/27))
 
 ### The diary
 
@@ -247,6 +253,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-24**: A public preview runs on GitHub Pages at https://johnesco.github.io/karaokeunderground/, kept out of search, and the content repo is public (#27): [ADR-010](docs/adr/010-preview-on-github-pages.md)
 - **2026-09-24**: The songlist became the home page, and the site regrouped into Songlist, Shows, Photos and About, with the posts as an archive (#25): [ADR-009](docs/adr/009-songlist-home-four-sections.md)
 - **2026-09-24**: Posts left the menu, back to the old site's six links, and the home page leads to them (#24): [ADR-008](docs/adr/008-posts-from-the-home-page.md), superseded the same day
 - **2026-09-24**: On wide screens the menu stands in a left column, as on the old site, set in SprayME (#23): [ADR-007](docs/adr/007-left-menu-in-sprayme.md)
@@ -267,7 +274,8 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 
 - **This repo is public.** Never commit secrets. Hosting, DNS, form-service and CMS credentials live in the platform's environment config; `.env*` is gitignored
 - **The live site is the owner's.** Read its public pages only: no logins, no form submissions, no changes. Keep the owner's accounts and personal details out of this repo
-- **The owner's content stays private.** It lives only in `snapshot/` on John's machine and in `work/`, whose remote is the private `Johnesco/karaokeunderground-content` repo. Never commit it here, paste it into issues, or quote it in commit messages
+- **The owner's content stays out of this repo.** It lives in `work/`, whose remote is `Johnesco/karaokeunderground-content`, public since 2026-09-24 for the preview ([ADR-010](docs/adr/010-preview-on-github-pages.md)), and in `snapshot/`, which stays private on John's machine. Never commit content here. Personal and admin details never go public in either repo: a history scan before the content repo opened found none
+- **The preview is public but unofficial.** Keep its `noindex` and its preview line, so it never competes with the owner's site in search or passes for it
 - **The legacy install is end-of-life** (PHP 5.6, WordPress 5.8). Copy its content, but don't port its code or plugins
 - **Contact form:** validate input at the boundary, add spam protection, and keep the destination address out of page source
 - **Third-party embeds** (Instagram, Facebook, Spotify) run other people's scripts on our pages. Add each one on purpose, never by default
