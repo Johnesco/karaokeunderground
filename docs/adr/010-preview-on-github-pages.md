@@ -1,0 +1,6 @@
+# ADR-010: A public preview on GitHub Pages, kept out of search
+**Status:** Proposed · **Date:** 2026-09-24 · **Issue(s):** [#27](https://github.com/Johnesco/karaokeunderground/issues/27)
+## Context
+The prototype runs only on John's machine, and he wants it online to show and check. ADR-001 chose Netlify for the real site, pending the owner's agreement, and neither Netlify's free plan nor GitHub Pages can password-protect a preview. The content is the owner's, and already public on their own site. A GitHub project page lives under a subfolder, `/karaokeunderground/`, but the site links from the root.
+## Decision
+Serve the prototype as a public preview on GitHub Pages, at `johnesco.github.io/karaokeunderground/`, from the public repo. A GitHub Actions workflow checks out the code and the content repo, which becomes public, runs `npm test`, builds with a dependency-free script and deploys: on a push, daily to pick up content changes, and by hand. The site learns a base path from where its scripts load, so it works under the subfolder and still at `/` locally. The build writes a page shell at every page and post address, a 404 page, `noindex` in every page so search engines leave it out, and a line marking it as a prototype preview, linking to the official site. The real site stays ADR-001's decision, and the owner's.
