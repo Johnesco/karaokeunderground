@@ -16,3 +16,4 @@ Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-base
 | [008](008-posts-from-the-home-page.md) | Posts are reached from the home page, not the menu | Superseded by 009 |
 | [009](009-songlist-home-four-sections.md) | The songlist is the home page, and the site has four sections | Accepted |
 | [010](010-preview-on-github-pages.md) | A public preview on GitHub Pages, kept out of search | Accepted |
+| [011](011-old-site-at-old.md) | A private, frozen copy of the pre-2013 site, shown locally at /old/ | Proposed |
