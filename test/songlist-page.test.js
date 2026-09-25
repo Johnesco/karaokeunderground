@@ -70,7 +70,7 @@ describe('the example songlist', () => {
     const view = songlistView(doc, songs, '2026-09-05');
     assert.equal(view.title, 'Songlist');
     assert.equal(view.wide, true);
-    assert.match(view.html, /<legend>Lists<\/legend>\n.*<span>All songs \(3\)<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s, 'every list shows its size');
+    assert.match(view.html, /<legend>Lists<\/legend>\n.*<span>All \(3\)<\/span>.*<span>Sad \(2\)<\/span>.*<span>Scary \(1\)<\/span>/s, 'every list shows its size');
     assert.match(view.html, /<p class="song-count"><span class="song-status" role="status">3 songs, sorted by artist\.<\/span> <span class="song-hint">Pick Title or Album to sort that way\.<\/span><\/p>/, 'only the count is announced as it changes');
     assert.match(view.html, /<\/ul>\n<\/div>\n<p class="song-summary">Updated <time datetime="2026-09-05">September 5, 2026<\/time><\/p>\n<p>Most of these are on/, 'the date sits at the foot of the songs, before the page\u{2019}s text');
     assert.match(view.html, /<legend>Tags<\/legend>/);
@@ -91,12 +91,18 @@ describe('the example songlist', () => {
     assert.ok(html.indexOf('<div class="song-table" data-sort="artist">') < html.indexOf('<div class="song-controls">'), 'the columns\u{2019} widths reach the column names');
   });
 
-  it('puts the search box under the list and tag buttons, in the page order too', () => {
+  it('puts the search box under the list and tag buttons, then the status line, all in the search form', () => {
     const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
     const at = (s) => html.indexOf(s);
     assert.ok(at('<legend>Lists</legend>') < at('<legend>Tags</legend>'));
     assert.ok(at('<legend>Tags</legend>') < at('<input id="song-query"'));
-    assert.ok(at('<input id="song-query"') < at('</form>'));
+    assert.ok(at('<input id="song-query"') < at('class="song-status"'), 'a phone shows it above the search box, with the stylesheet');
+    assert.ok(at('class="song-status"') < at('</form>'));
+  });
+
+  it('has a back-to-top button, hidden until the reader is far down the list', () => {
+    const { html } = songlistView(parseFrontMatter('---\ntitle: Songlist\n---\n'), songs, null);
+    assert.match(html, /<button class="to-top" type="button" hidden><span aria-hidden="true">\u{2191} Top<\/span><span class="visually-hidden">Back to top<\/span><\/button>/u);
   });
 
   it('labels the search box "Search", beside it, and screen readers hear "Search the songlist"', () => {

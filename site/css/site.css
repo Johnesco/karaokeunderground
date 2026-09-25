@@ -281,19 +281,35 @@ main.wide {
   color: var(--muted);
 }
 
-/* The lists, the search, the status line and the column names stay at the top
-   of the screen as the songs scroll under them (#11), but only where the window
-   is tall enough to spare the room. On a short window, a phone on its side, or
-   with the text made bigger, they stay in the page, so they never cover most of
-   the screen. */
+/* The controls stay at the top of the screen as the songs scroll under them
+   (#11), with their top part scrolled off as far as --stuck-offset, which the
+   script measures: on a phone everything above the search box, so only the
+   search and the column names stay, and on wider screens the "Lists" label.
+   Only where the window is tall enough to spare the room: on a short window, a
+   phone on its side, or with the text made bigger, they stay in the page, so
+   they never cover most of the screen. */
 @media (min-height: 40rem) {
   .song-controls {
     position: sticky;
-    top: 0;
+    top: calc(-1 * var(--stuck-offset, 0px));
     z-index: 1;
     padding-top: 0.25rem;
     background: var(--bg);
+    container-type: scroll-state;
   }
+
+  /* Stuck, the hint steps aside, where the browser can tell (Chrome and Edge so far). */
+  @container scroll-state(stuck: top) {
+    .song-hint {
+      visibility: hidden;
+    }
+  }
+}
+
+/* On a phone the status line shows above the search box, so it scrolls off
+   with the lists when the controls stick. */
+.song-query-row {
+  order: 1;
 }
 
 .song-search {
@@ -409,8 +425,26 @@ main.wide {
 /* What's showing, then how to sort another way, which names the buttons
    below it and so stands in for a "Sort by" label (#22). */
 .song-count {
-  margin: 0 0 0.25rem;
+  margin: 0;
   color: var(--muted);
+}
+
+/* Far down a long list, back to the top, from the lower left: the corner logo
+   has the lower right (#11). */
+.to-top {
+  position: fixed;
+  bottom: 1rem;
+  left: 1rem;
+  z-index: 2;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.5rem 0.9rem;
+  border: 2px solid var(--text);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 /* The column names are the sort buttons (#22, ADR-006), and the one the list
@@ -498,6 +532,11 @@ main.wide {
 }
 
 @media (min-width: 48rem) {
+  /* Wider screens keep the status line under the search box. */
+  .song-query-row {
+    order: 0;
+  }
+
   /* Each column keeps its width wherever it goes: the title gets the most room. */
   .songs li,
   .songs-head {

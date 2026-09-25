@@ -177,7 +177,7 @@ export function songlistView(doc, songs, updated) {
     + '<form class="song-search" role="search" action="/">\n'
     + (themes.length
       ? '<fieldset class="choices"><legend>Lists</legend>\n'
-        + choice('radio', 'theme', '', `All songs (${count(songs.length)})`, true)
+        + choice('radio', 'theme', '', `All (${count(songs.length)})`, true)
         + themes.map((t) => choice('radio', 'theme', t.key, `${label(t.name)} (${count(t.count)})`, false)).join('')
         + '</fieldset>\n'
       : '')
@@ -194,11 +194,12 @@ export function songlistView(doc, songs, updated) {
     + `<button class="song-clear" type="button" hidden><span class="visually-hidden">Clear the search</span>${CLEAR_ICON}</button>\n`
     + '</div>\n'
     + '</div>\n'
-    + '</form>\n'
     // The status line: what's showing, which screen readers hear as it changes, then how to
     // sort another way, which they read with the page but don't hear on every keystroke.
+    // On a phone it shows above the search box, so it scrolls off with the lists.
     + `<p class="song-count"><span class="song-status" role="status">${describe(songs.length, {}, themes)}</span>`
     + ` <span class="song-hint">${sortHint('artist')}</span></p>\n`
+    + '</form>\n'
     // The column names are the sort buttons, and the list starts sorted by artist.
     // On a phone they pile up as each song does, with the same dash after the first.
     + `<div class="songs-head" role="group" aria-label="Sort by">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
@@ -208,7 +209,9 @@ export function songlistView(doc, songs, updated) {
     // When the list last changed sits at its foot, and the page's own text, like where
     // to stream the songs, comes after that, so the list starts sooner.
     + (updated ? `<p class="song-summary">Updated <time datetime="${escapeHtml(updated)}">${formatDate(updated)}</time></p>\n` : '')
-    + markdownHtml(doc.body, 'pages');
+    + markdownHtml(doc.body, 'pages')
+    // Far down the list, a button in the lower left goes back to the top.
+    + '<button class="to-top" type="button" hidden><span aria-hidden="true">\u{2191} Top</span><span class="visually-hidden">Back to top</span></button>\n';
   return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
 }
 
@@ -284,6 +287,38 @@ export function enhanceSonglist(main, songs, themes) {
     const gap = list.getBoundingClientRect().top - controls.getBoundingClientRect().bottom;
     if (gap < 0) window.scrollBy(0, gap);
   };
+
+  // The block sticks with its top part scrolled off the screen, as far as --stuck-offset:
+  // on a phone everything above the search box, so only the search and the column names
+  // stay, and on wider screens just the "Lists" label. The stylesheet does the sticking;
+  // this only measures, since the status line above the search box can wrap.
+  const wide = window.matchMedia('(min-width: 48rem)');
+  const measureStuck = () => {
+    const keep = wide.matches ? form.querySelector('.choice') : form.querySelector('.song-query-row');
+    const offset = keep ? keep.getBoundingClientRect().top - controls.getBoundingClientRect().top - 6 : 0;
+    controls.style.setProperty('--stuck-offset', `${Math.max(0, Math.round(offset))}px`);
+  };
+  measureStuck();
+  new ResizeObserver(measureStuck).observe(controls);
+  wide.addEventListener('change', measureStuck);
+
+  // Far down a long list, more than three screens, a button in the lower left goes back
+  // to the top, and focus goes to the start of the page rather than a button that's gone.
+  const toTop = main.querySelector('.to-top');
+  let watching = false;
+  window.addEventListener('scroll', () => {
+    if (watching) return;
+    watching = true;
+    requestAnimationFrame(() => {
+      watching = false;
+      toTop.hidden = window.scrollY < 3 * window.innerHeight;
+    });
+  }, { passive: true });
+  toTop.addEventListener('click', () => {
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({ top: 0, behavior: still ? 'auto' : 'smooth' });
+    main.focus({ preventScroll: true });
+  });
 
   form.addEventListener('input', (event) => {
     update(event);

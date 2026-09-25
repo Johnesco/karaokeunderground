@@ -352,6 +352,14 @@ The label didn't last the day. John folded its job into the status line, which n
 
 **Then the controls stayed on screen.** The lists, the search, the status line and the column names now form one block that sticks to the top of the screen as the songs scroll under it, with plain CSS. Two details made it work. A new list, search or sort brings the first song up to just under the controls, so nobody is left halfway down an old list. And the block only sticks when the window is at least 640px tall. Sticky controls on a short window, a phone on its side, or text made bigger would cover most of the screen, which is exactly what the accessibility rules on zoom and reflow warn against. On a 375px phone the stuck block still takes 42% of the screen, a cost we chose to see in use before trimming.
 
+The trimming came next, in three cuts:
+
+- **"All (1,853)",** so the three list buttons fit on one row on a phone.
+- **On phones, only the search box and the column names stay.** The block sticks with its top part scrolled off, so the lists and the status line move above the search box there.
+- **On wider screens, only the "Lists" label scrolls off.** Once stuck, the hint hides too, where the browser supports it.
+
+On a 375px phone the stuck part went from 340px to 148px, 18% of the screen. And far down the list, more than three screens, a "↑ Top" button in the lower left now goes back to the top, and moves keyboard focus to the start of the page.
+
 **Around it, the same page got smaller changes** ([#11]). The list buttons pack tighter, since more themed lists are coming. The search box has an X to clear it. "Search" now sits beside the box as a one-word label, where "Search the songlist" used to sit above it, and screen readers still hear the whole phrase.
 
 **Then a prune.** John noticed the song count showing three times: in the line under the title, on the All songs button, and in the status line. Claude mocked up a rule, each fact shown once, where it's most useful, and John kept one exception: the Sad and Scary buttons keep their counts. The count lives in the status line above the songs, the one line that follows the lists and the search. The date sits alone under the title. The page's own text, a link to a Spotify playlist, now comes after the songs. On a 375px phone the first song moved up 114px, and the first screen shows four songs instead of two. Later that day John put the total back on All songs, so every list button shows its size, renamed the List label "Lists", and moved the date to the foot of the songs.
