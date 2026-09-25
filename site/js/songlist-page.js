@@ -103,6 +103,17 @@ export function label(value) {
 
 const count = (n) => n.toLocaleString('en-US');
 
+/**
+ * The page's heading for the list picked: the page's own title for all the
+ * songs ("Full Songlist"), and "Sad Songs Only" for the sad list, from the
+ * theme's name, like the list buttons' labels.
+ */
+export function listTitle(theme, themes, pageTitle) {
+  if (!theme) return pageTitle;
+  const name = themes.find((t) => t.key === theme)?.name ?? theme;
+  return `${name.split(' ').map(label).join(' ')} Songs Only`;
+}
+
 /** What the status line says about what's showing, and how it's sorted. */
 export function describe(shown, { words = [], theme = '', tags = [], sort = 'artist' }, themes) {
   const list = theme ? ` on the ${label(themes.find((t) => t.key === theme)?.name ?? theme)} list` : '';
@@ -234,6 +245,10 @@ export function enhanceSonglist(main, songs, themes) {
   let sort = 'artist';
   let rows = songs; // the songs in the order of their rows, which starts by artist
   let items = [...list.children];
+  // The heading, and the browser tab, name the list picked: "Full Songlist", "Sad Songs Only".
+  const heading = main.querySelector('h1');
+  const pageTitle = heading.textContent;
+  const site = document.title.split(' \u{B7} ').pop();
 
   const params = new URLSearchParams(window.location.search);
   input.value = params.get('q') ?? '';
@@ -253,6 +268,9 @@ export function enhanceSonglist(main, songs, themes) {
       sort,
     };
     clear.hidden = !input.value;
+    const title = listTitle(state.theme, themes, pageTitle);
+    heading.textContent = title;
+    document.title = `${title} \u{B7} ${site}`;
     let shown = 0;
     rows.forEach((song, i) => {
       const show = matches(song, state);

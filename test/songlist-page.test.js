@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fold, queryWords, listSongs, valuesOf, matches, describe as status, sortHint, songlistView, columnsFor, sortSongs, songItem } from '../site/js/songlist-page.js';
+import { fold, queryWords, listSongs, valuesOf, matches, describe as status, sortHint, listTitle, songlistView, columnsFor, sortSongs, songItem } from '../site/js/songlist-page.js';
 import { parseFrontMatter } from '../site/js/front-matter.js';
 
 const FIXTURE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'content');
@@ -187,6 +187,17 @@ describe('sorting', () => {
     const html = songItem(song, columnsFor('album'));
     assert.match(html, /^<li><span class="song-album song-first"><\/span><span class="song-artist song-second">Cover Band<\/span>/, 'no dash, and nothing read before the artist');
     assert.equal(html.match(/class="song-/g).length, 3);
+  });
+});
+
+describe('the heading', () => {
+  const themes = [{ key: 'sad', name: 'sad', count: 542 }, { key: 'riot grrrl', name: 'riot grrrl', count: 12 }];
+
+  it('names the list picked: the page\u{2019}s own title for all songs, "Sad Songs Only" for a theme', () => {
+    assert.equal(listTitle('', themes, 'Full Songlist'), 'Full Songlist');
+    assert.equal(listTitle('sad', themes, 'Full Songlist'), 'Sad Songs Only');
+    assert.equal(listTitle('scary', themes, 'Full Songlist'), 'Scary Songs Only', 'a theme not yet counted still gets a name');
+    assert.equal(listTitle('riot grrrl', themes, 'Full Songlist'), 'Riot Grrrl Songs Only');
   });
 });
 
