@@ -15,7 +15,7 @@ A revamp of [karaokeunderground.com](https://karaokeunderground.com), the site f
 
 ## Previewing and checking
 
-- `npm run dev` previews the site at http://127.0.0.1:8001/.
+- `npm run dev` previews the site at http://127.0.0.1:8001/. Given a private copy of the site from before WordPress in `snapshots/`, which `scripts/snapshot-legacy-site.py` takes, it also shows that at http://127.0.0.1:8001/old/. Nothing links there, and the build leaves it out ([ADR-011](docs/adr/011-old-site-at-old.md)).
 - `npm test` runs the unit tests, then checks the core files: the songlist, the pages and posts, and the images.
 - `npm run build` writes a static copy to `dist/`. The preview's workflow, [`.github/workflows/pages.yml`](.github/workflows/pages.yml), runs `npm test`, then builds with `--base /karaokeunderground/ --preview` and deploys to GitHub Pages, on a push, daily and by hand.
 

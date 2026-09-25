@@ -1,6 +1,7 @@
 import { describe, it, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { route, sitePath, siteUrl } from '../site/js/router.js';
@@ -176,6 +177,65 @@ describe('the dev server', () => {
       assert.equal(font.status, 200);
       assert.equal(font.headers.get('content-type'), 'font/woff');
       assert.equal((await font.arrayBuffer()).byteLength, 17356);
+    });
+  });
+
+  describe('the copy of the old site at /old/ (ADR-011)', () => {
+    let oldDir;
+    let dirs;
+    let server;
+    let base;
+    // A made-up old page in iso-8859-1, so its é is the single byte 0xE9.
+    const page = Buffer.from('<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">'
+      + '<a href="http://www.karaokeunderground.com/photos.html">Photos</a> <a href="photos.html">again</a> caf\u{E9}', 'latin1');
+
+    before(async () => {
+      oldDir = fs.mkdtempSync(path.join(os.tmpdir(), 'ku-old-'));
+      fs.writeFileSync(path.join(oldDir, 'index.html'), page);
+      fs.mkdirSync(path.join(oldDir, 'forum'));
+      fs.writeFileSync(path.join(oldDir, 'forum', 'index.html'), 'news');
+      fs.writeFileSync(path.join(oldDir, "trophy's6-16.html"), 'recap');
+      dirs = { ...DIRS, oldDir };
+      server = createServer(dirs);
+      await new Promise((done) => server.listen(0, '127.0.0.1', done));
+      base = `http://127.0.0.1:${server.address().port}`;
+    });
+    after(() => {
+      server.close();
+      fs.rmSync(oldDir, { recursive: true, force: true });
+    });
+
+    it('serves its files and folders, and nothing outside it', () => {
+      const trophy = { status: 200, file: path.join(oldDir, "trophy's6-16.html"), old: true };
+      assert.deepEqual(resolve('/old/', dirs), { status: 200, file: path.join(oldDir, 'index.html'), old: true });
+      assert.deepEqual(resolve('/old/forum/', dirs), { status: 200, file: path.join(oldDir, 'forum', 'index.html'), old: true });
+      assert.deepEqual(resolve("/old/trophy's6-16.html", dirs), trophy);
+      assert.deepEqual(resolve('/old/trophy%27s6-16.html', dirs), trophy);
+      for (const url of ['/old/missing.html', '/old/..%2f..%2fpackage.json', '/old/%2e%2e/%2e%2e/package.json']) {
+        assert.equal(resolve(url, dirs).status, 404, url);
+      }
+    });
+
+    it('adds a folder\u{2019}s slash, so the old pages\u{2019} relative links stay inside it', () => {
+      assert.deepEqual(resolve('/old', dirs), { status: 301, location: '/old/' });
+      assert.deepEqual(resolve('/old/forum', dirs), { status: 301, location: '/old/forum/' });
+    });
+
+    it('is just a missing page when there\u{2019}s no copy', () => {
+      assert.deepEqual(resolve('/old/', DIRS), { status: 200, file: path.join(DIRS.siteDir, 'index.html') });
+    });
+
+    it('sends old pages without a charset, and keeps their links to the old domain inside /old/', async () => {
+      const res = await fetch(`${base}/old/`);
+      assert.equal(res.status, 200);
+      assert.equal(res.headers.get('content-type'), 'text/html');
+      assert.equal(res.headers.get('content-security-policy'), "default-src 'self' 'unsafe-inline' data:", 'nothing loads from other sites');
+      const body = Buffer.from(await res.arrayBuffer());
+      assert.match(body.toString('latin1'), /href="\/old\/photos\.html">Photos<\/a> <a href="photos\.html">/);
+      assert.ok(body.includes(0xe9), 'the page keeps its own encoding');
+      const redirect = await fetch(`${base}/old`, { redirect: 'manual' });
+      assert.equal(redirect.status, 301);
+      assert.equal(redirect.headers.get('location'), '/old/');
     });
   });
 });

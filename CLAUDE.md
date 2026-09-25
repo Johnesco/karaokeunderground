@@ -36,6 +36,7 @@ The owner has to be able to take it over: the stack runs in accounts they contro
 - **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/` (the songlist, which is the home page, [ADR-009](docs/adr/009-songlist-home-four-sections.md)), `/shows/`, `/photos/`, `/about/`, `/posts/<file>/`, and the archive at `/posts/`. Old paths like `/songlist/` and `/calendar/` land on their new pages. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
 - **Our own Markdown renderer** ([ADR-004](docs/adr/004-own-markdown-renderer.md)), with no dependencies, checked against markdown-it
 - **Local, and a public preview.** `npm run dev` previews the site on 127.0.0.1:8001, reading the core files from `work/content/`. `npm run build` writes a static copy to `dist/`, with a page shell at every address ([ADR-010](docs/adr/010-preview-on-github-pages.md)). A GitHub Actions workflow runs `npm test`, builds with `--base /karaokeunderground/ --preview` and deploys to GitHub Pages: on a push, daily for content changes, and by hand. Setting up Netlify for the real site comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
+- **The old site, locally only, at `/old/`** ([ADR-011](docs/adr/011-old-site-at-old.md)). `npm run dev` also shows the newest private copy of the site from before WordPress, from `snapshots/<date>-pre-wordpress/`. Nothing links there, and the build leaves it out, so it never reaches the preview
 - **Links go through the base path.** The site works under any base, `/` locally and `/karaokeunderground/` on Pages. `router.js` works it out from where the scripts load, and every address comes from `siteUrl()` or `sitePath()`, never a hard-coded `/`. CSS `url()`s are relative to the stylesheet, and the build moves the shell's root links under the base
 
 ### The current site
@@ -46,7 +47,7 @@ Audited 2026-09-23 in spike [#1](https://github.com/Johnesco/karaokeunderground/
 - **Plugins:** Contact Form 7, MetaSlider, Simply Instagram, Instagram Feed (broken), plus admin-only ones the page source can't show
 - **Menu:** Songlist · Calendar · Photos · Contact · Media · About
 - **Changes often:** the upcoming shows and the 1,853-song master songlist, both every month or so. Themed songlists go up as blog posts about once a year (e.g. *SAD SONGS ONLY 2025*, 542 songs). Easy editing is a requirement, not a nice-to-have
-- **URLs are query strings** (`/?page_id=16`, `/?p=835`), so the new host must redirect on query parameters. The pre-WordPress static site (2004–2013) is still live alongside it
+- **URLs are query strings** (`/?page_id=16`, `/?p=835`), so the new host must redirect on query parameters. The pre-WordPress static site (2004–2013) is still live alongside it, and a private copy is in `snapshots/` ([#29](https://github.com/Johnesco/karaokeunderground/issues/29))
 - **Email runs on the web server** (MX points at the apex), so move it before changing DNS. The domain expires 2027-01-15
 - **Off-site:** Facebook events, Spotify playlists, Instagram `@karaokeunderground`, X/Twitter `@KUAustin`
 
@@ -75,7 +76,8 @@ karaokeunderground/
 │   │   ├── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
 │   │   ├── 008-posts-from-the-home-page.md    # Posts reached from the home page (#24). Superseded by ADR-009
 │   │   ├── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25)
-│   │   └── 010-preview-on-github-pages.md     # The public preview on GitHub Pages, kept out of search (#27)
+│   │   ├── 010-preview-on-github-pages.md     # The public preview on GitHub Pages, kept out of search (#27)
+│   │   └── 011-old-site-at-old.md             # A private, frozen copy of the pre-2013 site, shown locally at /old/ (#29)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -98,9 +100,11 @@ karaokeunderground/
 │   ├── make-thumbnails.py         # Ours: the Photos page's small copies, in images/thumbs/ (ADR-005). Needs Pillow
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
 │   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
+│   ├── snapshot-legacy-site.py    # Ours: a private, frozen copy of the site from before WordPress (#29, ADR-011)
 │   └── sync-github-templates.sh   # Vendored: pulls the latest vendored files
 ├── test/                          # Unit tests for node --test. fixtures/content/ is a made-up example of the core files
 ├── snapshot/                      # Gitignored: the 2026-09-23 snapshot, frozen read-only. Later ones go in snapshots/
+├── snapshots/                     # Gitignored, frozen the same way. <date>-pre-wordpress/ holds the site from before WordPress (ADR-011)
 └── work/                          # Gitignored: the content working copy, its own repo pushed to a private one. The core files are in work/content/
 ```
 
@@ -240,6 +244,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-008](docs/adr/008-posts-from-the-home-page.md): Posts leaves the menu, and the home page, a logo's touch away, is the way to the posts. *Superseded* by ADR-009 the same day ([#24](https://github.com/Johnesco/karaokeunderground/issues/24))
 - [ADR-009](docs/adr/009-songlist-home-four-sections.md): the songlist is the home page, and the site has four sections, Songlist, Shows, Photos and About, with the posts as an archive. *Accepted* 2026-09-24 ([#25](https://github.com/Johnesco/karaokeunderground/issues/25))
 - [ADR-010](docs/adr/010-preview-on-github-pages.md): a public preview on GitHub Pages, built by a workflow from both repos, kept out of search and marked as a preview. The real site stays ADR-001's, and the owner's. *Accepted* 2026-09-24 ([#27](https://github.com/Johnesco/karaokeunderground/issues/27))
+- [ADR-011](docs/adr/011-old-site-at-old.md): a private, frozen copy of the site from before WordPress, in `snapshots/`, shown by the dev server at `/old/`, where nothing links. The build leaves it out. *Accepted* 2026-09-25 ([#29](https://github.com/Johnesco/karaokeunderground/issues/29))
 
 ### The diary
 
@@ -253,6 +258,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-25**: A private, frozen copy of the site from before WordPress, 2004–2013, is in `snapshots/`, and `npm run dev` shows it at `/old/` (#29): [ADR-011](docs/adr/011-old-site-at-old.md). The contact form got its own ticket (#30)
 - **2026-09-24**: The Shows page lists the social accounts, Facebook, Instagram and X, under "How to find out more", as plain links in `pages/shows.md` (#20)
 - **2026-09-24**: A public preview runs on GitHub Pages at https://johnesco.github.io/karaokeunderground/, kept out of search, and the content repo is public (#27): [ADR-010](docs/adr/010-preview-on-github-pages.md)
 - **2026-09-24**: The songlist became the home page, and the site regrouped into Songlist, Shows, Photos and About, with the posts as an archive (#25): [ADR-009](docs/adr/009-songlist-home-four-sections.md)
@@ -275,7 +281,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 
 - **This repo is public.** Never commit secrets. Hosting, DNS, form-service and CMS credentials live in the platform's environment config; `.env*` is gitignored
 - **The live site is the owner's.** Read its public pages only: no logins, no form submissions, no changes. Keep the owner's accounts and personal details out of this repo
-- **The owner's content stays out of this repo.** It lives in `work/`, whose remote is `Johnesco/karaokeunderground-content`, public since 2026-09-24 for the preview ([ADR-010](docs/adr/010-preview-on-github-pages.md)), and in `snapshot/`, which stays private on John's machine. Never commit content here. Personal and admin details never go public in either repo: a history scan before the content repo opened found none
+- **The owner's content stays out of this repo.** It lives in `work/`, whose remote is `Johnesco/karaokeunderground-content`, public since 2026-09-24 for the preview ([ADR-010](docs/adr/010-preview-on-github-pages.md)), and in `snapshot/` and `snapshots/`, which stay private on John's machine. The copy of the site from before WordPress includes an old contact page with the hosts' personal details, so `/old/` stays local ([ADR-011](docs/adr/011-old-site-at-old.md)). Never commit content here. Personal and admin details never go public in either repo: a history scan before the content repo opened found none
 - **The preview is public but unofficial.** Keep its `noindex` and its preview line, so it never competes with the owner's site in search or passes for it
 - **The legacy install is end-of-life** (PHP 5.6, WordPress 5.8). Copy its content, but don't port its code or plugins
 - **Contact form:** validate input at the boundary, add spam protection, and keep the destination address out of page source

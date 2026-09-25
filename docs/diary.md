@@ -439,6 +439,31 @@ The old site linked to three accounts from every page, with icons at the top rig
 
 **A question left open.** The new links are plain text links, like the shows above them, and 22px tall, where every control on the site gets 44px. A check of every page and post at 375px found 137 links that stand on their own line or in a list. 122 of them are a single 22px line, and some sit only 25px from the next. All of them pass WCAG 2.2 AA, which allows a small target with enough space around it. Holding them to the controls' 44px would change the spacing of every list of links on the site, and we're not ready to choose that yet. So it's a ticket for now ([#28]), under the accessibility target ([#4]).
 
+### 2026-09-25 · What the old site had that the new one didn't
+
+**Finding · Decision** · [#29] · [#30] · [ADR-011](adr/011-old-site-at-old.md)
+
+John had a feeling the old site showed media and images the new one didn't, and asked what we'd missed that's worth keeping, for history or for what the site does. Claude compared the two, file by file.
+
+**Nothing the WordPress site showed was lost.** All 53 uploaded images are in the content, and every post shows the images it did before. The 8 slideshow photos are in the Photos gallery. The press list kept every entry, with Wayback Machine copies standing in for dead articles.
+
+**Some things never came across:**
+
+- **The site from before WordPress.** KU's first website, from 2004 to 2013, is still on the owner's server: photo write-ups of shows from 2004–05, "The First Year, 2004", the 2013 songlist and an old news page, with 413 photos. The first snapshot took only the WordPress site, so none of this had been copied, and it would vanish when the domain moves.
+- **Four flyers nothing shows.** Three SAD SONGS ONLY flyers and a KU seal made for a show at Indian Roller sit in the uploads with no page to show them. One belonged to the 2022 post, which was later rewritten for 2024, so that year's show lost its flyer.
+- **Videos became links.** The old pages played 9 YouTube videos and an Instagram clip in place. All of them are still online and linked, and four are KU's own history, from the old Media page.
+- **A way to get in touch.** The old Contact page had a form. The new About page has a "Get in touch" heading with no form and no address, and the Shows page sends people who want to book a show there.
+
+**Chose:** two tickets. The contact form ([#30]) waits for the real site on Netlify, and for the owner's answers. The old site ([#29]) couldn't wait, so it came first: a script copied it into a frozen folder of its own, and the local preview shows it at `/old/`, an address nothing links to.
+
+**The copy:** 446 files and 72 MB, in 453 requests. It matches the audit exactly: all 31 old pages that still answer, and all 413 photos. No page links to two of those photos any more, so the script found them in the Wayback Machine's list of the site's addresses. The old homepage, which the server lost when WordPress took over, came back from the Wayback Machine's copy of August 2013. Two pages the audit listed were broken links as far back as 2006.
+
+**A bug, caught by the count.** The first run went looking for seven pages that never existed, because an apostrophe in names like `trophy's6-16.html` read as a quote mark. It was fixed and the copy taken again, and the two runs matched byte for byte, apart from the two photos the fix brought in.
+
+**Looking at it brought one more surprise.** The old news page loads a script from its comments service, Haloscan, which closed long ago, and the domain still answers today, for whoever holds it now. So the preview tells the browser to load nothing from other sites under `/old/`, and nobody else's code runs beside the private copy. The old pages also embed videos in Flash, which browsers stopped playing years ago: a December 2009 show on the homepage, still on YouTube, and two on the links page, one of them no longer public.
+
+**It stays private.** The old contact page shows the hosts' personal details, so the copy lives only on John's machine, like the first snapshot. It never goes in either repo or on the public preview. Whether the old site becomes a public archive is the owner's call.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -464,3 +489,5 @@ The old site linked to three accounts from every page, with icons at the top rig
 [#26]: https://github.com/Johnesco/karaokeunderground/issues/26
 [#27]: https://github.com/Johnesco/karaokeunderground/issues/27
 [#28]: https://github.com/Johnesco/karaokeunderground/issues/28
+[#29]: https://github.com/Johnesco/karaokeunderground/issues/29
+[#30]: https://github.com/Johnesco/karaokeunderground/issues/30

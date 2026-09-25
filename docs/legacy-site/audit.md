@@ -242,7 +242,7 @@ For the hosts, or for whoever has wp-admin and hosting access.
 
 **Content decisions**
 
-13. Keep the 2004–2013 static site as an archive, or retire it?
+13. Keep the 2004–2013 static site as an archive, or retire it? Either way, a private, frozen copy has been kept since 2026-09-25, and the local preview shows it at `/old/` ([#29](https://github.com/Johnesco/karaokeunderground/issues/29), [ADR-011](../adr/011-old-site-at-old.md)).
 14. Keep all 46 posts? Which themed lists matter most?
 15. Which accounts are still active: X/Twitter, the Facebook page, Instagram? Which should the site link to? Today the Shows page lists all three, under "How to find out more" ([#20](https://github.com/Johnesco/karaokeunderground/issues/20)).
 16. Would they want to publish the play-tracking data they've kept since 2014, like most-sung and never-sung lists?
