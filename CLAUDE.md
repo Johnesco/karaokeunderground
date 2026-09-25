@@ -253,6 +253,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-24**: The Shows page lists the social accounts, Facebook, Instagram and X, under "How to find out more", as plain links in `pages/shows.md` (#20)
 - **2026-09-24**: A public preview runs on GitHub Pages at https://johnesco.github.io/karaokeunderground/, kept out of search, and the content repo is public (#27): [ADR-010](docs/adr/010-preview-on-github-pages.md)
 - **2026-09-24**: The songlist became the home page, and the site regrouped into Songlist, Shows, Photos and About, with the posts as an archive (#25): [ADR-009](docs/adr/009-songlist-home-four-sections.md)
 - **2026-09-24**: Posts left the menu, back to the old site's six links, and the home page leads to them (#24): [ADR-008](docs/adr/008-posts-from-the-home-page.md), superseded the same day

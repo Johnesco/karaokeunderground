@@ -421,6 +421,22 @@ Publishing went against the plan in the project's own notes, where the owner see
 
 **Two surprises on the way.** Git Bash on Windows quietly rewrote the base path, `/karaokeunderground/`, into a Windows folder path, and the build's own check on the base path caught it. And the first push to the newly public content repo was refused, "Your repository is disabled", for the moment it took GitHub to finish the change. The retry went through.
 
+### 2026-09-24 · Where the social links go
+
+**Decision · Finding** · [#20]
+
+The old site linked to three accounts from every page, with icons at the top right of the content: the Facebook page, X and Instagram. The new site had none, apart from the Instagram card on Photos. John asked whether they'd fit under the menu in the wide screens' left column, and where they'd go on smaller screens.
+
+**Measuring first.** Claude loaded the pages at common screen sizes:
+
+- **The left column has room.** The logo and menu end 433px down, and a row of three 44px icons needs 68px. On a 1280×720 laptop, the smallest common size, 144px is free below the menu, or 84px on the preview, whose note sits there too.
+- **A phone's header is full.** At 375px the four menu links fill the row beside the logo with nothing to spare, and at 320px they already take two rows. Icons would need a row of their own, about 50px off the first screen of every page.
+- **The footer is far down the home page.** It's the usual place for social links, but on the songlist it sits under all 1,853 songs, 194 screens down on a phone.
+
+**Chose:** John put them on the Shows page, under the shows, as "How to find out more". Someone checking for the next show is already there, and each show links to its Facebook event. The links are plain Markdown in the page, so the owner edits them like any other text, with no new format and no code. Each link's words name the account, like "@karaokeunderground on Instagram", where the old icons gave screen readers nothing to say. On a 375px phone the list sits on the first screen.
+
+**All three accounts still exist.** Before linking them, we checked each address. Instagram and X answer where they always have. The Facebook page has moved, and its old address redirects, so the link goes straight to the new one. Which accounts the owner still uses is a question for the owner interview ([#3]), so the page lists all three until then.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -437,6 +453,7 @@ Publishing went against the plan in the project's own notes, where the owner see
 [#14]: https://github.com/Johnesco/karaokeunderground/issues/14
 [#18]: https://github.com/Johnesco/karaokeunderground/issues/18
 [#19]: https://github.com/Johnesco/karaokeunderground/issues/19
+[#20]: https://github.com/Johnesco/karaokeunderground/issues/20
 [#21]: https://github.com/Johnesco/karaokeunderground/issues/21
 [#22]: https://github.com/Johnesco/karaokeunderground/issues/22
 [#23]: https://github.com/Johnesco/karaokeunderground/issues/23
