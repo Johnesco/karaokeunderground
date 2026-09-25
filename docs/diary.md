@@ -423,7 +423,7 @@ Publishing went against the plan in the project's own notes, where the owner see
 
 ### 2026-09-24 · Where the social links go
 
-**Decision · Finding** · [#20]
+**Decision · Finding** · [#20] · [#28]
 
 The old site linked to three accounts from every page, with icons at the top right of the content: the Facebook page, X and Instagram. The new site had none, apart from the Instagram card on Photos. John asked whether they'd fit under the menu in the wide screens' left column, and where they'd go on smaller screens.
 
@@ -436,6 +436,8 @@ The old site linked to three accounts from every page, with icons at the top rig
 **Chose:** John put them on the Shows page, under the shows, as "How to find out more". Someone checking for the next show is already there, and each show links to its Facebook event. The links are plain Markdown in the page, so the owner edits them like any other text, with no new format and no code. Each link's words name the account, like "@karaokeunderground on Instagram", where the old icons gave screen readers nothing to say. On a 375px phone the list sits on the first screen.
 
 **All three accounts still exist.** Before linking them, we checked each address. Instagram and X answer where they always have. The Facebook page has moved, and its old address redirects, so the link goes straight to the new one. Which accounts the owner still uses is a question for the owner interview ([#3]), so the page lists all three until then.
+
+**A question left open.** The new links are plain text links, like the shows above them, and 22px tall, where every control on the site gets 44px. A check of every page and post at 375px found 137 links that stand on their own line or in a list. 122 of them are a single 22px line, and some sit only 25px from the next. All of them pass WCAG 2.2 AA, which allows a small target with enough space around it. Holding them to the controls' 44px would change the spacing of every list of links on the site, and we're not ready to choose that yet. So it's a ticket for now ([#28]), under the accessibility target ([#4]).
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
@@ -461,3 +463,4 @@ The old site linked to three accounts from every page, with icons at the top rig
 [#25]: https://github.com/Johnesco/karaokeunderground/issues/25
 [#26]: https://github.com/Johnesco/karaokeunderground/issues/26
 [#27]: https://github.com/Johnesco/karaokeunderground/issues/27
+[#28]: https://github.com/Johnesco/karaokeunderground/issues/28
