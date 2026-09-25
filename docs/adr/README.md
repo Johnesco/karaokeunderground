@@ -15,3 +15,4 @@ Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-base
 | [007](007-left-menu-in-sprayme.md) | On wide screens, the menu stands in a left column, set in SprayME | Accepted |
 | [008](008-posts-from-the-home-page.md) | Posts are reached from the home page, not the menu | Superseded by 009 |
 | [009](009-songlist-home-four-sections.md) | The songlist is the home page, and the site has four sections | Accepted |
+| [010](010-preview-on-github-pages.md) | A public preview on GitHub Pages, kept out of search | Accepted |

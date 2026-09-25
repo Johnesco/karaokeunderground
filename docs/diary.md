@@ -28,8 +28,8 @@ Every entry is tagged:
 | 2026-09-23 | [The stack chosen: ADR-001](#2026-09-23--choosing-the-stack) ([#2]) |
 | 2026-09-23 | [The content converted into core files, with a check to guard them](#2026-09-23--the-core-files) ([#10]) |
 | 2026-09-23 | [The new site renders, phone-first, with a searchable songlist](#2026-09-23--the-new-site-renders) ([#13], [#11]) |
+| 2026-09-24 | [A public preview on GitHub Pages](#2026-09-24--a-public-preview) ([#27]) |
 | Next | The shows, once we decide how events get updated ([#12]), and redirects for every old URL ([#14]) |
-| Later | A preview ready to show |
 | Later | Presented to the owner |
 
 ## Entries
@@ -405,6 +405,22 @@ The posts all keep their addresses, as an archive linked from Shows and About. T
 
 **A decision that lasted an afternoon.** ADR-008, which made the home page the way to the posts, was superseded by ADR-009 the same day. Prototyping fast means some decisions turn over fast, and the ADRs keep the trail of why.
 
+### 2026-09-24 · A public preview
+
+**Milestone · Decision** · [#27] · [ADR-010](adr/010-preview-on-github-pages.md)
+
+Until now the new site ran only on John's machine. John wanted it online, so it could be shown without a laptop, and chose GitHub Pages: https://johnesco.github.io/karaokeunderground/.
+
+Publishing went against the plan in the project's own notes, where the owner sees the revamp privately before anything goes public. The owner's content was already public on their own site, so the real risks were an unofficial copy turning up in search results, or passing for the official site. So every page of the preview tells search engines to leave it out, and a line under the menu says it's a prototype and links to karaokeunderground.com. The content repo went public so the build could read it, but only after a scan of its whole history found no phone numbers, email addresses, logins or plugin versions.
+
+**What it took:**
+
+- **A base path.** A project page lives under a subfolder, `/karaokeunderground/`, but the site linked from the root. The scripts now work out where the site lives from where they load, so the same code runs at `/` on John's machine and under the subfolder on Pages.
+- **A page at every address.** GitHub Pages can't send every path to one shell, as Netlify will, so the build writes a copy of the shell at each page and post address, and a 404 page for the rest. Every page answers 200, and a missing one 404.
+- **The same gate.** The workflow runs `npm test` before it deploys, so a failed check keeps the last good preview up. The first run passed, built and deployed in one go.
+
+**Two surprises on the way.** Git Bash on Windows quietly rewrote the base path, `/karaokeunderground/`, into a Windows folder path, and the build's own check on the base path caught it. And the first push to the newly public content repo was refused, "Your repository is disabled", for the moment it took GitHub to finish the change. The retry went through.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -427,3 +443,4 @@ The posts all keep their addresses, as an archive linked from Shows and About. T
 [#24]: https://github.com/Johnesco/karaokeunderground/issues/24
 [#25]: https://github.com/Johnesco/karaokeunderground/issues/25
 [#26]: https://github.com/Johnesco/karaokeunderground/issues/26
+[#27]: https://github.com/Johnesco/karaokeunderground/issues/27
