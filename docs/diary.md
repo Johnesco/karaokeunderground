@@ -464,6 +464,16 @@ John had a feeling the old site showed media and images the new one didn't, and 
 
 **It stays private.** The old contact page shows the hosts' personal details, so the copy lives only on John's machine, like the first snapshot. It never goes in either repo or on the public preview. Whether the old site becomes a public archive is the owner's call.
 
+### 2026-09-26 · A speed-up that wasn't
+
+**Challenge · Process** · [#31] · [ADR-012](adr/012-phone-rows-from-boxes.md)
+
+John found sorting the songlist slow. Measuring showed the sort itself takes under 7ms: the time goes into replacing all 1,853 rows and laying them out again. In the preview's phone mode, the first taps took 320 to 730ms, and the rows seemed to be the reason. On a phone each row is flowing text, the artist, a dash and the title on one line and the album below, and rebuilt from flex boxes, the same list came out several times faster. John asked whether three columns on phones would help, and they measured faster than flowing text, but slower than boxes.
+
+**Then the numbers didn't hold.** Built for real and measured with the old rows and the new ones taking turns, the two took the same time: a median of 137ms for the old rows and 143ms for boxes. Every earlier comparison had run the old rows first, at a moment when the machine happened to be slower, and none had alternated. The change was taken back before it shipped, and ADR-012 records it as rejected, with the reason.
+
+It's the same lesson as sorting's first version, where timings in a background tab swung fivefold from run to run and only alternating runs could be trusted. The alternating runs did confirm something useful: drawing just the first screenful of rows takes 5 to 10ms, against 22 to 57ms for the whole list. If sorting still feels slow, the next step is to draw the rest after the first screen.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -491,3 +501,4 @@ John had a feeling the old site showed media and images the new one didn't, and 
 [#28]: https://github.com/Johnesco/karaokeunderground/issues/28
 [#29]: https://github.com/Johnesco/karaokeunderground/issues/29
 [#30]: https://github.com/Johnesco/karaokeunderground/issues/30
+[#31]: https://github.com/Johnesco/karaokeunderground/issues/31

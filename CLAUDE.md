@@ -77,7 +77,8 @@ karaokeunderground/
 │   │   ├── 008-posts-from-the-home-page.md    # Posts reached from the home page (#24). Superseded by ADR-009
 │   │   ├── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25)
 │   │   ├── 010-preview-on-github-pages.md     # The public preview on GitHub Pages, kept out of search (#27)
-│   │   └── 011-old-site-at-old.md             # A private, frozen copy of the pre-2013 site, shown locally at /old/ (#29)
+│   │   ├── 011-old-site-at-old.md             # A private, frozen copy of the pre-2013 site, shown locally at /old/ (#29)
+│   │   └── 012-phone-rows-from-boxes.md       # Phone rows built from boxes for quicker sorting: rejected, no faster (#31)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -245,6 +246,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-009](docs/adr/009-songlist-home-four-sections.md): the songlist is the home page, and the site has four sections, Songlist, Shows, Photos and About, with the posts as an archive. *Accepted* 2026-09-24 ([#25](https://github.com/Johnesco/karaokeunderground/issues/25))
 - [ADR-010](docs/adr/010-preview-on-github-pages.md): a public preview on GitHub Pages, built by a workflow from both repos, kept out of search and marked as a preview. The real site stays ADR-001's, and the owner's. *Accepted* 2026-09-24 ([#27](https://github.com/Johnesco/karaokeunderground/issues/27))
 - [ADR-011](docs/adr/011-old-site-at-old.md): a private, frozen copy of the site from before WordPress, in `snapshots/`, shown by the dev server at `/old/`, where nothing links. The build leaves it out. *Accepted* 2026-09-25 ([#29](https://github.com/Johnesco/karaokeunderground/issues/29))
+- [ADR-012](docs/adr/012-phone-rows-from-boxes.md): phone rows built from flex boxes, to make sorting quicker. *Rejected* 2026-09-26 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): measured with old and new taking turns, they're no faster. Time sorting only that way
 
 ### The diary
 
