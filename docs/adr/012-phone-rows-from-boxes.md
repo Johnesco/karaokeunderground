@@ -1,0 +1,6 @@
+# ADR-012: Phone rows built from boxes, so sorting stays quick
+**Status:** Proposed · **Date:** 2026-09-26 · **Issue(s):** [#31](https://github.com/Johnesco/karaokeunderground/issues/31)
+## Context
+A sort replaces all 1,853 rows of the songlist (ADR-006). In the preview's phone mode a tap on a column name takes 320 to 730ms, nearly all of it removing the old rows and laying out the new ones: the sort itself takes under 7ms. On phones each row is text that flows inside the row, the first two columns on a line with a dash between them and the third below, and the phone mode makes rows like that expensive. At wide-screen size the same rows are quick.
+## Decision
+On phones, each row is built from boxes, with CSS flex. The first two columns share a line when they fit, with the dash between them, and the third sits on its own line below. It reads as before, except that when the first two don't fit on one line, the second starts a line of its own instead of wrapping after the dash: 117 of the 1,853 rows at 375px. Wide screens keep their grid. Three columns on phones were measured too: slower than boxes, with every column squeezed to about 100px. Drawing the first screenful first would cut more, and is held for later.

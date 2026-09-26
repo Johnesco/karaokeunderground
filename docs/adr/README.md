@@ -17,3 +17,4 @@ Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-base
 | [009](009-songlist-home-four-sections.md) | The songlist is the home page, and the site has four sections | Accepted |
 | [010](010-preview-on-github-pages.md) | A public preview on GitHub Pages, kept out of search | Accepted |
 | [011](011-old-site-at-old.md) | A private, frozen copy of the pre-2013 site, shown locally at /old/ | Accepted |
+| [012](012-phone-rows-from-boxes.md) | Phone rows built from boxes, so sorting stays quick | Proposed |
