@@ -19,3 +19,4 @@ Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-base
 | [011](011-old-site-at-old.md) | A private, frozen copy of the pre-2013 site, shown locally at /old/ | Accepted |
 | [012](012-phone-rows-from-boxes.md) | Phone rows built from boxes, so sorting stays quick | Rejected |
 | [013](013-what-a-button-looks-like.md) | What a button looks like, starting with the songlist's lists and column names ([mockups](013-button-mockups.html)) | Proposed |
+| [014](014-first-screenful-first.md) | Draw the first screenful of songs first, and the rest after | Proposed |
