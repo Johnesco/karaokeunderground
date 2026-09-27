@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { fold, queryWords, listSongs, valuesOf, matches, describe as status, sortHint, listTitle, songlistView, columnsFor, sortSongs, songItem } from '../site/js/songlist-page.js';
+import { fold, queryWords, listSongs, valuesOf, matches, describe as status, sortHint, listTitle, songlistView, columnsFor, sortSongs, songItem, pieceEnds, PIECE } from '../site/js/songlist-page.js';
 import { parseFrontMatter } from '../site/js/front-matter.js';
 
 const FIXTURE = path.join(path.dirname(fileURLToPath(import.meta.url)), 'fixtures', 'content');
@@ -65,7 +65,7 @@ describe('the example songlist', () => {
     assert.deepEqual(valuesOf(songs, 'tags'), [{ key: 'duet', name: 'duet', count: 1 }]);
   });
 
-  it('renders the page: lists, tags, count, every song, the date, then the page\u{2019}s text', () => {
+  it('renders the page: lists, tags, count, the list, the date, then the page\u{2019}s text', () => {
     const doc = parseFrontMatter('---\ntitle: Songlist\n---\nMost of these are on [a playlist](https://e.com).\n');
     const view = songlistView(doc, songs, '2026-09-05');
     assert.equal(view.title, 'Songlist');
@@ -74,8 +74,14 @@ describe('the example songlist', () => {
     assert.match(view.html, /<p class="song-count"><span class="song-status" role="status">3 songs, sorted by artist\.<\/span> <span class="song-hint">Pick Title or Album to sort that way\.<\/span><\/p>/, 'only the count is announced as it changes');
     assert.match(view.html, /<\/ul>\n<\/div>\n<p class="song-summary">Updated <time datetime="2026-09-05">September 5, 2026<\/time><\/p>\n<p>Most of these are on/, 'the date sits at the foot of the songs, before the page\u{2019}s text');
     assert.match(view.html, /<legend>Tags<\/legend>/);
-    assert.equal(view.html.match(/<li>/g).length, 3);
-    assert.match(view.html, /<li><span class="song-artist song-first">Sample, Solo<\/span><span class="song-sep" aria-hidden="true"> \u{2013} <\/span><span class="song-title song-second"><span class="visually-hidden">, <\/span>Third Song<\/span> <span class="song-album song-third"><span class="visually-hidden">, from <\/span>Tape, Vol. 1<\/span><\/li>/u);
+    assert.match(view.html, /<ul class="songs" aria-label="Songs"><\/ul>/, 'the page draws the songs itself, a screenful first (ADR-014)');
+  });
+
+  it('writes a song with its columns in the usual order, and a hidden one when the list or search leaves it out', () => {
+    const song = songs.find((s) => s.title === 'Third Song');
+    const html = '<span class="song-artist song-first">Sample, Solo</span><span class="song-sep" aria-hidden="true"> \u{2013} </span><span class="song-title song-second"><span class="visually-hidden">, </span>Third Song</span> <span class="song-album song-third"><span class="visually-hidden">, from </span>Tape, Vol. 1</span></li>\n';
+    assert.equal(songItem(song), `<li>${html}`);
+    assert.equal(songItem(song, columnsFor('artist'), true), `<li hidden>${html}`);
   });
 
   it('heads the songs with the sort buttons, a group screen readers hear as "Sort by", with the songs\u{2019} dash after the first', () => {
@@ -187,6 +193,27 @@ describe('sorting', () => {
     const html = songItem(song, columnsFor('album'));
     assert.match(html, /^<li><span class="song-album song-first"><\/span><span class="song-artist song-second">Cover Band<\/span>/, 'no dash, and nothing read before the artist');
     assert.equal(html.match(/class="song-/g).length, 3);
+  });
+});
+
+describe('drawing the rows a screenful first (ADR-014)', () => {
+  const shows = Boolean;
+
+  it('ends the first piece once a screenful of the rows that show are in', () => {
+    assert.deepEqual(pieceEnds([1, 1, 1, 1, 1, 1], shows, 2, 3), [2, 5, 6]);
+    assert.deepEqual(pieceEnds([0, 1, 0, 0, 1, 1, 0, 1], shows, 2, 3), [5, 8], 'hidden rows come along, and don\u{2019}t count');
+  });
+
+  it('draws the whole list at once when fewer songs show than a screenful holds', () => {
+    assert.deepEqual(pieceEnds([0, 1, 0, 0, 1], shows, 3, 2), [5]);
+    assert.deepEqual(pieceEnds([0, 0, 0], shows, 3, 2), [3], 'nothing shows: every row is drawn hidden');
+    assert.deepEqual(pieceEnds([], shows, 3, 2), [0]);
+  });
+
+  it('splits the rest into pieces of 400 rows, so 1,853 songs take a screenful and five pieces', () => {
+    const rows = Array.from({ length: 1853 }, () => 1);
+    assert.equal(PIECE, 400);
+    assert.deepEqual(pieceEnds(rows, shows, 23), [23, 423, 823, 1223, 1623, 1853]);
   });
 });
 

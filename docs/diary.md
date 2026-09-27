@@ -474,6 +474,40 @@ John found sorting the songlist slow. Measuring showed the sort itself takes und
 
 It's the same lesson as sorting's first version, where timings in a background tab swung fivefold from run to run and only alternating runs could be trusted. The alternating runs did confirm something useful: drawing just the first screenful of rows takes 5 to 10ms, against 22 to 57ms for the whole list. If sorting still feels slow, the next step is to draw the rest after the first screen.
 
+### 2026-09-27 · A screenful first
+
+**Decision · Challenge · Process** · [#31] · [ADR-014](adr/014-first-screenful-first.md)
+
+The day before, rebuilding the phone rows to make sorting quicker had come to nothing (ADR-012). But its fair timings had pointed somewhere else: after a sort, only a screenful of songs can be seen, and drawing that screenful took a fraction of the time of drawing all 1,853. John had the ticket rewritten for that approach, and asked to start with the decision.
+
+**Decided before any code, in ADR-014:**
+
+- **How many rows make a screenful.** As many as the window could hold if every song took a single line, the least a row takes. On a phone 812px tall that's 23, where 12 songs actually show under the controls, so the foot of the page never flashes up before the rest arrives.
+- **How the rest arrives.** In pieces of 400 rows, one per frame, each queued after the frame before it has been painted, so the page stays free to answer a tap.
+- **What cancels it.** Only another sort. A search or a list picked while the rest is still coming doesn't restart anything: it hides and shows the rows already there, and the rows still to come follow it. The status line counts every song from the start.
+- **Opening the page, too.** The page used to draw the whole list the same way when it opened, and an address with a sort in it, like a shared `?sort=title`, drew it twice: by artist, then again by title. Now it draws the list once, in the order and with the filters the address asks for.
+- **A rule for keeping it.** The change would stay only if it beat the old drawing timed fairly, with the two taking turns, the lesson of the day before.
+
+**Built and checked.** After a tap the list holds 21 rows at the preview's size, then 421, 821, 1,221, 1,621 and all 1,853, a frame apart. Checks tried to catch it out: two taps a frame apart, two in the same moment, and a list and a search picked while the rest was still arriving. Every time, the list ended with every song in the right order and exactly the right ones showing.
+
+**Then the phone screen held a surprise.** Timed against the old drawing, the new one was well ahead everywhere, but on a phone-sized screen a tap still spent 35ms before anything could be painted, against 8ms on a wide one. Timing each step found where it went: removing the old 1,853 rows. On a phone screen, where each row is text flowing around a dash, that took 30 to 40ms, and on a wide screen, where each row is a grid, 2 to 8. More experiments showed the cost comes from removing rows the browser has already laid out. Hiding the list first, and letting the browser work out its style so it drops the rows' layout, brought the removal down to 4 to 10ms. Timed three ways taking turns on the phone screen, a tap showed the new order in a median 106ms with the old drawing, 52ms with the screenful first, and 30ms with the hiding as well.
+
+**The results,** timed in the preview, old and new taking turns, 12 rounds of three taps each:
+
+| Median time until the songs show | Old | New |
+|---|---|---|
+| A tap, wide screen (811×746) | 54ms | 22ms |
+| A tap, phone screen (375×812) | 102ms | 21ms |
+| A tap far down the list, phone screen | 98ms | 20ms |
+| Opening the page, wide / phone | 49 / 47ms | 21 / 22ms |
+| Opening `?sort=title`, wide / phone | 84 / 123ms | 14 / 16ms |
+
+No piece took more than 10ms. A frame of 50ms or more, long enough to feel like a stall, came with 16 of 36 old taps on the wide screen and all 36 on the phone screen, and with 1 and none of the new ones. The price is that the whole list takes about a tenth of a second to be complete: 30ms longer than before on a wide screen, and a little less on the phone screen. Until then, find-in-page and screen readers reach only the songs drawn so far.
+
+**Timing fairly took its own work.** Both versions were built side by side on one local server, each in a frame of the same size, and they took turns tap by tap, with each round starting with a different one. Two readings were wrong at first. The browser's reports of long frames seemed to say neither version ever had one: they were going to the test's own page, not the frames, because the test tapped from its own code. And opening the page looked slow on phones, because re-rendering in place made every opening remove the list before it, which a real opening never has to do. One check stalled for good, and that turned out to be the design at work: browsers hold back frames in a tab that isn't showing, so the rest of the list waits until the tab shows.
+
+**Left for later.** A row the browser hasn't drawn yet is meant to count as one row tall, but on a phone it counts as 70px where a real row is 56, because its placeholder height leaves out the padding. So after a sort the fade reaches only the first 9 or 10 of the 12 or more songs on screen, and the scroll bar is off by about a quarter. It dates from ADR-006, and it's a question for its own ticket.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3

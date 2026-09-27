@@ -80,7 +80,8 @@ karaokeunderground/
 │   │   ├── 011-old-site-at-old.md             # A private, frozen copy of the pre-2013 site, shown locally at /old/ (#29)
 │   │   ├── 012-phone-rows-from-boxes.md       # Phone rows built from boxes for quicker sorting: rejected, no faster (#31)
 │   │   ├── 013-what-a-button-looks-like.md    # The site's button rule, from the lists and column names: proposed, waiting on John's pick
-│   │   └── 013-button-mockups.html            # Its 24 mockups, black and white with a punk spirit, also published as an artifact
+│   │   ├── 013-button-mockups.html            # Its 24 mockups, black and white with a punk spirit, also published as an artifact
+│   │   └── 014-first-screenful-first.md       # The songlist draws its first screenful of songs first, and the rest after (#31)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -128,7 +129,7 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-007](docs/adr/
 - **Phone-first.** Base styles are for a phone, and wider screens only add room. Nothing may scroll sideways at 320px, and touch targets are at least 44px
 - **White text on black, everywhere we can,** at the owner's request, as the old site was. No inverted panels: a picked control shows a white border, bold text and its own state. Text colours stay at WCAG AA or better on black, and so do the borders of controls. The colours are the variables at the top of `site.css`
 - **Borrowed assets carry their licence.** A font or image from outside the owner's content sits with a note of its licence, and gets a credit where the licence asks for one. SprayME's credit is in the footer ([ADR-007](docs/adr/007-left-menu-in-sprayme.md)). The old menu font, ALL AGES, is licensed for personal use only, so it isn't used
-- **The songlist stays quick at 1,853 songs** ([ADR-006](docs/adr/006-sort-by-moving-a-column.md)). Its rows use `content-visibility: auto`, so the browser lays out only the ones near the screen, and an animation reads every position before starting any. Reading a position between animations once made a sort take 1.2 seconds
+- **The songlist stays quick at 1,853 songs** ([ADR-006](docs/adr/006-sort-by-moving-a-column.md), [ADR-014](docs/adr/014-first-screenful-first.md)). Its rows use `content-visibility: auto`, so the browser lays out only the ones near the screen, and an animation reads every position before starting any. Reading a position between animations once made a sort take 1.2 seconds. When the page opens and after a sort, it draws a screenful of rows straight away and the rest in pieces of 400, one a frame, and the old rows go while the list is hidden, which is several times quicker on phones
 
 ## Data Formats
 
@@ -250,6 +251,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-011](docs/adr/011-old-site-at-old.md): a private, frozen copy of the site from before WordPress, in `snapshots/`, shown by the dev server at `/old/`, where nothing links. The build leaves it out. *Accepted* 2026-09-25 ([#29](https://github.com/Johnesco/karaokeunderground/issues/29))
 - [ADR-012](docs/adr/012-phone-rows-from-boxes.md): phone rows built from flex boxes, to make sorting quicker. *Rejected* 2026-09-26 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): measured with old and new taking turns, they're no faster. Time sorting only that way
 - [ADR-013](docs/adr/013-what-a-button-looks-like.md): what a button looks like, starting with the songlist's list buttons and column names, which don't look tappable. *Proposed* 2026-09-27: John picks from 24 mockups ([`013-button-mockups.html`](docs/adr/013-button-mockups.html)), white on black with a punk spirit, and the pick becomes the site's button rule
+- [ADR-014](docs/adr/014-first-screenful-first.md): the songlist draws its first screenful of songs straight away, and the rest in pieces of 400, one a frame, when the page opens and after every sort. Only another sort cancels the pieces to come. *Accepted* 2026-09-27 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): timed taking turns, the new order shows 2 to 5 times sooner
 
 ### The diary
 
@@ -263,6 +265,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-27**: The songlist draws its first screenful of songs straight away, and the rest over the next frames, when it opens and after a sort (#31): [ADR-014](docs/adr/014-first-screenful-first.md). A sort shows the new order 2 to 5 times sooner, and an address with a sort draws the list once
 - **2026-09-25**: A private, frozen copy of the site from before WordPress, 2004–2013, is in `snapshots/`, and `npm run dev` shows it at `/old/` (#29): [ADR-011](docs/adr/011-old-site-at-old.md). The contact form got its own ticket (#30)
 - **2026-09-24**: The Shows page lists the social accounts, Facebook, Instagram and X, under "How to find out more", as plain links in `pages/shows.md` (#20)
 - **2026-09-24**: A public preview runs on GitHub Pages at https://johnesco.github.io/karaokeunderground/, kept out of search, and the content repo is public (#27): [ADR-010](docs/adr/010-preview-on-github-pages.md)

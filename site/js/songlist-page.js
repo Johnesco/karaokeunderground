@@ -152,9 +152,10 @@ export function sortHint(sort) {
 /**
  * One song, its columns in the order given. Every column gets its cell, even
  * a blank one, so wide screens keep each in its place. On a phone the first
- * two share a line, with a dash between them, and the third sits below.
+ * two share a line, with a dash between them, and the third sits below. A song
+ * the list or search leaves out is drawn hidden.
  */
-export function songItem(song, columns = SORTS) {
+export function songItem(song, columns = SORTS, hidden = false) {
   const cell = (column, i) => {
     const text = song[column];
     const lead = text && columns.slice(0, i).some((before) => song[before])
@@ -164,7 +165,28 @@ export function songItem(song, columns = SORTS) {
   };
   const [first, second, third] = columns;
   const sep = song[first] && song[second] ? SEP : '';
-  return `<li>${cell(first, 0)}${sep}${cell(second, 1)} ${cell(third, 2)}</li>\n`;
+  return `<li${hidden ? ' hidden' : ''}>${cell(first, 0)}${sep}${cell(second, 1)} ${cell(third, 2)}</li>\n`;
+}
+
+/** Rows drawn in each piece after the first screenful (#31, ADR-014). 400 took 3 to 14ms at 811px. */
+export const PIECE = 400;
+
+/**
+ * Where drawing the rows stops for a frame (#31, ADR-014): after the first
+ * screenful, which ends once `screenful` of the rows that show are in, then
+ * every `piece` rows to the end. `shows` says whether a row's song shows.
+ */
+export function pieceEnds(rows, shows, screenful, piece = PIECE) {
+  let end = 0;
+  for (let seen = 0; end < rows.length && seen < screenful; end++) {
+    if (shows(rows[end])) seen++;
+  }
+  const ends = [end];
+  while (end < rows.length) {
+    end = Math.min(end + piece, rows.length);
+    ends.push(end);
+  }
+  return ends;
 }
 
 function sortButton(column) {
@@ -173,11 +195,11 @@ function sortButton(column) {
 
 /**
  * The page: its title from pages/songlist.md, the lists with their sizes, the
- * search, the count of what's showing, every song, the date the list last
- * changed, and then the page's own text.
+ * search, the count of what's showing, the list, the date it last changed, and
+ * then the page's own text. The page draws the songs into the list itself, in
+ * the order its address asks for, a screenful first (#31, ADR-014).
  */
 export function songlistView(doc, songs, updated) {
-  const byArtist = sortSongs(songs, 'artist');
   const themes = valuesOf(songs, 'themes');
   const tags = valuesOf(songs, 'tags');
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n`
@@ -216,7 +238,7 @@ export function songlistView(doc, songs, updated) {
     // On a phone they pile up as each song does, with the same dash after the first.
     + `<div class="songs-head" role="group" aria-label="Sort by">\n${sortButton('artist')}${SEP}\n${sortButton('title')}${sortButton('album')}</div>\n`
     + '</div>\n'
-    + `<ul class="songs" aria-label="Songs">\n${byArtist.map((song) => songItem(song)).join('')}</ul>\n`
+    + '<ul class="songs" aria-label="Songs"></ul>\n'
     + '</div>\n'
     // When the list last changed sits at its foot, and the page's own text, like where
     // to stream the songs, comes after that, so the list starts sooner.
@@ -224,13 +246,14 @@ export function songlistView(doc, songs, updated) {
     + markdownHtml(doc.body, 'pages')
     // Far down the list, a button in the lower left goes back to the top.
     + '<button class="to-top" type="button" hidden><span aria-hidden="true">\u{2191} Top</span><span class="visually-hidden">Back to top</span></button>\n';
-  return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, byArtist, themes) };
+  return { title: doc.data.title, html, wide: true, enhance: (main) => enhanceSonglist(main, songs, themes) };
 }
 
 /**
- * Makes the page's search, filters and sorting work: rows show and hide as
- * you type, a column's name sorts the list by it, and the address keeps it
- * all, so /?theme=sad&sort=title can be shared. The songlist is the home page (ADR-009).
+ * Draws the songs, and makes the page's search, filters and sorting work: rows
+ * show and hide as you type, a column's name sorts the list by it, and the
+ * address keeps it all, so /?theme=sad&sort=title can be shared. The songlist
+ * is the home page (ADR-009).
  */
 export function enhanceSonglist(main, songs, themes) {
   const form = main.querySelector('.song-search');
@@ -244,8 +267,9 @@ export function enhanceSonglist(main, songs, themes) {
   const list = table.querySelector('.songs');
   const buttons = new Map([...head.querySelectorAll('.song-sort')].map((button) => [button.dataset.sort, button]));
   let sort = 'artist';
-  let rows = songs; // the songs in the order of their rows, which starts by artist
-  let items = [...list.children];
+  let rows = []; // the songs in the order of their rows
+  let items = []; // the rows drawn so far, which can be fewer (#31, ADR-014)
+  let picked = {}; // what's picked, which the rows still to be drawn follow
   // The heading, and the browser tab, name the list picked: "Full Songlist", "Sad Songs Only".
   const heading = main.querySelector('h1');
   const pageTitle = heading.textContent;
@@ -268,14 +292,16 @@ export function enhanceSonglist(main, songs, themes) {
       tags: [...form.querySelectorAll('input[name="tag"]:checked')].map((box) => box.value),
       sort,
     };
+    picked = state;
     clear.hidden = !input.value;
     const title = listTitle(state.theme, themes, pageTitle);
     heading.textContent = title;
     document.title = `${title} \u{B7} ${site}`;
+    // Every song counts, drawn or not.
     let shown = 0;
     rows.forEach((song, i) => {
       const show = matches(song, state);
-      items[i].hidden = !show;
+      if (items[i]) items[i].hidden = !show;
       if (show) shown++;
     });
     const query = new URLSearchParams();
@@ -400,18 +426,55 @@ export function enhanceSonglist(main, songs, themes) {
   };
 
   // The picked column moves to the front of the header and of every row, and the list sorts by it.
-  const sortBy = (column, animate) => {
-    const before = animate ? places() : null;
-    const focused = head.contains(document.activeElement) ? document.activeElement : null;
+  const arrange = (column) => {
     sort = column;
-    const columns = columnsFor(sort);
-    for (const each of columns) head.append(buttons.get(each));
+    for (const each of columnsFor(sort)) head.append(buttons.get(each));
     buttons.get(sort).after(sep); // the dash stays between the first two names
     for (const [each, button] of buttons) button.setAttribute('aria-pressed', String(each === sort));
     table.dataset.sort = sort;
     rows = sortSongs(songs, sort);
-    list.innerHTML = rows.map((song) => songItem(song, columns)).join('');
-    items = [...list.children];
+  };
+
+  // Drawing the rows (#31, ADR-014). The first screenful goes in straight away, so it
+  // shows in the next frame: as many songs as the window could hold if each took one
+  // line, the least a row takes (2.25rem). The rest follows in pieces, one a frame,
+  // each in a task of its own once the frame before it is painted, so a tap is answered
+  // between them. A row whose song doesn't show is drawn hidden, by what's picked when
+  // its piece is drawn, and another sort stops the pieces still to come.
+  const oneLine = 2.25 * parseFloat(getComputedStyle(document.documentElement).fontSize);
+  let drawing = 0;
+  const draw = () => {
+    const which = ++drawing;
+    const columns = columnsFor(sort);
+    const shows = (song) => matches(song, picked);
+    const ends = pieceEnds(rows, shows, Math.max(1, Math.ceil(window.innerHeight / oneLine)));
+    const add = (end) => {
+      const start = items.length;
+      list.insertAdjacentHTML('beforeend', rows.slice(start, end).map((song) => songItem(song, columns, !shows(song))).join(''));
+      for (let i = start; i < end; i++) items.push(list.children[i]);
+    };
+    const next = (piece) => requestAnimationFrame(() => setTimeout(() => {
+      if (which !== drawing) return;
+      add(ends[piece]);
+      if (piece + 1 < ends.length) next(piece + 1);
+    }));
+    // The old rows go several times faster once the browser has let go of their layout,
+    // so the list is hidden, and its style worked out, before they go: 1,853 went in 4 to
+    // 10ms on a phone screen, against 30 to 40ms as they were.
+    list.hidden = true;
+    getComputedStyle(list).display; // works the style out now
+    list.replaceChildren();
+    list.hidden = false;
+    items = [];
+    add(ends[0]);
+    if (ends.length > 1) next(1);
+  };
+
+  const sortBy = (column, animate) => {
+    const before = animate ? places() : null;
+    const focused = head.contains(document.activeElement) ? document.activeElement : null;
+    arrange(column);
+    draw();
     focused?.focus({ preventScroll: true }); // moving a button drops its focus, so it goes back
     update();
     toListStart();
@@ -424,7 +487,10 @@ export function enhanceSonglist(main, songs, themes) {
     sortBy(button.dataset.sort, !window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   });
 
+  // The page opens in the order, and with the list and search, its address asks for,
+  // and draws the songs once.
   const wanted = params.get('sort');
-  if (buttons.has(wanted) && wanted !== sort) sortBy(wanted, false);
+  arrange(buttons.has(wanted) ? wanted : sort);
   update();
+  draw();
 }
