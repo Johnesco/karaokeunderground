@@ -3,7 +3,7 @@
 ## Context
 John, 2026-09-27: the column names Artist, Title and Album sort the songlist, but they don't look like they can be tapped, and the site has no written rule for what a button looks like. Most controls are already outlined boxes at least 44px tall and black inside: the list buttons, the search box, "↑ Top" and the Photos page's "Follow on Instagram". A picked one gets a white border and bold text. The column names are plain words. Whatever replaces them stays white on black, as the owner asked, reads on a phone with no hover, and has a punk spirit rather than a corporate one.
 ## Decision
-Not made yet. John asked for mockups, and chooses from them: ten for the list buttons and ten for the column names, from minimal to maximal, after a first round of four. They're in [`013-button-mockups.html`](013-button-mockups.html), which is also published as a claude.ai artifact, and listed below. When John picks, this ADR records the choice as the site's button rule, which the Photos page's Instagram button and "↑ Top" then follow too.
+Not made yet. John asked for mockups, and chooses from them: ten for the list buttons and ten for the column names, from minimal to maximal, after a first round of four, then ten more for the column names as pills. They're in [`013-button-mockups.html`](013-button-mockups.html), which is also published as a claude.ai artifact, and listed below. When John picks, this ADR records the choice as the site's button rule, which the Photos page's Instagram button and "↑ Top" then follow too.
 
 ## What any choice has to keep
 
@@ -11,7 +11,7 @@ Not made yet. John asked for mockups, and chooses from them: ten for the list bu
 - Touch targets at least 44px tall, and control borders at 3:1 or more on black.
 - The pick shows by a shape, like a bar, an X, a circle or a stamp, so it never relies on brightness alone and needs no hover.
 - The controls underneath stay the same: radio buttons for the lists, and pressed buttons for the sort ([ADR-006](006-sort-by-moving-a-column.md)). It's styling, so screen readers hear what they do now.
-- A new font costs 15 to 40 KB on phones, which load none today, and needs a licence note, as SprayME has ([ADR-007](007-left-menu-in-sprayme.md)). Lists 1, 3, 7 and 9, and sort 1, 4, 5, 6 and 8, need no new font.
+- A new font costs 15 to 40 KB on phones, which load none today, and needs a licence note, as SprayME has ([ADR-007](007-left-menu-in-sprayme.md)). Lists 1, 3, 7 and 9, sort 1, 4, 5, 6 and 8, and pills 1 to 9 need no new font.
 - Outlined type (lists 8, sort 10) and heavy tilts (lists 4 and 10) get a check at arm's length on a phone in a dark bar before they're chosen.
 
 ## The options
@@ -22,4 +22,6 @@ Not made yet. John asked for mockups, and chooses from them: ten for the list bu
 
 **Column names:** 1 brackets, with a caret. 2 scribbled arrows. 3 label-maker tape. 4 stompboxes, the pick's light on. 5 tape-deck keys, the pick pressed in. 6 folder tabs, the pick open to the list. 7 circled in marker. 8 numbered, tap one to make it number 1. 9 rubber stamp. 10 poster type.
 
-**Pairs:** the label-maker tape (lists 3 with sort 3), poster type (lists 8 with sort 10), and cut and paste (the ransom note, lists 4, with the rubber stamp, sort 9).
+**Column names as pills:** 1 outlined, with an arrow on the pick. 2 sort signs, the up-and-down arrows apps use, pointing one way on the pick. 3 check chips, after a Sort label. 4 A to Z, a tag on the pick. 5 a switch, the pick in a pill of its own. 6 a pointer, the pick pointing down into the list. 7 capsules, split into the name and the sort sign. 8 patches, stitched, the pick safety-pinned. 9 stickers, tilted, the pick with a star. 10 marker-drawn, the pick gone over twice. If a pill wins, the list buttons and the site's other buttons round off to match.
+
+**Pairs:** the label-maker tape (lists 3 with sort 3), poster type (lists 8 with sort 10), cut and paste (the ransom note, lists 4, with the rubber stamp, sort 9), patches (lists 9 with pill 8), and drawn by hand (the sprayed circle, lists 5, with pill 10).
