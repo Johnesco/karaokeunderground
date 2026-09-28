@@ -29,6 +29,8 @@ figcaption b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
 .row small{display:block;color:var(--site-muted);font-size:14.4px}
 .pill{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:44px;padding:0 14px;border:2px solid var(--site-control);border-radius:999px;box-sizing:border-box;position:relative;font-size:16px;white-space:nowrap}
 .pill.on{border-color:var(--site-text);font-weight:700}
+.state{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.cols{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:12px;justify-items:start}
 .pairs{margin:0;padding-left:1.2em;display:grid;gap:6px}
 footer{color:var(--muted);font-size:13px;border-top:1px solid var(--rule);padding-top:14px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
@@ -37,7 +39,7 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--rule);paddin
 <main>
 <header class="intro">
 <h1>Songlist Button Mockups</h1>
-<p>On the Karaoke Underground songlist, the column names Artist, Title and Album sort the list, but they don&rsquo;t look like they can be tapped. The site also has no written rule for what a button looks like. These are the options John asked for on 2026-09-27, each set from minimal to maximal: a first round of four, ten for the list buttons, ten for the column names, and ten more for the column names as pills.</p>
+<p>On the Karaoke Underground songlist, the column names Artist, Title and Album sort the list, but they don&rsquo;t look like they can be tapped. The site also has no written rule for what a button looks like. These are the options John asked for on 2026-09-27 and 28, each set from minimal to maximal: a first round of four, ten for the list buttons, ten for the column names, ten more for the column names as pills, and four ways for pill 2 to show which part of a song is which.</p>
 <p class="sub">Pick a list button and a column name, like <b>lists 3</b> with <b>sort 5</b> or <b>pill 4</b>. The choice goes into ADR-013 as the site&rsquo;s button rule.</p>
 </header>
 
@@ -323,6 +325,86 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--rule);paddin
 </div>
 </section>
 
+<section aria-labelledby="key">
+<h2 id="key">Pill 2 as a key to the songs</h2>
+<p>On a phone each song takes two lines: the first two columns on the top line, with a dash between them, and the third below in grey. Today&rsquo;s column names pile up the same way, so they read as a key to every song. Pills in one row lose that. Here are four ways to keep it with pill 2, each sorted by artist and then after a tap on Title. On a wide screen, where each column has its own place, any of them simply heads its column.</p>
+<div class="grid">
+
+<figure><span class="state">Sorted by artist</span>
+<div class="ph"><div class="h" style="gap:8px">
+<span class="pill on" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Belle &amp; Sebastian</b> &ndash; Me And The Major<small>If You're Feeling Sinister</small></div><div class="row"><b>Belle &amp; Sebastian</b> &ndash; Photo Jenny<small>Lazy Line Painter Jane</small></div>
+</div>
+<span class="state">After a tap on Title</span>
+<div class="ph"><div class="h" style="gap:8px">
+<span class="pill on" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Me And The Major</b> &ndash; Belle &amp; Sebastian<small>If You're Feeling Sinister</small></div><div class="row"><b>Photo Jenny</b> &ndash; Belle &amp; Sebastian<small>Lazy Line Painter Jane</small></div>
+</div><figcaption><b>Pill 2a. One row,</b> as pill 2 above. The pills say what sorts the list, but not that the album sits on the line below, or which side of the dash is which</figcaption></figure>
+
+<figure><span class="state">Sorted by artist</span>
+<div class="ph"><div class="h" style="flex-wrap:wrap;gap:2px 8px;padding:4px 0 6px">
+<span class="pill on" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span aria-hidden="true">&ndash;</span>
+<span class="pill" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span style="flex-basis:100%;height:0"></span>
+<span class="pill" style="padding:0 11px 0 14px;color:#aaa;font-size:14.4px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Belle &amp; Sebastian</b> &ndash; Me And The Major<small>If You're Feeling Sinister</small></div><div class="row"><b>Belle &amp; Sebastian</b> &ndash; Photo Jenny<small>Lazy Line Painter Jane</small></div>
+</div>
+<span class="state">After a tap on Title</span>
+<div class="ph"><div class="h" style="flex-wrap:wrap;gap:2px 8px;padding:4px 0 6px">
+<span class="pill on" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span aria-hidden="true">&ndash;</span>
+<span class="pill" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span style="flex-basis:100%;height:0"></span>
+<span class="pill" style="padding:0 11px 0 14px;color:#aaa;font-size:14.4px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Me And The Major</b> &ndash; Belle &amp; Sebastian<small>If You're Feeling Sinister</small></div><div class="row"><b>Photo Jenny</b> &ndash; Belle &amp; Sebastian<small>Lazy Line Painter Jane</small></div>
+</div><figcaption><b>Pill 2b. Shaped like a song,</b> as the column names are today: two pills on the top line with the dash between them, and the third below in the album&rsquo;s grey. About 100px tall on a 375px phone, against 90px for today&rsquo;s names</figcaption></figure>
+
+<figure><span class="state">Sorted by artist</span>
+<div class="ph"><div class="h" style="gap:6px">
+<span class="pill on" style="padding:0 9px 0 12px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span aria-hidden="true">&ndash;</span>
+<span class="pill" style="padding:0 9px 0 12px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 9px 0 12px;color:#aaa;font-size:14.4px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Belle &amp; Sebastian</b> &ndash; Me And The Major<small>If You're Feeling Sinister</small></div><div class="row"><b>Belle &amp; Sebastian</b> &ndash; Photo Jenny<small>Lazy Line Painter Jane</small></div>
+</div>
+<span class="state">After a tap on Title</span>
+<div class="ph"><div class="h" style="gap:6px">
+<span class="pill on" style="padding:0 9px 0 12px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span aria-hidden="true">&ndash;</span>
+<span class="pill" style="padding:0 9px 0 12px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 9px 0 12px;color:#aaa;font-size:14.4px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Me And The Major</b> &ndash; Belle &amp; Sebastian<small>If You're Feeling Sinister</small></div><div class="row"><b>Photo Jenny</b> &ndash; Belle &amp; Sebastian<small>Lazy Line Painter Jane</small></div>
+</div><figcaption><b>Pill 2c. One row, dressed like the parts.</b> The pick is bold and followed by the dash, the next is plain, and the album pill takes the album&rsquo;s small grey. About 60px tall</figcaption></figure>
+
+<figure><span class="state">Sorted by artist</span>
+<div class="ph"><div class="h" style="gap:8px">
+<span class="pill on" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Belle &amp; Sebastian</b> &ndash; Me And The Major<small><i>from</i> If You're Feeling Sinister</small></div><div class="row"><b>Belle &amp; Sebastian</b> &ndash; Photo Jenny<small><i>from</i> Lazy Line Painter Jane</small></div>
+</div>
+<span class="state">After a tap on Title</span>
+<div class="ph"><div class="h" style="gap:8px">
+<span class="pill on" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row"><b>Me And The Major</b> <i style="color:#aaa">by</i> Belle &amp; Sebastian<small><i>from</i> If You're Feeling Sinister</small></div><div class="row"><b>Photo Jenny</b> <i style="color:#aaa">by</i> Belle &amp; Sebastian<small><i>from</i> Lazy Line Painter Jane</small></div>
+</div><figcaption><b>Pill 2d. Words in the songs.</b> The pills stay in one row, and each song shows the small words screen readers already hear: by before the artist, and from before the album</figcaption></figure>
+
+<figure style="grid-column:1/-1"><span class="state">On a wide screen, any of them</span>
+<div style="overflow-x:auto;width:100%"><div class="ph" style="width:640px">
+<div class="h cols">
+<span class="pill on" style="padding:0 11px 0 14px">Artist<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2.5v10.5M3.5 8.5 8 13l4.5-4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Title<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+<span class="pill" style="padding:0 11px 0 14px">Album<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M5 13V3M2 6l3-3 3 3M11 3v10M8 10l3 3 3-3" fill="none" stroke="#aaa" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+<div class="row cols"><b>Belle &amp; Sebastian</b><span>Me And The Major</span><span style="color:#aaa">If You're Feeling Sinister</span></div>
+<div class="row cols"><b>Belle &amp; Sebastian</b><span>Photo Jenny</span><span style="color:#aaa">Lazy Line Painter Jane</span></div>
+</div></div><figcaption><b>Wide screens.</b> Each pill heads its own column, so the question is only on phones</figcaption></figure>
+
+</div>
+</section>
+
 <section aria-labelledby="pairs">
 <h2 id="pairs">Pairs that go together</h2>
 <ul class="pairs">
@@ -334,5 +416,5 @@ footer{color:var(--muted);font-size:13px;border-top:1px solid var(--rule);paddin
 </ul>
 </section>
 
-<footer>Karaoke Underground revamp &middot; ADR-013 &middot; 2026-09-27. Two songs from the list stand in for its rows.</footer>
+<footer>Karaoke Underground revamp &middot; ADR-013 &middot; 2026-09-27 and 28. Two songs from the list stand in for its rows.</footer>
 </main>
