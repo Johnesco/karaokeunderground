@@ -265,6 +265,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-09-27**: A song the browser hasn't drawn yet counts as tall as a typical row, so every row on screen animates after a sort, and the list's height is close to right before its rows are drawn (#35)
 - **2026-09-27**: The songlist draws its first screenful of songs straight away, and the rest over the next frames, when it opens and after a sort (#31): [ADR-014](docs/adr/014-first-screenful-first.md). A sort shows the new order 2 to 5 times sooner, and an address with a sort draws the list once
 - **2026-09-25**: A private, frozen copy of the site from before WordPress, 2004–2013, is in `snapshots/`, and `npm run dev` shows it at `/old/` (#29): [ADR-011](docs/adr/011-old-site-at-old.md). The contact form got its own ticket (#30)
 - **2026-09-24**: The Shows page lists the social accounts, Facebook, Instagram and X, under "How to find out more", as plain links in `pages/shows.md` (#20)

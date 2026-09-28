@@ -508,17 +508,19 @@ main.wide {
 
 /* A song's lines sit closer together than the songs do, so each row reads as one.
    The browser lays out only the songs near the screen, which keeps sorting all
-   1,853 quick (#22). A song it hasn't drawn yet counts as one row tall. Screen
-   readers and find-in-page still reach every song. The page draws a screenful of
-   songs first, counting 2.25rem, this padding and one line, as the least a row
-   takes (ADR-014), so a shorter row needs that number changed too. */
+   1,853 quick (#22). Screen readers and find-in-page still reach every song.
+   A song it hasn't drawn yet counts as a typical row. The size given is the row
+   inside its padding and border, which come on top: on a phone, the song's line
+   and the album's smaller one below it, 1.4rem and 1.26rem (#35). The page draws
+   a screenful of songs first, counting 2.25rem, this padding and one line, as the
+   least a row takes (ADR-014), so a shorter row needs that number changed too. */
 .songs li {
   padding: 0.4rem 0;
   border-bottom: 1px solid var(--line);
   line-height: 1.4;
   overflow-wrap: break-word;
   content-visibility: auto;
-  contain-intrinsic-size: auto 3.5rem;
+  contain-intrinsic-size: auto 2.66rem;
 }
 
 /* Whichever column comes first leads each song in bold. On a phone the third
@@ -555,8 +557,9 @@ main.wide {
     grid-template-columns: 1fr 1fr 1.4fr;
   }
 
+  /* A song not yet drawn: one line, inside the padding (#35). */
   .songs li {
-    contain-intrinsic-size: auto 2.25rem;
+    contain-intrinsic-size: auto 1.4rem;
   }
 
   .song-sort:nth-of-type(n) {

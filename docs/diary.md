@@ -508,6 +508,18 @@ No piece took more than 10ms. A frame of 50ms or more, long enough to feel like 
 
 **Left for later.** A row the browser hasn't drawn yet is meant to count as one row tall, but on a phone it counts as 70px where a real row is 56, because its placeholder height leaves out the padding. So after a sort the fade reaches only the first 9 or 10 of the 12 or more songs on screen, and the scroll bar is off by about a quarter. It dates from ADR-006, and it's a question for its own ticket.
 
+### 2026-09-27 · Songs that counted too tall
+
+**Challenge · Decision** · [#35]
+
+The ticket left for later came straight after. The browser draws only the songs near the screen, and counts every song it hasn't drawn yet at a set height, meant to be one row. But that height is the row inside its padding and border, which come on top. So a song not yet drawn counted as 69.6px on a phone, where a typical row is 56.2px, and as 49.6px on a wide screen, where a typical row is 36px.
+
+Two things showed it. The fade after a sort looks for the rows on screen before the browser has drawn them, so it went by the taller height: it found 10 of the 12 rows on screen on a phone, and 12 of 15 on a wide screen, and the bottom rows appeared without it. And until the rows were drawn, the list counted as 20% taller than it is on a phone and 28% on a wide screen, so the scroll bar shifted as songs came into view.
+
+**Chose:** a typical row, not an average one. Most rows are two lines on a phone, the song's and the album's below it, and one line on a wide screen: 1,686 and 1,645 of the 1,853 songs. The rest wrap onto more lines, so the average row is a few pixels taller. Counting every song at the average would get the list's height closer, but typical rows would count as taller than they are, and the fade would miss a row at the bottom again. So the set height is now a typical row inside its padding: 2.66rem on a phone, and 1.4rem on a wide screen. A song not yet drawn counts exactly as tall as a typical one, and after a sort every row on screen fades in or slides, at 320, 375, 768 and 810px wide. Before the rows are drawn, the list's height is now 4 to 9% short, depending on the width, instead of 20 to 28% too tall. Once drawn, each row keeps its real height.
+
+**A check that tapped where nobody can.** On the narrowest phone screen, 320 by 568, the first check said 17 of 22 rows missed the fade. But on a window that short the controls don't stay on screen, so a reader far down the list can't reach the column names. The check had scrolled to the middle of the list and tapped them anyway. Tapped the way a reader would, with the column names on screen, all 9 rows on screen faded in.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -536,3 +548,4 @@ No piece took more than 10ms. A frame of 50ms or more, long enough to feel like 
 [#29]: https://github.com/Johnesco/karaokeunderground/issues/29
 [#30]: https://github.com/Johnesco/karaokeunderground/issues/30
 [#31]: https://github.com/Johnesco/karaokeunderground/issues/31
+[#35]: https://github.com/Johnesco/karaokeunderground/issues/35
