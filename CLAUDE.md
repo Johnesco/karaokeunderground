@@ -80,7 +80,7 @@ karaokeunderground/
 │   │   ├── 011-old-site-at-old.md             # A private, frozen copy of the pre-2013 site, shown locally at /old/ (#29)
 │   │   ├── 012-phone-rows-from-boxes.md       # Phone rows built from boxes for quicker sorting: rejected, no faster (#31)
 │   │   ├── 013-what-a-button-looks-like.md    # The site's button rule, from the lists and column names: proposed, waiting on John's pick
-│   │   ├── 013-button-mockups.html            # Its 24 mockups, black and white with a punk spirit, also published as an artifact
+│   │   ├── 013-button-mockups.html            # Its 38 mockups, pills among them, white on black with a punk spirit, also published as an artifact
 │   │   └── 014-first-screenful-first.md       # The songlist draws its first screenful of songs first, and the rest after (#31)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
@@ -250,7 +250,7 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-010](docs/adr/010-preview-on-github-pages.md): a public preview on GitHub Pages, built by a workflow from both repos, kept out of search and marked as a preview. The real site stays ADR-001's, and the owner's. *Accepted* 2026-09-24 ([#27](https://github.com/Johnesco/karaokeunderground/issues/27))
 - [ADR-011](docs/adr/011-old-site-at-old.md): a private, frozen copy of the site from before WordPress, in `snapshots/`, shown by the dev server at `/old/`, where nothing links. The build leaves it out. *Accepted* 2026-09-25 ([#29](https://github.com/Johnesco/karaokeunderground/issues/29))
 - [ADR-012](docs/adr/012-phone-rows-from-boxes.md): phone rows built from flex boxes, to make sorting quicker. *Rejected* 2026-09-26 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): measured with old and new taking turns, they're no faster. Time sorting only that way
-- [ADR-013](docs/adr/013-what-a-button-looks-like.md): what a button looks like, starting with the songlist's list buttons and column names, which don't look tappable. *Proposed* 2026-09-27: John picks from 24 mockups ([`013-button-mockups.html`](docs/adr/013-button-mockups.html)), white on black with a punk spirit, and the pick becomes the site's button rule
+- [ADR-013](docs/adr/013-what-a-button-looks-like.md): what a button looks like, starting with the songlist's list buttons and column names, which don't look tappable. *Proposed* 2026-09-27: John picks from 38 mockups ([`013-button-mockups.html`](docs/adr/013-button-mockups.html)), white on black with a punk spirit, among them ten pills and four ways for pill 2 to stay a key to each song's two lines on a phone. The pick becomes the site's button rule
 - [ADR-014](docs/adr/014-first-screenful-first.md): the songlist draws its first screenful of songs straight away, and the rest in pieces of 400, one a frame, when the page opens and after every sort. Only another sort cancels the pieces to come. *Accepted* 2026-09-27 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): timed taking turns, the new order shows 2 to 5 times sooner
 
 ### The diary
