@@ -16,28 +16,37 @@ const DIRS = { siteDir: path.join(ROOT, 'site'), contentDir: FIXTURE };
 
 describe('route', () => {
   it('maps clean paths to views, with the trailing slash as the canonical form', () => {
-    assert.deepEqual(route('/'), { view: 'page', name: 'songlist', path: '/' });
+    assert.deepEqual(route('/'), { view: 'page', name: 'home', path: '/' });
+    assert.deepEqual(route('/songlist'), { view: 'page', name: 'songlist', path: '/songlist/' });
     assert.deepEqual(route('/about'), { view: 'page', name: 'about', path: '/about/' });
     assert.deepEqual(route('/posts/'), { view: 'posts', path: '/posts/' });
     assert.deepEqual(route('/posts/2025-12-27-sad-songs-only-2025/'), { view: 'post', name: '2025-12-27-sad-songs-only-2025', path: '/posts/2025-12-27-sad-songs-only-2025/' });
   });
 
   it('lands old paths on the page that took them in when the site regrouped (ADR-009)', () => {
-    assert.deepEqual(route('/songlist/'), { view: 'page', name: 'songlist', path: '/' });
     assert.deepEqual(route('/calendar/'), { view: 'page', name: 'shows', path: '/shows/' });
     assert.deepEqual(route('/contact'), { view: 'page', name: 'about', path: '/about/' });
     assert.deepEqual(route('/media/'), { view: 'page', name: 'about', path: '/about/' });
   });
 
+  it('lands a songlist search at /, from when the songlist was the home page, on the songlist (ADR-015)', () => {
+    for (const search of ['?theme=sad', '?q=pixies', '?tag=punk', '?sort=title']) {
+      assert.deepEqual(route('/', '/', search), { view: 'page', name: 'songlist', path: '/songlist/' }, search);
+    }
+    assert.deepEqual(route('/', '/', '?fbclid=x'), { view: 'page', name: 'home', path: '/' }, 'anything else stays home');
+    assert.deepEqual(route('/home/'), { view: 'page', name: 'home', path: '/' });
+  });
+
   it('works under a base path, as on GitHub Pages (ADR-010)', () => {
     const base = '/karaokeunderground/';
-    assert.deepEqual(route('/karaokeunderground/', base), { view: 'page', name: 'songlist', path: base });
-    assert.deepEqual(route('/karaokeunderground', base), { view: 'page', name: 'songlist', path: base });
+    assert.deepEqual(route('/karaokeunderground/', base), { view: 'page', name: 'home', path: base });
+    assert.deepEqual(route('/karaokeunderground', base), { view: 'page', name: 'home', path: base });
+    assert.deepEqual(route('/karaokeunderground/', base, '?theme=sad'), { view: 'page', name: 'songlist', path: '/karaokeunderground/songlist/' });
     assert.deepEqual(route('/karaokeunderground/shows', base), { view: 'page', name: 'shows', path: '/karaokeunderground/shows/' });
     assert.deepEqual(route('/karaokeunderground/calendar/', base), { view: 'page', name: 'shows', path: '/karaokeunderground/shows/' });
     assert.equal(route('/shows/', base).view, 'missing', 'outside the base is no page of ours');
     assert.equal(sitePath('about.md', 'pages', base), '/karaokeunderground/about/');
-    assert.equal(sitePath('../pages/songlist.md?theme=sad', 'posts', base), '/karaokeunderground/?theme=sad');
+    assert.equal(sitePath('../pages/songlist.md?theme=sad', 'posts', base), '/karaokeunderground/songlist/?theme=sad');
     assert.equal(sitePath('../images/2014/04/poster.jpg', 'posts', base), '/karaokeunderground/content/images/2014/04/poster.jpg');
     assert.equal(sitePath('../posts/', 'pages', base), '/karaokeunderground/posts/');
     assert.equal(siteUrl('/', base), base);
@@ -51,8 +60,9 @@ describe('route', () => {
 describe('sitePath', () => {
   it('turns links to .md files into page and post paths', () => {
     assert.equal(sitePath('about.md', 'pages'), '/about/');
-    assert.equal(sitePath('../pages/songlist.md', 'posts'), '/', 'the songlist is the home page');
-    assert.equal(sitePath('../pages/songlist.md?theme=sad', 'posts'), '/?theme=sad');
+    assert.equal(sitePath('../pages/songlist.md', 'posts'), '/songlist/');
+    assert.equal(sitePath('../pages/songlist.md?theme=sad', 'posts'), '/songlist/?theme=sad');
+    assert.equal(sitePath('home.md', 'pages'), '/', 'the home page is at the root (ADR-015)');
     assert.equal(sitePath('../posts/2019-01-03-2018-top-tens.md#songs', 'pages'), '/posts/2019-01-03-2018-top-tens/#songs');
   });
 
@@ -95,9 +105,9 @@ describe('views', () => {
     assert.match(view.html, /<a href="\/posts\/2019-01-03-c\/">C &amp; D<\/a>/);
   });
 
-  it('points a lost visitor to the songlist, at home, and to the posts', () => {
+  it('points a lost visitor to the songlist and to the posts', () => {
     const { html } = missingView();
-    assert.match(html, /<a href="\/">songlist<\/a>/);
+    assert.match(html, /<a href="\/songlist\/">songlist<\/a>/);
     assert.match(html, /<a href="\/posts\/">posts<\/a>/);
   });
 });
@@ -110,11 +120,11 @@ describe('site.css', () => {
 });
 
 describe('the page shell', () => {
-  it('has four menu links, with the songlist at home (ADR-009)', () => {
+  it('has four menu links, with the logo leading home (ADR-009, ADR-015)', () => {
     const shell = fs.readFileSync(path.join(ROOT, 'site', 'index.html'), 'utf8');
     const menu = [...shell.matchAll(/<li><a href="([^"]+)">([^<]+)<\/a><\/li>/g)].map((m) => `${m[2]} ${m[1]}`);
-    assert.deepEqual(menu, ['Songlist /', 'Shows /shows/', 'Photos /photos/', 'About /about/']);
-    assert.match(shell, /<a class="site-logo" href="\/">/, 'the logo leads home, to the songlist');
+    assert.deepEqual(menu, ['Songlist /songlist/', 'Shows /shows/', 'Photos /photos/', 'About /about/']);
+    assert.match(shell, /<a class="site-logo" href="\/">/, 'the logo leads home');
   });
 
   it('credits SprayME and its licence, as the licence asks (ADR-007)', () => {

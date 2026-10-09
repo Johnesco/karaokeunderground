@@ -33,7 +33,7 @@ The owner has to be able to take it over: the stack runs in accounts they contro
 - **Code and content live apart.** Code is in this repo and the core files in the content repo, public since 2026-09-24 ([ADR-010](docs/adr/010-preview-on-github-pages.md)). The build combines them
 - **An owner login comes later.** A git-based editor, such as TinaCMS or Decap, edits the same files
 - **Watch the credits.** The free plan gives 300 credits a month: 15 per production deploy, 20 per GB of traffic. When they run out, every site on the account is paused. Batch content updates, and develop on deploy previews, which are free
-- **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/` (the songlist, which is the home page, [ADR-009](docs/adr/009-songlist-home-four-sections.md)), `/shows/`, `/photos/`, `/about/`, `/posts/<file>/`, and the archive at `/posts/`. Old paths like `/songlist/` and `/calendar/` land on their new pages. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
+- **Clean paths from one page shell** ([ADR-003](docs/adr/003-clean-paths-one-shell.md)): `/` (the home page, with the old site's photo slideshow and intro, [ADR-015](docs/adr/015-home-page-montage-and-intro.md)), `/songlist/`, `/shows/`, `/photos/`, `/about/`, `/posts/<file>/`, and the archive at `/posts/`. Old paths like `/calendar/` land on their new pages, and a songlist search at `/`, like `/?theme=sad`, lands on `/songlist/`. `site/index.html` reads the path and renders the matching core file, and Netlify will send every path without a file to it
 - **Our own Markdown renderer** ([ADR-004](docs/adr/004-own-markdown-renderer.md)), with no dependencies, checked against markdown-it
 - **Local, and a public preview.** `npm run dev` previews the site on 127.0.0.1:8001, reading the core files from `work/content/`. `npm run build` writes a static copy to `dist/`, with a page shell at every address ([ADR-010](docs/adr/010-preview-on-github-pages.md)). A GitHub Actions workflow runs `npm test`, builds with `--base /karaokeunderground/ --preview` and deploys to GitHub Pages: on a push, daily for content changes, and by hand. Setting up Netlify for the real site comes later. Build tickets: [#10](https://github.com/Johnesco/karaokeunderground/issues/10)–[#14](https://github.com/Johnesco/karaokeunderground/issues/14)
 - **The old site, locally only, at `/old/`** ([ADR-011](docs/adr/011-old-site-at-old.md)). `npm run dev` also shows the newest private copy of the site from before WordPress, from `snapshots/<date>-pre-wordpress/`. Nothing links there, and the build leaves it out, so it never reaches the preview
@@ -75,13 +75,14 @@ karaokeunderground/
 │   │   ├── 006-sort-by-moving-a-column.md     # Sorting the songlist by moving a column to the front (#22)
 │   │   ├── 007-left-menu-in-sprayme.md        # The wide-screen left menu, set in SprayME (#23)
 │   │   ├── 008-posts-from-the-home-page.md    # Posts reached from the home page (#24). Superseded by ADR-009
-│   │   ├── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25)
+│   │   ├── 009-songlist-home-four-sections.md # The songlist as the home page, in four sections (#25). Its home page superseded by ADR-015
 │   │   ├── 010-preview-on-github-pages.md     # The public preview on GitHub Pages, kept out of search (#27)
 │   │   ├── 011-old-site-at-old.md             # A private, frozen copy of the pre-2013 site, shown locally at /old/ (#29)
 │   │   ├── 012-phone-rows-from-boxes.md       # Phone rows built from boxes for quicker sorting: rejected, no faster (#31)
 │   │   ├── 013-what-a-button-looks-like.md    # The site's button rule, from the lists and column names: proposed, waiting on John's pick
 │   │   ├── 013-button-mockups.html            # Its 38 mockups, pills among them, white on black with a punk spirit, also published as an artifact
-│   │   └── 014-first-screenful-first.md       # The songlist draws its first screenful of songs first, and the rest after (#31)
+│   │   ├── 014-first-screenful-first.md       # The songlist draws its first screenful of songs first, and the rest after (#31)
+│   │   └── 015-home-page-montage-and-intro.md # The home page: the old site's photo slideshow and intro, and the songlist at /songlist/ (#36)
 │   ├── diary.md                   # The revamp's story for the portfolio: findings, decisions, milestones (#8)
 │   ├── legacy-site/
 │   │   ├── audit.md               # What the old site has and does (spike #1)
@@ -93,7 +94,7 @@ karaokeunderground/
 │   ├── css/site.css               # Plain, phone-first styles, white on black. The design comes later, with the owner
 │   ├── fonts/                     # SprayME, the wide-screen menu's font, with a note of its CC BY-SA licence (ADR-007)
 │   └── js/                        # ES modules. app.js runs the page; router.js, views.js, markdown.js (ADR-004),
-│                                  #   songlist-page.js and photos-page.js (ADR-005) render it; csv.js, front-matter.js
+│                                  #   songlist-page.js, photos-page.js (ADR-005) and home-page.js (ADR-015) render it; csv.js, front-matter.js
 │                                  #   and songlist.js are shared with the check
 ├── scripts/
 │   ├── build-site.js              # Ours: the static build, npm run build, into dist/ (ADR-010)
@@ -101,7 +102,7 @@ karaokeunderground/
 │   ├── dev-server.js              # Ours: the local preview, npm run dev (ADR-003)
 │   ├── lib/                       # Their parts: build-site.js, check-content.js, dev-server.js, and content-index.js, which builds /content/index.json
 │   ├── convert-working-copy.py    # Ours, one-off: turned the working copy into the core files (#10)
-│   ├── make-thumbnails.py         # Ours: the Photos page's small copies, in images/thumbs/ (ADR-005). Needs Pillow
+│   ├── make-thumbnails.py         # Ours: small copies of the Photos and home pages' photos, in images/thumbs/ (ADR-005). Needs Pillow
 │   ├── setup-labels.sh            # Vendored: creates the label taxonomy
 │   ├── snapshot-content.py        # Ours: takes a snapshot of the live site (#6), never over an existing one (#7)
 │   ├── snapshot-legacy-site.py    # Ours: a private, frozen copy of the site from before WordPress (#29, ADR-011)
@@ -144,9 +145,10 @@ From [ADR-001](docs/adr/001-static-netlify-core-files.md) to [ADR-007](docs/adr/
 - **`pages/<slug>.md`, `posts/<YYYY-MM-DD>-<slug>.md`:** plain Markdown (CommonMark, plus `~~strikethrough~~`) with no HTML, no tables and no reference-style links ([ADR-004](docs/adr/004-own-markdown-renderer.md)). A line break inside a paragraph is a backslash at the end of the line. A page's `#` headings sit under its title, as `h2`
   - Front matter between two `---` lines: `title` (required), `date` (required for posts, and the same as the file name's), `updated`, and `old_url`, the legacy address without the domain, in the same form as `urls.csv` (`/?p=835`). A value with `: ` or ` #` in it goes in double quotes, and the converted files quote every title
   - Links to other pages and posts point at their `.md` files, and images use paths from the file: `![Alt text](../images/2014/04/poster.jpg)`. A link to the posts archive points at the folder, `../posts/` ([ADR-009](docs/adr/009-songlist-home-four-sections.md)). Links are checked exactly, upper and lower case included, because the web host is case-sensitive
+  - **`pages/home.md`** ([ADR-015](docs/adr/015-home-page-montage-and-intro.md)): the home page, at `/`. Each image alone on its line is a photo in the slideshow, as on the Photos page, and the rest is the intro under its title
   - **`pages/photos.md`** ([ADR-005](docs/adr/005-photos-gallery.md)): each image alone on its line is a photo in the gallery, with its description as the alt text. Its front matter's `instagram` field, an account name like `karaokeunderground`, shows a card that links to Instagram. The check allows `instagram` on any page
 - **`images/`:** WordPress's year/month folders, plus `site/` for the logo and icons. jpg, jpeg, png, gif or webp
-  - **`images/thumbs/`** holds the small copies of the Photos page's photos, at the same paths as the originals, made by `scripts/make-thumbnails.py`. Where a photo has none, the grid shows the original
+  - **`images/thumbs/`** holds the small copies of the Photos and home pages' photos, at the same paths as the originals, made by `scripts/make-thumbnails.py`. Where a photo has none, the page shows the original
 - **The shows wait.** `work/shows.json` stays as the snapshot wrote it (`homepage` and `calendar` lists of `{date, weekday, venue, details, link, text}`, with each year inferred) until we decide how events get updated
 
 ## Testing
@@ -246,12 +248,13 @@ ADRs live in `docs/adr/` in this project (index: [`docs/adr/README.md`](docs/adr
 - [ADR-006](docs/adr/006-sort-by-moving-a-column.md): sorting the songlist by moving a column to the front, John's design. *Accepted* 2026-09-24 ([#22](https://github.com/Johnesco/karaokeunderground/issues/22))
 - [ADR-007](docs/adr/007-left-menu-in-sprayme.md): on wide screens, the menu stands in a left column, set in SprayME, a Creative Commons font credited in the footer. *Accepted* 2026-09-24 ([#23](https://github.com/Johnesco/karaokeunderground/issues/23))
 - [ADR-008](docs/adr/008-posts-from-the-home-page.md): Posts leaves the menu, and the home page, a logo's touch away, is the way to the posts. *Superseded* by ADR-009 the same day ([#24](https://github.com/Johnesco/karaokeunderground/issues/24))
-- [ADR-009](docs/adr/009-songlist-home-four-sections.md): the songlist is the home page, and the site has four sections, Songlist, Shows, Photos and About, with the posts as an archive. *Accepted* 2026-09-24 ([#25](https://github.com/Johnesco/karaokeunderground/issues/25))
+- [ADR-009](docs/adr/009-songlist-home-four-sections.md): the songlist is the home page, and the site has four sections, Songlist, Shows, Photos and About, with the posts as an archive. *Accepted* 2026-09-24 ([#25](https://github.com/Johnesco/karaokeunderground/issues/25)); its home page superseded by ADR-015
 - [ADR-010](docs/adr/010-preview-on-github-pages.md): a public preview on GitHub Pages, built by a workflow from both repos, kept out of search and marked as a preview. The real site stays ADR-001's, and the owner's. *Accepted* 2026-09-24 ([#27](https://github.com/Johnesco/karaokeunderground/issues/27))
 - [ADR-011](docs/adr/011-old-site-at-old.md): a private, frozen copy of the site from before WordPress, in `snapshots/`, shown by the dev server at `/old/`, where nothing links. The build leaves it out. *Accepted* 2026-09-25 ([#29](https://github.com/Johnesco/karaokeunderground/issues/29))
 - [ADR-012](docs/adr/012-phone-rows-from-boxes.md): phone rows built from flex boxes, to make sorting quicker. *Rejected* 2026-09-26 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): measured with old and new taking turns, they're no faster. Time sorting only that way
 - [ADR-013](docs/adr/013-what-a-button-looks-like.md): what a button looks like, starting with the songlist's list buttons and column names, which don't look tappable. *Proposed* 2026-09-27: John picks from 38 mockups ([`013-button-mockups.html`](docs/adr/013-button-mockups.html)), white on black with a punk spirit, among them ten pills and four ways for pill 2 to stay a key to each song's two lines on a phone. The pick becomes the site's button rule
 - [ADR-014](docs/adr/014-first-screenful-first.md): the songlist draws its first screenful of songs straight away, and the rest in pieces of 400, one a frame, when the page opens and after every sort. Only another sort cancels the pieces to come. *Accepted* 2026-09-27 ([#31](https://github.com/Johnesco/karaokeunderground/issues/31)): timed taking turns, the new order shows 2 to 5 times sooner
+- [ADR-015](docs/adr/015-home-page-montage-and-intro.md): the home page brings back the old site's slideshow of 8 photos and its intro, "You've found us", from `pages/home.md`. The logo leads there, and the songlist moves to `/songlist/`, the menu's first link. The slideshow pauses on a button and starts paused for reduced motion. *Accepted* 2026-10-09 ([#36](https://github.com/Johnesco/karaokeunderground/issues/36), [#17](https://github.com/Johnesco/karaokeunderground/issues/17))
 
 ### The diary
 
@@ -265,6 +268,7 @@ This revamp is also a portfolio piece, and the process is half of it. [`docs/dia
 ## Project History
 
 ### Recent Changes
+- **2026-10-09**: The home page is back: the old site's photo slideshow and its intro, from `pages/home.md` (#36, #17): [ADR-015](docs/adr/015-home-page-montage-and-intro.md). The logo leads there, and the songlist moved to `/songlist/`
 - **2026-09-27**: A song the browser hasn't drawn yet counts as tall as a typical row, so every row on screen animates after a sort, and the list's height is close to right before its rows are drawn (#35)
 - **2026-09-27**: The songlist draws its first screenful of songs straight away, and the rest over the next frames, when it opens and after a sort (#31): [ADR-014](docs/adr/014-first-screenful-first.md). A sort shows the new order 2 to 5 times sooner, and an address with a sort draws the list once
 - **2026-09-25**: A private, frozen copy of the site from before WordPress, 2004–2013, is in `snapshots/`, and `npm run dev` shows it at `/old/` (#29): [ADR-011](docs/adr/011-old-site-at-old.md). The contact form got its own ticket (#30)

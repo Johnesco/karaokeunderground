@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""Make the small copies of the photos the Photos page shows (ADR-005, #18).
+"""Make the small copies of the photos the Photos page shows (ADR-005, #18),
+and the home page's slideshow (ADR-015).
 
-For each photo that pages/photos.md lists, it writes images/thumbs/<same
+For each photo that pages/photos.md or pages/home.md lists, it writes images/thumbs/<same
 path>: 480 pixels on its shorter side, turned the right way up, and with no
 metadata, so no camera or location data goes with it. It rewrites every copy
 each time, and the same photo always gives the same bytes. It lists copies
@@ -27,6 +28,7 @@ from PIL import Image, ImageOps
 
 REPO = Path(__file__).resolve().parent.parent
 SHORT_SIDE = 480
+PAGES = ("photos.md", "home.md")
 # The same rule as site/js/photos-page.js: an image alone on its line.
 IMAGE_LINE = re.compile(r"^ {0,3}!\[(?:\\.|[^\]\\])*\]\((?:<([^>]*)>|([^\s)]+))\)[ \t]*\\?[ \t]*$")
 
@@ -40,7 +42,9 @@ def main() -> int:
     thumbs = images / "thumbs"
 
     made, wanted = 0, set()
-    for line in (content / "pages" / "photos.md").read_text(encoding="utf-8").splitlines():
+    lines = [line for page in PAGES if (content / "pages" / page).is_file()
+             for line in (content / "pages" / page).read_text(encoding="utf-8").splitlines()]
+    for line in lines:
         m = IMAGE_LINE.match(line)
         if not m:
             continue
@@ -52,6 +56,8 @@ def main() -> int:
             print(f"skipped {src}: not a photo in images/")
             continue
         rel = original.relative_to(images)
+        if rel.as_posix() in wanted:
+            continue  # on both pages
         wanted.add(rel.as_posix())
         thumb = thumbs / rel
         thumb.parent.mkdir(parents=True, exist_ok=True)
@@ -72,7 +78,7 @@ def main() -> int:
     extra = sorted(f.relative_to(thumbs).as_posix() for f in thumbs.rglob("*") if f.is_file()) if thumbs.exists() else []
     for rel in extra:
         if rel not in wanted:
-            print(f"  images/thumbs/{rel} is a copy of a photo the page no longer shows")
+            print(f"  images/thumbs/{rel} is a copy of a photo the pages no longer show")
     return 0
 
 

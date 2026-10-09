@@ -25,6 +25,22 @@ export function galleryOf(body) {
   return { photos, rest: rest.join('\n') };
 }
 
+/**
+ * Where a photo in a page lives on the site, and the copy to show: its small
+ * copy in images/thumbs/ where there is one, or else the photo itself.
+ *
+ * @param {string} src as written in the Markdown
+ * @param {Set<string>} small the small copies there are, as paths under images/thumbs/
+ * @returns {{ full: string, shown: string } | null} null for an address that isn't safe
+ */
+export function photoUrls(src, small) {
+  const full = safeUrl(sitePath(src, 'pages'));
+  if (full === null) return null;
+  const images = siteUrl('/content/images/');
+  const rel = full.startsWith(images) ? full.slice(images.length) : null;
+  return { full, shown: rel && small.has(rel) ? `${images}thumbs/${rel}` : full };
+}
+
 export function instagramUrl(handle) {
   return `https://www.instagram.com/${encodeURIComponent(handle)}/`;
 }
@@ -43,12 +59,9 @@ export function photosView(doc, thumbs = []) {
       + `<p><a class="button" href="${escapeHtml(instagramUrl(handle))}">Follow on Instagram</a></p>\n</aside>\n`
     : '';
   const items = photos.flatMap(({ alt, src }) => {
-    const full = safeUrl(sitePath(src, 'pages'));
-    if (full === null) return [];
-    const images = siteUrl('/content/images/');
-    const rel = full.startsWith(images) ? full.slice(images.length) : null;
-    const shown = rel && small.has(rel) ? `${images}thumbs/${rel}` : full;
-    return [`<li><a href="${escapeHtml(full)}"><img src="${escapeHtml(shown)}" alt="${escapeHtml(alt)}" loading="lazy"></a></li>\n`];
+    const urls = photoUrls(src, small);
+    if (urls === null) return [];
+    return [`<li><a href="${escapeHtml(urls.full)}"><img src="${escapeHtml(urls.shown)}" alt="${escapeHtml(alt)}" loading="lazy"></a></li>\n`];
   });
   const html = `<h1>${escapeHtml(doc.data.title)}</h1>\n${card}${markdownHtml(rest, 'pages')}`
     + (items.length ? `<ul class="gallery" aria-label="Photos">\n${items.join('')}</ul>\n` : '');

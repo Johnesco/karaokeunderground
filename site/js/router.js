@@ -2,8 +2,8 @@
  * The site's paths (ADR-003, ADR-009), under its base path (ADR-010). Every
  * page has a clean path, and one page shell, index.html, renders them all:
  *
- *   /                 the songlist, which is the home page (ADR-009)
- *   /<name>/          a page, from content/pages/<name>.md, like /about/
+ *   /                 the home page, from content/pages/home.md (ADR-015)
+ *   /<name>/          a page, from content/pages/<name>.md, like /about/ and /songlist/
  *   /posts/           the post archive
  *   /posts/<name>/    a post, from content/posts/<name>.md
  *
@@ -24,8 +24,12 @@ export const BASE = typeof document === 'undefined' ? '/' : new URL('..', import
 /** A path on the site, like "/shows/", as an address under the base: "/karaokeunderground/shows/". */
 export const siteUrl = (path, base = BASE) => `${base}${path.replace(/^\//, '')}`;
 
-// The songlist lives at / (ADR-009). Every other page lives at /<name>/.
-const pagePath = (name) => (name === 'songlist' ? '/' : `/${name}/`);
+// The home page lives at / (ADR-015). Every other page lives at /<name>/.
+const pagePath = (name) => (name === 'home' ? '/' : `/${name}/`);
+
+// The songlist's search, list, tags and sort, in its address. Until ADR-015 the
+// songlist was the home page, so an address at / that carries one is the songlist's.
+const SONGLIST_KEYS = ['q', 'theme', 'tag', 'sort'];
 
 // Pages folded into others when the site regrouped (ADR-009): their old paths land on the page that took them in.
 const MERGED = { calendar: 'shows', contact: 'about', media: 'about' };
@@ -35,9 +39,10 @@ const MERGED = { calendar: 'shows', contact: 'about', media: 'about' };
  *
  * @param {string} pathname location.pathname
  * @param {string} [base] where the site lives
+ * @param {string} [search] location.search, which tells an old songlist address at / from the home page
  * @returns {{ view: 'page' | 'posts' | 'post' | 'missing', name?: string, path?: string }}
  */
-export function route(pathname, base = BASE) {
+export function route(pathname, base = BASE, search = '') {
   let path;
   try {
     path = decodeURIComponent(pathname);
@@ -48,7 +53,11 @@ export function route(pathname, base = BASE) {
   if (!path.startsWith(base)) return { view: 'missing' };
   path = `/${path.slice(base.length)}`;
   const at = (p) => siteUrl(p, base);
-  if (path === '/' || path === '/index.html') return { view: 'page', name: 'songlist', path: at('/') };
+  if (path === '/' || path === '/index.html') {
+    const params = new URLSearchParams(search);
+    if (SONGLIST_KEYS.some((key) => params.has(key))) return { view: 'page', name: 'songlist', path: at('/songlist/') };
+    return { view: 'page', name: 'home', path: at('/') };
+  }
   if (/^\/posts\/?$/.test(path)) return { view: 'posts', path: at('/posts/') };
   let m = new RegExp(`^/posts/(${NAME})/?$`).exec(path);
   if (m) return { view: 'post', name: m[1], path: at(`/posts/${m[1]}/`) };

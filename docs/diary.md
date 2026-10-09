@@ -520,6 +520,20 @@ Two things showed it. The fade after a sort looks for the rows on screen before 
 
 **A check that tapped where nobody can.** On the narrowest phone screen, 320 by 568, the first check said 17 of 22 rows missed the fade. But on a window that short the controls don't stay on screen, so a reader far down the list can't reach the column names. The check had scrolled to the middle of the list and tapped them anyway. Tapped the way a reader would, with the column names on screen, all 9 rows on screen faded in.
 
+### 2026-10-09 · The front door, back
+
+**Decision · Finding** · [#36] · [#17] · [ADR-015](adr/015-home-page-montage-and-intro.md)
+
+Two weeks earlier we made the songlist the home page ([ADR-009](adr/009-songlist-home-four-sections.md)), on the view that fans come for the songs. John reversed half of that. The old WordPress site opened with a slideshow of photos from the shows, then a heading, "You've found us", and two paragraphs on who KU is for: punk and indie fans who "scream, yelp, croon, bark and sometimes even sing". That front door said what the night is before asking anyone to search. So it's back, at `/`. The logo leads there, and the songlist moved to `/songlist/`, the menu's first link.
+
+**The words were never content.** The intro is written into the old theme's template, not WordPress's pages, so the snapshot's clean content didn't have it. It had sat in its own ticket, #17, since the audit. It's now a core file, `pages/home.md`, copied word for word from the old home page, the double hyphen included. Its list of artists still differs from the About page's, as on the old site, and that's a question for the owner.
+
+**The photos were already here.** The old slideshow's 8 photos are the first 8 on the Photos page, which already had small copies and alt text for them. So the home page follows the Photos page's rule: an image alone on its line is a photo in the slideshow. The old slideshow loaded jQuery and two plugins, and the new one is a few dozen lines of our own code and 340 KB of photos. It keeps the old 680 by 300 shape and fades between photos every 5 seconds.
+
+**Movement needs a stop.** The accessibility rules say anything that moves on its own for more than 5 seconds needs a way to pause it, so a Pause button sits in the slideshow's corner and plays it again. If the reader's device asks for less motion, the slideshow starts paused. Screen readers hear only the photo on show, not all 8 at once.
+
+**Old links kept working.** Since ADR-009, the preview's songlist searches had lived at `/`, like `/?theme=sad`. An address at `/` with a songlist search in it now lands on `/songlist/`, search and all. Every link in the posts to the songlist moved with it, because they point at the songlist's file, not its address.
+
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
 [#2]: https://github.com/Johnesco/karaokeunderground/issues/2
 [#3]: https://github.com/Johnesco/karaokeunderground/issues/3
@@ -534,6 +548,7 @@ Two things showed it. The fade after a sort looks for the rows on screen before 
 [#12]: https://github.com/Johnesco/karaokeunderground/issues/12
 [#13]: https://github.com/Johnesco/karaokeunderground/issues/13
 [#14]: https://github.com/Johnesco/karaokeunderground/issues/14
+[#17]: https://github.com/Johnesco/karaokeunderground/issues/17
 [#18]: https://github.com/Johnesco/karaokeunderground/issues/18
 [#19]: https://github.com/Johnesco/karaokeunderground/issues/19
 [#20]: https://github.com/Johnesco/karaokeunderground/issues/20
@@ -549,3 +564,4 @@ Two things showed it. The fade after a sort looks for the rows on screen before 
 [#30]: https://github.com/Johnesco/karaokeunderground/issues/30
 [#31]: https://github.com/Johnesco/karaokeunderground/issues/31
 [#35]: https://github.com/Johnesco/karaokeunderground/issues/35
+[#36]: https://github.com/Johnesco/karaokeunderground/issues/36

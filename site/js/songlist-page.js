@@ -208,7 +208,7 @@ export function songlistView(doc, songs, updated) {
     + '<div class="song-table" data-sort="artist">\n'
     + '<div class="song-controls">\n'
     // The list buttons come first, then tags, then the search box, which narrows whatever list is picked.
-    + `<form class="song-search" role="search" action="${siteUrl('/')}">\n`
+    + `<form class="song-search" role="search" action="${siteUrl('/songlist/')}">\n`
     + (themes.length
       ? '<fieldset class="choices"><legend>Lists</legend>\n'
         + choice('radio', 'theme', '', `All (${count(songs.length)})`, true)
@@ -310,7 +310,7 @@ export function enhanceSonglist(main, songs, themes) {
     for (const tag of state.tags) query.append('tag', tag);
     if (sort !== 'artist') query.set('sort', sort);
     const search = query.toString();
-    window.history.replaceState(null, '', `${siteUrl('/')}${search ? `?${search}` : ''}`);
+    window.history.replaceState(null, '', `${siteUrl('/songlist/')}${search ? `?${search}` : ''}`);
     // While someone types, screen readers hear the count once typing pauses, not on every key.
     // When the page opens, it's right straight away.
     clearTimeout(announce);

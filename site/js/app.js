@@ -9,6 +9,7 @@ import { parseFrontMatter } from './front-matter.js';
 import { pageView, postView, postsView, missingView, errorView } from './views.js';
 import { listSongs, songlistView } from './songlist-page.js';
 import { photosView } from './photos-page.js';
+import { homeView } from './home-page.js';
 
 const SITE = 'Karaoke Underground';
 
@@ -29,6 +30,10 @@ const fetchIndex = async () => JSON.parse(await fetchText(content('index.json'))
 async function load(r) {
   switch (r.view) {
     case 'page':
+      if (r.name === 'home') {
+        const [page, index] = await Promise.all([fetchText(content('pages/home.md')), fetchIndex()]);
+        return homeView(parseFrontMatter(page), index.thumbs ?? []);
+      }
       if (r.name === 'songlist') {
         const [page, csv, index] = await Promise.all([fetchText(content('pages/songlist.md')), fetchText(content('songlist.csv')), fetchIndex()]);
         return songlistView(parseFrontMatter(page), listSongs(csv), index.songlist?.updated ?? null);
@@ -48,11 +53,11 @@ async function load(r) {
 }
 
 async function start() {
-  const r = route(window.location.pathname);
+  const r = route(window.location.pathname, undefined, window.location.search);
   if (r.path && r.path !== window.location.pathname) {
     window.history.replaceState(null, '', r.path + window.location.search + window.location.hash);
   }
-  // The logo and Songlist both lead home, to the songlist (ADR-009), so both are marked there.
+  // The logo leads home (ADR-015), and each menu link to its page: the one here is marked.
   for (const link of document.querySelectorAll('.site-logo, .menu a')) {
     if (link.getAttribute('href') === r.path) link.setAttribute('aria-current', 'page');
   }

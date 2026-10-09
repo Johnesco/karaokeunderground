@@ -576,6 +576,75 @@ main.wide {
   }
 }
 
+/* ---- the home page (#36, ADR-015) ---- */
+
+/* The old site's slideshow: its photos cropped to the same 680 by 300 shape,
+   stacked, with the one on show faded in. */
+.montage {
+  position: relative;
+  max-width: 680px;
+  margin: 0 auto 1.5rem;
+}
+
+.montage-slides {
+  position: relative;
+  aspect-ratio: 680 / 300;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  list-style: none;
+}
+
+main .montage-slide {
+  position: absolute;
+  inset: 0;
+  max-width: none;
+  margin: 0;
+  opacity: 0;
+  transition: opacity 1s ease-in-out;
+}
+
+main .montage-slide.is-shown {
+  opacity: 1;
+}
+
+.montage-slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  main .montage-slide {
+    transition: none;
+  }
+}
+
+/* Pause and Play, in the slideshow's lower right corner, black so it reads on any photo. */
+.montage-toggle {
+  position: absolute;
+  right: 0.5rem;
+  bottom: 0.5rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  padding: 0.4rem 0.8rem;
+  border: 2px solid var(--text);
+  background: var(--bg);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.montage-toggle:hover {
+  text-decoration: underline;
+}
+
+.intro {
+  text-align: center;
+}
+
 /* ---- the Photos page (#18, ADR-005) ---- */
 
 .social-card {

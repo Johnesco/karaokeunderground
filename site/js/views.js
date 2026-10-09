@@ -61,7 +61,7 @@ export function postsView(index) {
 export function missingView() {
   return {
     title: 'Page not found',
-    html: `<h1>Page not found</h1>\n<p>There\u{2019}s no page at this address. Try the <a href="${siteUrl('/')}">songlist</a> or the <a href="${siteUrl('/posts/')}">posts</a>.</p>\n`,
+    html: `<h1>Page not found</h1>\n<p>There\u{2019}s no page at this address. Try the <a href="${siteUrl('/songlist/')}">songlist</a> or the <a href="${siteUrl('/posts/')}">posts</a>.</p>\n`,
   };
 }
 

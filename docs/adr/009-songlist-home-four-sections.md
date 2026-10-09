@@ -1,5 +1,5 @@
 # ADR-009: The songlist is the home page, and the site has four sections
-**Status:** Accepted · **Date:** 2026-09-24 · **Issue(s):** [#25](https://github.com/Johnesco/karaokeunderground/issues/25) · **Supersedes:** [ADR-008](008-posts-from-the-home-page.md)
+**Status:** Accepted, its home page superseded by [ADR-015](015-home-page-montage-and-intro.md) · **Date:** 2026-09-24 · **Issue(s):** [#25](https://github.com/Johnesco/karaokeunderground/issues/25) · **Supersedes:** [ADR-008](008-posts-from-the-home-page.md)
 ## Context
 The posts weigh on the site: 27 of the 46 are notices for past shows, 9 are song lists the songlist now holds, and the newest post that isn't a list is from March 2022. The songlist is what fans come for. Three pages are thin: Contact is 30 words, Media is a press list, and the "shows monthly, book us" paragraph appears on both About and Calendar. ADR-008 made the home page the way to the posts, hours earlier.
 ## Decision
@@ -27,3 +27,4 @@ The router ([`site/js/router.js`](../../site/js/router.js)) sends `/` and `/song
 - The shows (#12) arrive: the next show may belong on the songlist page too.
 - The redirects (#14): the old site's Calendar, Contact and Media pages now point at Shows and About.
 - #17, the old home page's intro, has no separate home page to go on any more.
+- 2026-10-09: [ADR-015](015-home-page-montage-and-intro.md) brought the old home page back, with its photos and intro, and moved the songlist to `/songlist/`. The four sections and the posts archive stand.

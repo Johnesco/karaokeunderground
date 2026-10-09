@@ -14,9 +14,10 @@ Format: see [sdlc-baseline `docs/adrs.md`](https://github.com/Johnesco/sdlc-base
 | [006](006-sort-by-moving-a-column.md) | Sort the songlist by moving a column to the front | Accepted |
 | [007](007-left-menu-in-sprayme.md) | On wide screens, the menu stands in a left column, set in SprayME | Accepted |
 | [008](008-posts-from-the-home-page.md) | Posts are reached from the home page, not the menu | Superseded by 009 |
-| [009](009-songlist-home-four-sections.md) | The songlist is the home page, and the site has four sections | Accepted |
+| [009](009-songlist-home-four-sections.md) | The songlist is the home page, and the site has four sections | Accepted; its home page superseded by 015 |
 | [010](010-preview-on-github-pages.md) | A public preview on GitHub Pages, kept out of search | Accepted |
 | [011](011-old-site-at-old.md) | A private, frozen copy of the pre-2013 site, shown locally at /old/ | Accepted |
 | [012](012-phone-rows-from-boxes.md) | Phone rows built from boxes, so sorting stays quick | Rejected |
 | [013](013-what-a-button-looks-like.md) | What a button looks like, starting with the songlist's lists and column names ([mockups](013-button-mockups.html)) | Proposed |
 | [014](014-first-screenful-first.md) | Draw the first screenful of songs first, and the rest after | Accepted |
+| [015](015-home-page-montage-and-intro.md) | A home page with the old site's photo slideshow and intro, and the songlist at /songlist/ | Accepted |

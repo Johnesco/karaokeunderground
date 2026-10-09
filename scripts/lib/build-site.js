@@ -15,7 +15,7 @@ import { buildIndex } from './content-index.js';
 
 // Old paths from before the site regrouped (ADR-009): each gets a shell too,
 // so it answers as a page while the router sends it on.
-const MOVED = ['songlist', 'calendar', 'contact', 'media'];
+const MOVED = ['calendar', 'contact', 'media'];
 
 const PREVIEW_NOTE = '<p class="preview-note">A prototype preview, not the official site: that\u{2019}s <a href="https://karaokeunderground.com/">karaokeunderground.com</a>.</p>';
 
@@ -55,8 +55,9 @@ export function buildSite({ siteDir, contentDir, outDir, base = '/', preview = f
   const shell = pageShell(fs.readFileSync(shellFile, 'utf8'), { base, preview });
   const addresses = [
     '',
+    'songlist/', // always there, since the build needs songlist.csv
     'posts/',
-    ...index.pages.filter((p) => p.name !== 'songlist').map((p) => `${p.name}/`),
+    ...index.pages.filter((p) => !['home', 'songlist'].includes(p.name)).map((p) => `${p.name}/`),
     ...index.posts.map((p) => `posts/${p.name}/`),
     ...MOVED.map((name) => `${name}/`),
   ];
