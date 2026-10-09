@@ -37,7 +37,24 @@ export function homeView(doc, thumbs = []) {
       + '</div>\n'
     : '';
   // The tab says just the site's name: the home page's heading is a greeting, not a name.
-  return { title: null, enhance: enhanceHome, html: `${montage}<div class="intro">\n<h1>${escapeHtml(doc.data.title)}</h1>\n${markdownHtml(rest, 'pages')}</div>\n` };
+  return { title: null, enhance: enhanceHome, html: `${montage}<div class="intro">\n<h1>${escapeHtml(doc.data.title)}</h1>\n${introHtml(rest)}</div>\n` };
+}
+
+// A link alone on its line, [text](path).
+const LINK_LINE = /^ {0,3}\[(?:\\.|[^\]\\])+\]\((?:<[^>]*>|[^\s)]+)\)[ \t]*$/;
+
+/**
+ * The intro, its first link alone on its line as the big link, to the
+ * songlist, and whatever follows it as the small print under it.
+ */
+function introHtml(markdown) {
+  const lines = markdown.split('\n');
+  const at = lines.findIndex((line) => LINK_LINE.test(line));
+  if (at === -1) return markdownHtml(markdown, 'pages');
+  const after = lines.slice(at + 1).join('\n');
+  return markdownHtml(lines.slice(0, at).join('\n'), 'pages')
+    + `<div class="home-cta">\n${markdownHtml(lines[at], 'pages')}</div>\n`
+    + (after.trim() ? `<div class="home-aside">\n${markdownHtml(after, 'pages')}</div>\n` : '');
 }
 
 /** Starts the slideshow, if there's more than one photo. */

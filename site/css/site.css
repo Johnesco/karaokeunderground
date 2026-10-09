@@ -645,6 +645,32 @@ main .montage-slide.is-shown {
   text-align: center;
 }
 
+/* The big link to the songlist, under the intro. */
+.home-cta {
+  margin: 2rem 0 1rem;
+}
+
+main .home-cta a {
+  display: inline-block;
+  min-height: 2.75rem;
+  padding: 0.75rem 1.5rem;
+  border: 3px solid var(--text);
+  font-size: 1.5rem;
+  font-weight: 700;
+  text-decoration: none;
+  overflow-wrap: normal;
+}
+
+main .home-cta a:hover {
+  text-decoration: underline;
+}
+
+/* The small print under it, like "Request a song". */
+.home-aside {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 /* ---- the Photos page (#18, ADR-005) ---- */
 
 .social-card {

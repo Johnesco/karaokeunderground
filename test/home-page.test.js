@@ -14,7 +14,11 @@ old_url: /
 
 ![Nothing](javascript:alert)
 
-Punk and indie video karaoke. [Request a song!](about.md)
+Punk and indie video karaoke.
+
+[See the full songlist](songlist.md)
+
+Don't see your favorite? [Request a song!](about.md)
 `);
 
 describe('the home page (ADR-015)', () => {
@@ -36,8 +40,14 @@ describe('the home page (ADR-015)', () => {
   it('puts the intro under its heading, and leaves the tab to the site name', () => {
     const view = homeView(doc);
     assert.equal(view.title, null);
-    assert.match(view.html, /<div class="intro">\n<h1>You&#39;ve found us<\/h1>\n<p>Punk and indie video karaoke\. <a href="\/about\/">Request a song!<\/a><\/p>/);
+    assert.match(view.html, /<div class="intro">\n<h1>You&#39;ve found us<\/h1>\n<p>Punk and indie video karaoke\.<\/p>\n/);
     assert.doesNotMatch(view.html, /<p><img/, 'the photos stay out of the intro');
+  });
+
+  it('makes the first link alone on its line the big link, and what follows it the small print', () => {
+    const { html } = homeView(doc);
+    assert.match(html, /<div class="home-cta">\n<p><a href="\/songlist\/">See the full songlist<\/a><\/p>\n<\/div>\n<div class="home-aside">\n<p>Don&#39;t see your favorite\? <a href="\/about\/">Request a song!<\/a><\/p>\n<\/div>/);
+    assert.doesNotMatch(homeView(parseFrontMatter('---\ntitle: Hi\n---\n\nHello, [a link](about.md) in a sentence.\n')).html, /home-cta/);
   });
 
   it('leaves the slideshow out when the page has no photos', () => {

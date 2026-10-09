@@ -532,6 +532,8 @@ Two weeks earlier we made the songlist the home page ([ADR-009](adr/009-songlist
 
 **Movement needs a stop.** The accessibility rules say anything that moves on its own for more than 5 seconds needs a way to pause it, so a Pause button sits in the slideshow's corner and plays it again. If the reader's device asks for less motion, the slideshow starts paused. Screen readers hear only the photo on show, not all 8 at once.
 
+**The songlist, first.** On the old page, "Don't see your favorite? Request a song!" closed the intro, and nothing on it led to the songlist. John moved the request under a big link to the songlist, smaller and in grey, so the first thing to do is find a song and the request is for when that fails. The content can't carry HTML or classes, so the home page has a rule instead: its first link alone on a line is drawn as the big link, and whatever follows is small print.
+
 **Old links kept working.** Since ADR-009, the preview's songlist searches had lived at `/`, like `/?theme=sad`. An address at `/` with a songlist search in it now lands on `/songlist/`, search and all. Every link in the posts to the songlist moved with it, because they point at the songlist's file, not its address.
 
 [#1]: https://github.com/Johnesco/karaokeunderground/issues/1
