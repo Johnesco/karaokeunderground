@@ -4,7 +4,8 @@
  * where each image alone on its line is a photo in the slideshow, as on the
  * Photos page, and the rest is the intro.
  *
- * The slideshow fades to the next photo every few seconds. A button pauses it
+ * The slideshow fades to the next photo every few seconds, panning slowly down
+ * each one, since they're cropped from the top. A button pauses it
  * and plays it again (WCAG 2.2.2), it starts paused when the browser asks for
  * reduced motion, and screen readers hear only the photo on show.
  */
@@ -15,6 +16,9 @@ import { galleryOf, photoUrls } from './photos-page.js';
 
 /** How long each photo shows, in milliseconds. */
 export const INTERVAL = 5000;
+
+/** How long a photo takes to fade out, as in site.css. */
+const FADE = 1000;
 
 /**
  * @param {{ data: object, body: string }} doc pages/home.md
@@ -69,6 +73,10 @@ export function enhanceHome(main) {
   let timer = null;
 
   const next = () => {
+    // The photo going keeps panning while it fades (site.css), then rests.
+    const leaving = slides[at];
+    leaving.classList.add('is-leaving');
+    setTimeout(() => leaving.classList.remove('is-leaving'), FADE);
     slides[at].classList.remove('is-shown');
     slides[at].setAttribute('aria-hidden', 'true');
     at = (at + 1) % slides.length;
@@ -77,11 +85,13 @@ export function enhanceHome(main) {
   };
   const play = () => {
     timer = setInterval(next, INTERVAL);
+    montage.classList.remove('is-paused');
     label.textContent = 'Pause';
   };
   const pause = () => {
     clearInterval(timer);
     timer = null;
+    montage.classList.add('is-paused');
     label.textContent = 'Play';
   };
 

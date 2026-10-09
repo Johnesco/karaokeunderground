@@ -616,9 +616,33 @@ main .montage-slide.is-shown {
   object-position: top; /* keep the singers' heads in the crop */
 }
 
+/* Each photo pans slowly from its top to its bottom while it shows, and on
+   through its fade out: 6s, home-page.js's INTERVAL and the 1s fade. It holds
+   still while the slideshow is paused. */
+@keyframes montage-pan {
+  from {
+    object-position: 50% 0%;
+  }
+  to {
+    object-position: 50% 100%;
+  }
+}
+
+.montage-slide:is(.is-shown, .is-leaving) img {
+  animation: montage-pan 6s ease-in-out forwards;
+}
+
+.montage.is-paused .montage-slide img {
+  animation-play-state: paused;
+}
+
 @media (prefers-reduced-motion: reduce) {
   main .montage-slide {
     transition: none;
+  }
+
+  .montage-slide:is(.is-shown, .is-leaving) img {
+    animation: none;
   }
 }
 
