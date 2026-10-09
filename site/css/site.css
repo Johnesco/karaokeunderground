@@ -613,6 +613,7 @@ main .montage-slide.is-shown {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  object-position: top; /* keep the singers' heads in the crop */
 }
 
 @media (prefers-reduced-motion: reduce) {
